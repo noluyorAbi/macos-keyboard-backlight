@@ -18,6 +18,11 @@
 
 <code>npm i -g macos-keyboard-backlight</code>&nbsp;&nbsp;then&nbsp;&nbsp;<code>kbdlight off</code>
 
+<br>
+<br>
+
+<a href="https://macos-keyboard-backlight.vercel.app?utm_source=readme&utm_medium=header">macos-keyboard-backlight.vercel.app</a>
+
 </div>
 
 <br>
