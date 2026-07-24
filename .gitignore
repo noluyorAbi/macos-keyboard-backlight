@@ -1,3 +1,45 @@
+# ---------------------------------------------------------------- launch tool
+# Local state written by the launch skill. Machine specific, and it can contain
+# paths and identifiers from a local machine that do not belong in a public repo.
+.launch/
+
+# ----------------------------------------------------------------------- node
 node_modules/
-*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tgz
+.npmrc
+.eslintcache
+*.tsbuildinfo
+
+# -------------------------------------------------------------------- secrets
+# Never relax these. A committed .env is the single most common way a key leaks,
+# and rewriting history afterwards does not un-leak it.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+
+# ------------------------------------------------- Remotion video workspace
+# The finished assets in assets/ are committed on purpose; these are the sawdust.
+video/node_modules/
+video/out/
+video/.cache/
+video/*.log
+out/
+
+# -------------------------------------------------------------- landing page
+# The landing page itself is committed. Only its local deploy state is not.
+landing/.vercel/
+.vercel/
+
+# -------------------------------------------------------------- editors, os
 .DS_Store
+Thumbs.db
+.idea/
+*.swp
+*.swo
+*.log

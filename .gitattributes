@@ -1,0 +1,15 @@
+# Normalise line endings so a Windows contributor does not rewrite every file.
+* text=auto eol=lf
+
+# Binary assets: never diffed, never line-ending converted.
+*.png binary
+*.gif binary
+*.mp4 binary
+*.woff2 binary
+
+# Generated or vendored paths excluded from the language statistics, so GitHub
+# reports what this project is actually written in.
+package-lock.json linguist-generated=true
+assets/** linguist-documentation=true
+video/** linguist-vendored=true
+landing/** linguist-documentation=true
