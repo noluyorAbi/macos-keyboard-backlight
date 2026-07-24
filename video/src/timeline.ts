@@ -205,11 +205,43 @@ export const TERMINAL: TerminalTimeline | null =
 export const SCREENS: ScreensTimeline | null =
   content.demo.kind === "screens" ? buildScreens(content.demo) : null;
 
-const BODY_DUR = TERMINAL
-  ? TERMINAL.duration
-  : SCREENS
-    ? SCREENS.duration
-    : 300;
+// ---------------------------------------------------------------------------
+// Scene-local: the keyboard payoff
+// ---------------------------------------------------------------------------
+
+/**
+ * The command the shot actually runs. Two statements on purpose: turning the
+ * sensor off first is the part every new user misses, so the demo teaches it
+ * rather than showing a `kbdlight off` that would drift back up on its own.
+ */
+export const KB_COMMAND = "kbdlight auto off && kbdlight off";
+
+/** Typing starts once the machine has settled, and runs at the house rate. */
+export const KB_TYPE_AT = 22;
+export const KB_TYPE_FRAMES = Math.ceil((KB_COMMAND.length / CPS) * FPS);
+
+/**
+ * A beat between the last keystroke and the light moving. Without it the two
+ * read as one event and the causality is lost, which is the whole point of the
+ * shot: the command did that.
+ */
+const KB_BEAT = 10;
+
+export const KB_SWEEP_AT = KB_TYPE_AT + KB_TYPE_FRAMES + KB_BEAT;
+
+/** How long one key takes to go dark: 11 frames, 367ms. */
+export const KB_SWEEP_KEY_FRAMES = 11;
+
+/** Frames between the first key starting and the last key starting. */
+export const KB_SWEEP_SPREAD = 26;
+
+/** The dark board holds, because holding is what makes the change land. */
+const KB_HOLD = 46;
+
+export const KB_DUR =
+  KB_SWEEP_AT + KB_SWEEP_SPREAD + KB_SWEEP_KEY_FRAMES + KB_HOLD;
+
+const BODY_DUR = KB_DUR;
 
 /** The body starts while the cold open is still fading out. */
 export const BODY_AT = 120;

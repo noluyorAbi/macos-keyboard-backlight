@@ -52,8 +52,8 @@
       "width": 1920,
       "height": 1080
     },
-    "alt": "The kbdlight command printing its full help output in a terminal",
-    "caption": "Real captured output, not a mockup. Recorded at 1920 by 1080."
+    "alt": "A lit MacBook keyboard seen from above. The command kbdlight auto off && kbdlight off runs, and the backlight drains away key by key.",
+    "caption": "The command is real and does exactly this. The MacBook is an illustration: the backlight is hardware, so no screen recording can show it."
   },
   "why": {
     "heading": "Why this exists",

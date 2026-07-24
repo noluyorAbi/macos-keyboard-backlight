@@ -4,8 +4,7 @@ import { AbsoluteFill, Sequence } from "remotion";
 import { withAlpha } from "./color";
 import { ColdOpen } from "./scenes/ColdOpen";
 import { EndCard } from "./scenes/EndCard";
-import { ScreensScene } from "./scenes/ScreensScene";
-import { TerminalScene } from "./scenes/TerminalScene";
+import { KeyboardScene } from "./scenes/KeyboardScene";
 import { accent, claude } from "./theme";
 import {
   BODY_AT,
@@ -13,7 +12,6 @@ import {
   COLD_OPEN_DUR,
   END_CARD_AT,
   END_CARD_DUR,
-  TERMINAL,
 } from "./timeline";
 
 /**
@@ -42,7 +40,7 @@ export const Demo: FC = () => (
     </Sequence>
 
     <Sequence from={BODY_AT} durationInFrames={BODY_DURATION}>
-      {TERMINAL ? <TerminalScene /> : <ScreensScene />}
+      <KeyboardScene />
     </Sequence>
 
     <Sequence from={END_CARD_AT} durationInFrames={END_CARD_DUR}>

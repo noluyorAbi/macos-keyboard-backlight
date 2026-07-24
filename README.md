@@ -45,10 +45,10 @@ kbdlight off
 <div align="center">
 
 <a href="https://github.com/noluyorAbi/macos-keyboard-backlight/blob/main/assets/demo.mp4">
-  <img src="https://raw.githubusercontent.com/noluyorAbi/macos-keyboard-backlight/main/assets/demo.gif" width="100%" alt="kbdlight running in a terminal">
+  <img src="https://raw.githubusercontent.com/noluyorAbi/macos-keyboard-backlight/main/assets/demo.gif" width="100%" alt="A lit MacBook keyboard seen from above. The command kbdlight auto off and kbdlight off runs, and the backlight drains away key by key.">
 </a>
 
-<sub><a href="https://github.com/noluyorAbi/macos-keyboard-backlight/blob/main/assets/demo.mp4">Full quality recording</a></sub>
+<sub>The command is real. The MacBook is an illustration: the backlight is hardware, so no screen recording can show it. <a href="https://github.com/noluyorAbi/macos-keyboard-backlight/blob/main/assets/demo.mp4">Full quality version</a></sub>
 
 </div>
 
