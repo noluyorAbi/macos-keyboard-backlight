@@ -31,6 +31,32 @@ export const keyboardSize = (unit: number): { w: number; h: number } => {
   return { w: width, h: height };
 };
 
+/**
+ * The largest key unit whose key well still fits inside `width` by `height`.
+ *
+ * Measured, not derived from restated constants. An earlier version of the
+ * stills solved this from its own copy of the row count and the gap and row
+ * height ratios, which meant adding a keyboard row or retuning `gapFor` would
+ * silently mis-size the banner and the social card while the video stayed
+ * correct. Measuring at a reference unit and scaling cannot drift, because it
+ * goes through the same `placeKeys` the real board uses.
+ *
+ * The reference is deliberately large: `gapFor` and `rowHFor` round to whole
+ * pixels, so measuring at unit 1 would quantise the ratios into uselessness.
+ */
+const FIT_REF = 1000;
+
+export const fitUnit = (
+  width: number,
+  height: number,
+  maxUnit: number,
+): number => {
+  const ref = keyboardSize(FIT_REF);
+  const byWidth = (width / ref.w) * FIT_REF;
+  const byHeight = (height / ref.h) * FIT_REF;
+  return Math.max(1, Math.floor(Math.min(byWidth, byHeight, maxUnit)));
+};
+
 const Key: FC<{ k: PlacedKey; lit: number; unit: number }> = ({
   k,
   lit,

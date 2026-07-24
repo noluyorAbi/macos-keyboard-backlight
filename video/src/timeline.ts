@@ -199,6 +199,16 @@ const buildScreens = (demo: ScreensDemo): ScreensTimeline => {
 // The composition
 // ---------------------------------------------------------------------------
 
+/**
+ * Retained template surface, with no consumer in this project.
+ *
+ * `Demo.tsx` renders the keyboard scene unconditionally, so neither of these
+ * selects the body any more and `BODY_DUR` below comes from `KB_DUR` instead.
+ * They are still built here so the template's terminal and screenshot modes
+ * stay restorable in one move, and so a malformed `content.demo` still fails
+ * loudly rather than rotting unnoticed. See "This copy deviates from the
+ * template" in README.md before deleting either.
+ */
 export const TERMINAL: TerminalTimeline | null =
   content.demo.kind === "terminal" ? buildTerminal(content.demo) : null;
 

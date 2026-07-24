@@ -39,6 +39,16 @@ export const Demo: FC = () => (
       <ColdOpen />
     </Sequence>
 
+    {/*
+      Project-specific override of the template.
+
+      Upstream this line is `{TERMINAL ? <TerminalScene /> : <ScreensScene />}`,
+      selected by `content.demo.kind`. Here the body is always the keyboard
+      shot, so `content.demo` no longer selects anything: editing it changes
+      nothing in the video. That is deliberate and it is written up under
+      "This copy deviates from the template" in README.md. Everything else in
+      content.ts still drives the render.
+    */}
     <Sequence from={BODY_AT} durationInFrames={BODY_DURATION}>
       <KeyboardScene />
     </Sequence>

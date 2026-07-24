@@ -1,7 +1,7 @@
 import type { FC } from "react";
 
 import { withAlpha } from "../color";
-import { KeyWell, LIGHT } from "./Keyboard";
+import { fitUnit, KeyWell, LIGHT } from "./Keyboard";
 
 /**
  * The product, as proof, on a still: a lit keyboard, fitted to a box.
@@ -19,23 +19,16 @@ import { KeyWell, LIGHT } from "./Keyboard";
  * would eat most of the box for a trackpad nobody needs to see.
  */
 
-/**
- * Width and height of the key well in multiples of one key unit, derived from
- * the layout (15 units across, 6 rows down, plus the gaps). Used to solve for
- * the largest unit that fits a given box.
- */
-const W_IN_UNITS = 15 + 14 * 0.12;
-const H_IN_UNITS = 6 * 0.92 + 5 * 0.12;
-
 export const KeyboardProof: FC<{
   width: number;
   height: number;
   /** Ceiling on the key size, so a wide card does not get an absurd keyboard. */
   maxUnit?: number;
 }> = ({ width, height, maxUnit = 64 }) => {
-  const unit = Math.floor(
-    Math.min(width / W_IN_UNITS, height / H_IN_UNITS, maxUnit),
-  );
+  // Measured through the same placeKeys the video uses. Never restate the row
+  // count or the gap and row height ratios here: a second copy of those numbers
+  // mis-sizes only the stills, and nothing would catch it but a human eye.
+  const unit = fitUnit(width, height, maxUnit);
 
   return (
     <div

@@ -112,6 +112,12 @@ jobs:
           done < /tmp/readme-assets.txt
           exit "$missing"
 
+      # The landing page generator must stay a pure function of content.json,
+      # otherwise its own --check gate reports the tree stale every day and gets
+      # ignored. This is the only thing that verifies that property.
+      - name: Landing generator is deterministic and in sync
+        run: node landing/test-sync.mjs
+
       - name: Packed tarball contains no surprises
         run: |
           set -eu
