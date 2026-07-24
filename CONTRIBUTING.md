@@ -16,7 +16,7 @@ Typo fixes, documentation and test improvements need no issue. Just send them.
 - macOS, Apple Silicon or Intel. The package cannot be meaningfully tested
   anywhere else: the smoke test skips itself on other platforms, so a green run
   on Linux proves nothing.
-- Node.js 16 or newer.
+- Node.js 18 or newer.
 - A Mac with a backlit keyboard, for the same reason.
 
 ## Setup
