@@ -1,0 +1,53 @@
+{
+  "name": "macos-keyboard-backlight",
+  "version": "1.0.0",
+  "description": "Control the MacBook keyboard backlight from the command line or Node - get/set brightness and toggle ambient auto-brightness. No native build step.",
+  "keywords": [
+    "macos",
+    "mac",
+    "macbook",
+    "osx",
+    "darwin",
+    "keyboard",
+    "backlight",
+    "keyboard-backlight",
+    "brightness",
+    "kbdlight",
+    "cli",
+    "corebrightness",
+    "apple-silicon"
+  ],
+  "license": "MIT",
+  "author": "noluyorAbi",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noluyorAbi/macos-keyboard-backlight.git"
+  },
+  "bugs": {
+    "url": "https://github.com/noluyorAbi/macos-keyboard-backlight/issues"
+  },
+  "homepage": "https://github.com/noluyorAbi/macos-keyboard-backlight#readme",
+  "type": "commonjs",
+  "main": "src/index.js",
+  "bin": {
+    "kbdlight": "bin/kbdlight.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "os": [
+    "darwin"
+  ],
+  "dependencies": {
+    "koffi": "^2.16.3"
+  },
+  "scripts": {
+    "test": "node test/smoke.js"
+  }
+}
