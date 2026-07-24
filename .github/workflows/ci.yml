@@ -77,7 +77,7 @@ jobs:
       - name: No em dashes or en dashes
         run: |
           set -eu
-          if git grep -n -P '\xe2\x80\x94|\xe2\x80\x93' -- . > /tmp/dashes.txt; then
+          if git grep -I -n -P '\xe2\x80\x94|\xe2\x80\x93' -- . > /tmp/dashes.txt; then
             echo "Em dashes or en dashes found. Use a comma, semicolon, colon, period or parentheses:" >&2
             cat /tmp/dashes.txt >&2
             exit 1
@@ -86,7 +86,7 @@ jobs:
       - name: No emoji
         run: |
           set -eu
-          if git grep -n -P '[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}]' -- . > /tmp/emoji.txt; then
+          if git grep -I -n -P '[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}]' -- . > /tmp/emoji.txt; then
             echo "Emoji found. This project does not use them:" >&2
             cat /tmp/emoji.txt >&2
             exit 1
