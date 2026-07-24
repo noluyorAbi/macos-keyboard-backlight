@@ -13,11 +13,19 @@
 set -eu
 
 GIF="../assets/demo.gif"
+TMP="$GIF.tmp"
 
 if ! command -v gifsicle >/dev/null 2>&1; then
   echo "gifsicle not found, shipping the unoptimised GIF (brew install gifsicle)"
   exit 0
 fi
 
-gifsicle -O3 --colors 128 --lossy=30 "$GIF" -o "$GIF.tmp"
-mv "$GIF.tmp" "$GIF"
+# The temp file lives inside the tracked assets/ directory, so a failed run must
+# not leave it there: it would sit next to the committed assets waiting to be
+# picked up by a careless `git add assets`. The trap fires on success, on
+# failure and on interrupt; `mv` has already consumed the file by then in the
+# success case, which is why `rm -f` rather than `rm`.
+trap 'rm -f "$TMP"' EXIT INT TERM
+
+gifsicle -O3 --colors 128 --lossy=30 "$GIF" -o "$TMP"
+mv "$TMP" "$GIF"
