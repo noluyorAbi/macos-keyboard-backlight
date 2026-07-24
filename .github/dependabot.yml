@@ -1,0 +1,28 @@
+version: 2
+updates:
+  # One runtime dependency, so a monthly cadence is plenty and keeps the noise
+  # low enough that the pull requests still get read.
+  #
+  # The cooldown is the point: a compromised package is usually caught and
+  # unpublished within a few days, so waiting before opening the bump pull
+  # request means the attack window has closed before the update is offered.
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      include: scope
+
+  # Actions are pinned by commit sha; this is what keeps those pins current.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "chore"

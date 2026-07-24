@@ -1,0 +1,79 @@
+# Publish to npm on a version tag, using npm trusted publishing.
+#
+# There is no NPM_TOKEN here on purpose. Trusted publishing exchanges a short
+# lived GitHub OIDC token for the right to publish this one package, so there is
+# no long lived secret to leak, rotate or forget to revoke. It also produces a
+# provenance attestation: npmjs.com then shows which repository, which commit and
+# which workflow built the tarball.
+#
+# ONE TIME SETUP ON NPMJS.COM, BEFORE THE FIRST TAG:
+#   1. The package must already exist. Trusted publishing cannot create a brand
+#      new name, so version 1.0.0 is published once by hand, then never again.
+#   2. Package, Settings, Trusted Publisher, GitHub Actions, filled in exactly:
+#         Organization or user:  noluyorAbi
+#         Repository:            macos-keyboard-backlight
+#         Workflow filename:     npm-publish.yml
+#         Environment:           leave empty
+#      The workflow filename must match this file character for character.
+#   3. Still in Settings, require two-factor or automation tokens, so a stolen
+#      password alone cannot publish.
+name: npm-publish
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    # Tests run on macOS for the same reason as in ci.yml: this package does
+    # nothing meaningful on another platform.
+    runs-on: macos-latest
+    permissions:
+      # id-token: write lets the runner mint the OIDC token npm exchanges.
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # This job never pushes. Leaving the token in .git/config would let any
+          # later step, including a compromised dependency, use it.
+          persist-credentials: false
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+
+      # Trusted publishing needs npm 11.5.1 or newer, which is newer than the
+      # npm bundled with the Node images. Pinned to a major rather than @latest:
+      # this step runs with id-token: write, so an unpinned global install is a
+      # supply chain hole in the one job that can publish.
+      - name: Use a recent npm
+        run: npm install -g npm@11
+
+      - name: Install
+        run: npm ci
+
+      # Refuse to publish a tag that disagrees with package.json. A version
+      # published under the wrong number cannot be unpublished after 72 hours.
+      - name: Tag matches package.json
+        run: |
+          set -eu
+          tag="${GITHUB_REF_NAME#v}"
+          pkg="$(node -p "require('./package.json').version")"
+          if [ "$tag" != "$pkg" ]; then
+            echo "tag $GITHUB_REF_NAME does not match package.json version $pkg" >&2
+            exit 1
+          fi
+
+      - name: Test
+        run: npm test
+
+      # Print the tarball contents into the log. This is the last chance to
+      # notice that something unintended is about to be published.
+      - name: Pack, list the tarball contents
+        run: npm pack --dry-run
+
+      - name: Publish with provenance
+        run: npm publish --provenance --access public
