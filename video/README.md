@@ -43,9 +43,12 @@ One optional native tool:
 brew install gifsicle   # optional, shrinks the GIF from ~3.3 MB to ~1.0 MB
 ```
 
-`render:gif` pipes the finished GIF through `gifsicle` at 128 colours and
-`--lossy=30`. Without it the render still succeeds and the build still exits
-zero; it prints a one line notice and ships the unoptimised GIF instead. The
+`render:gif` pipes the finished GIF through `optimize-gif.sh`, which runs
+`gifsicle` at 128 colours and `--lossy=30`. If gifsicle is not installed the
+script prints a notice and exits zero, shipping the unoptimised GIF. If it is
+installed and then fails, the build fails: only absence is tolerated, never an
+error. The optimisation writes to a temp file and only replaces the original on
+success, so an aborted run cannot leave a half written GIF behind. The
 glow gradients in this particular video dither badly, which is why the step
 exists at all. 64 colours was tried and rejected: it shreds the glow into bands.
 
