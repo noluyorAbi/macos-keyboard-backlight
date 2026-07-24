@@ -23,16 +23,24 @@ import { COLD_OPEN_DUR, COLD_OPEN_LINES } from "../timeline";
  * under about 42 characters to get the full 54px.
  */
 const longest = COLD_OPEN_LINES.reduce((n, l) => Math.max(n, l.length), 1);
-const FONT_SIZE = Math.max(26, Math.min(54, Math.floor(1500 / (longest * 0.6))));
+const FONT_SIZE = Math.max(
+  26,
+  Math.min(54, Math.floor(1500 / (longest * 0.6))),
+);
 
 export const ColdOpen: FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const leave = interpolate(frame, [COLD_OPEN_DUR - 20, COLD_OPEN_DUR], [1, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  const leave = interpolate(
+    frame,
+    [COLD_OPEN_DUR - 20, COLD_OPEN_DUR],
+    [1, 0],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    },
+  );
 
   return (
     <AbsoluteFill
@@ -42,7 +50,13 @@ export const ColdOpen: FC = () => {
         opacity: leave,
       }}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: FONT_SIZE * 0.26 }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: FONT_SIZE * 0.26,
+        }}
+      >
         {COLD_OPEN_LINES.map((line, i) => {
           const start = 10 + i * 20;
           const t = interpolate(frame, [start, start + 12], [0, 1], {

@@ -6,7 +6,8 @@
  * here would risk an import cycle.
  */
 
-const clamp255 = (n: number): number => Math.max(0, Math.min(255, Math.round(n)));
+const clamp255 = (n: number): number =>
+  Math.max(0, Math.min(255, Math.round(n)));
 
 /** "#rgb" or "#rrggbb" to [r, g, b]. Anything unparseable falls back to black. */
 export const toRgb = (hex: string): [number, number, number] => {

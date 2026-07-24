@@ -56,11 +56,16 @@ const scrollOffset = (sceneFrame: number): number => {
   if (from === to) {
     return to;
   }
-  const t = interpolate(sceneFrame, [lines[k].from, lines[k].from + 10], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.bezier(...easing.out),
-  });
+  const t = interpolate(
+    sceneFrame,
+    [lines[k].from, lines[k].from + 10],
+    [0, 1],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+      easing: Easing.bezier(...easing.out),
+    },
+  );
   return interpolate(t, [0, 1], [from, to]);
 };
 
@@ -73,11 +78,16 @@ export const TerminalScene: FC = () => {
   }
 
   // window enters: opacity plus an 8px lift, 10 frames (333ms), ease-out
-  const enter = interpolate(sceneFrame, [timeline.windowIn, timeline.windowIn + 10], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.bezier(...easing.out),
-  });
+  const enter = interpolate(
+    sceneFrame,
+    [timeline.windowIn, timeline.windowIn + 10],
+    [0, 1],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+      easing: Easing.bezier(...easing.out),
+    },
+  );
   // the exit is plainer than the entrance on purpose: attention is already
   // moving on to the end card, so it fades without moving
   const leave = interpolate(
@@ -117,7 +127,8 @@ export const TerminalScene: FC = () => {
             overflow: "hidden",
             background: claude.bg,
             maskImage: "linear-gradient(to bottom, transparent 0, #000 20px)",
-            WebkitMaskImage: "linear-gradient(to bottom, transparent 0, #000 20px)",
+            WebkitMaskImage:
+              "linear-gradient(to bottom, transparent 0, #000 20px)",
           }}
         >
           <div style={{ transform: `translateY(${-scroll}px)` }}>

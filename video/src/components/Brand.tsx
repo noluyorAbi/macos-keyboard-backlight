@@ -34,7 +34,15 @@ export const Tagline: FC<{ size: number; color?: string }> = ({
   size,
   color = claude.dim,
 }) => (
-  <div style={{ ...mono, fontSize: size, color, lineHeight: 1.35, whiteSpace: "pre-wrap" }}>
+  <div
+    style={{
+      ...mono,
+      fontSize: size,
+      color,
+      lineHeight: 1.35,
+      whiteSpace: "pre-wrap",
+    }}
+  >
     {content.tagline}
   </div>
 );
@@ -61,7 +69,9 @@ export const InstallPill: FC<{ size: number; padding?: string }> = ({
 );
 
 export const RepoLine: FC<{ size: number }> = ({ size }) => (
-  <div style={{ ...mono, fontSize: size, color: ansi.mut }}>{content.repoUrl}</div>
+  <div style={{ ...mono, fontSize: size, color: ansi.mut }}>
+    {content.repoUrl}
+  </div>
 );
 
 /** Two to four short claims, separated by accented middots. */
@@ -71,7 +81,9 @@ export const Highlights: FC<{ size: number }> = ({ size }) => {
     return null;
   }
   return (
-    <div style={{ ...mono, fontSize: size, color: ansi.mut, letterSpacing: 0.3 }}>
+    <div
+      style={{ ...mono, fontSize: size, color: ansi.mut, letterSpacing: 0.3 }}
+    >
       {items.map((item, i) => (
         <span key={item}>
           {i > 0 ? <span style={{ color: claude.clay }}> · </span> : null}

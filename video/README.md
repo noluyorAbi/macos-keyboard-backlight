@@ -3,12 +3,12 @@
 Remotion source for this project's launch assets. Rendering it produces the four
 files the top level README and GitHub use:
 
-| Artifact                    | Size             | Notes                              |
-| --------------------------- | ---------------- | ---------------------------------- |
-| `../assets/demo.mp4`        | 1920x1080, 30fps | h264, linked from the README       |
-| `../assets/demo.gif`        | 960x540, 15fps   | embedded inline in the README      |
-| `../assets/banner.png`      | 1584x396         | README hero                        |
-| `../assets/social-card.png` | 1280x640         | GitHub social preview              |
+| Artifact                    | Size             | Notes                         |
+| --------------------------- | ---------------- | ----------------------------- |
+| `../assets/demo.mp4`        | 1920x1080, 30fps | h264, linked from the README  |
+| `../assets/demo.gif`        | 960x540, 15fps   | embedded inline in the README |
+| `../assets/banner.png`      | 1584x396         | README hero                   |
+| `../assets/social-card.png` | 1280x640         | GitHub social preview         |
 
 Everything the assets say about the project lives in `src/content.ts`. That is
 the only file to edit. The contract for it is in `TEMPLATE.md`.

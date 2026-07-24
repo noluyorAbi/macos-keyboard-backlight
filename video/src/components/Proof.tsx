@@ -87,7 +87,8 @@ export const Proof: FC<{
       <div
         style={{
           maskImage: "linear-gradient(to right, #000 92%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to right, #000 92%, transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to right, #000 92%, transparent 100%)",
         }}
       >
         <div

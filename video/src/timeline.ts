@@ -205,7 +205,11 @@ export const TERMINAL: TerminalTimeline | null =
 export const SCREENS: ScreensTimeline | null =
   content.demo.kind === "screens" ? buildScreens(content.demo) : null;
 
-const BODY_DUR = TERMINAL ? TERMINAL.duration : SCREENS ? SCREENS.duration : 300;
+const BODY_DUR = TERMINAL
+  ? TERMINAL.duration
+  : SCREENS
+    ? SCREENS.duration
+    : 300;
 
 /** The body starts while the cold open is still fading out. */
 export const BODY_AT = 120;

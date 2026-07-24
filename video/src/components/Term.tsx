@@ -69,7 +69,10 @@ export const SpanRun: FC<{ spans: Span[]; size?: number }> = ({
         ) : null;
       }
       return (
-        <span key={i} style={{ color: s.color, fontWeight: s.bold ? 700 : 400 }}>
+        <span
+          key={i}
+          style={{ color: s.color, fontWeight: s.bold ? 700 : 400 }}
+        >
           {s.text}
         </span>
       );

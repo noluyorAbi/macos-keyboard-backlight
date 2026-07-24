@@ -39,11 +39,16 @@ export const ScreensScene: FC = () => {
     return null;
   }
 
-  const enter = interpolate(sceneFrame, [timeline.windowIn, timeline.windowIn + 10], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.bezier(...easing.out),
-  });
+  const enter = interpolate(
+    sceneFrame,
+    [timeline.windowIn, timeline.windowIn + 10],
+    [0, 1],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+      easing: Easing.bezier(...easing.out),
+    },
+  );
   const leave = interpolate(
     sceneFrame,
     [timeline.duration - 16, timeline.duration],
@@ -87,10 +92,15 @@ export const ScreensScene: FC = () => {
               },
             );
             const outT = next
-              ? interpolate(sceneFrame, [next.from, next.from + SHOT_FADE], [1, 0], {
-                  extrapolateLeft: "clamp",
-                  extrapolateRight: "clamp",
-                })
+              ? interpolate(
+                  sceneFrame,
+                  [next.from, next.from + SHOT_FADE],
+                  [1, 0],
+                  {
+                    extrapolateLeft: "clamp",
+                    extrapolateRight: "clamp",
+                  },
+                )
               : 1;
             const opacity = inT * outT;
             if (opacity <= 0) {

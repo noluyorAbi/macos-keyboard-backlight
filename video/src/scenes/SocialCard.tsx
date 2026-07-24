@@ -46,7 +46,13 @@ export const SocialCard: FC = () => (
         <Tagline size={26} />
       </div>
 
-      <Proof width={INNER_W} height={268} rows={6} maxFont={21} titlebarH={40} />
+      <Proof
+        width={INNER_W}
+        height={268}
+        rows={6}
+        maxFont={21}
+        titlebarH={40}
+      />
 
       <div
         style={{
