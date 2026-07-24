@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { AbsoluteFill } from "remotion";
 
 import { InstallPill, Mark, RepoLine, Tagline } from "../components/Brand";
-import { Proof } from "../components/Proof";
+import { KeyboardProof } from "../components/KeyboardProof";
 import { withAlpha } from "../color";
 import { content } from "../content";
 import { accent, claude } from "../theme";
@@ -46,13 +46,7 @@ export const SocialCard: FC = () => (
         <Tagline size={26} />
       </div>
 
-      <Proof
-        width={INNER_W}
-        height={268}
-        rows={6}
-        maxFont={21}
-        titlebarH={40}
-      />
+      <KeyboardProof width={INNER_W} height={268} />
 
       <div
         style={{

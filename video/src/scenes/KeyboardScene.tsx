@@ -1,14 +1,9 @@
 import type { FC } from "react";
-import {
-  AbsoluteFill,
-  Easing,
-  interpolate,
-  useCurrentFrame,
-} from "remotion";
+import { AbsoluteFill, Easing, interpolate, useCurrentFrame } from "remotion";
 
+import { MacBook } from "../components/Keyboard";
 import { MONO } from "../font";
-import { placeKeys, type PlacedKey } from "../keyboard-layout";
-import { withAlpha } from "../color";
+import type { PlacedKey } from "../keyboard-layout";
 import { accent, claude, easing } from "../theme";
 import {
   KB_COMMAND,
@@ -28,8 +23,8 @@ import {
  *
  * The command is real and does exactly what it says. The MacBook is an
  * illustration, not a screen recording, because the thing this tool changes is
- * hardware that no screen capture can show. The caption on the landing page
- * says so. Drawing the effect is fair; implying it was filmed would not be.
+ * hardware that no screen capture can show. The README and the landing caption
+ * both say so. Drawing the effect is fair; implying it was filmed would not be.
  *
  * MOTION BRIEF
  *
@@ -57,20 +52,6 @@ import {
  */
 
 const UNIT = 74;
-const GAP = 9;
-const ROW_H = 68;
-
-const { keys, width: KB_W, height: KB_H } = placeKeys(UNIT, GAP, ROW_H);
-
-/** Aluminium body around the key well. */
-const BODY_PAD_X = 96;
-const BODY_PAD_TOP = 78;
-const TRACKPAD_H = 232;
-const BODY_W = KB_W + BODY_PAD_X * 2;
-const BODY_H = KB_H + BODY_PAD_TOP + TRACKPAD_H + 74;
-
-/** Warm white, the colour a real backlight actually is. */
-const LIGHT = "#ffdfb8";
 
 /**
  * How lit one key is at this frame, 0 to 1.
@@ -87,52 +68,6 @@ const keyLight = (key: PlacedKey, frame: number): number => {
     easing: Easing.bezier(...easing.out),
   });
 };
-
-const Key: FC<{ k: PlacedKey; lit: number }> = ({ k, lit }) => (
-  <div
-    style={{
-      position: "absolute",
-      left: k.x,
-      top: k.y,
-      width: k.w,
-      height: k.h,
-      borderRadius: 9,
-      background: "#141412",
-      border: `1px solid ${withAlpha(LIGHT, 0.06 + lit * 0.22)}`,
-      boxShadow: `0 0 ${10 + lit * 26}px ${withAlpha(LIGHT, lit * 0.4)}, inset 0 1px 0 ${withAlpha(LIGHT, lit * 0.3)}`,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      overflow: "hidden",
-    }}
-  >
-    {/* the light bleeding out from under the cap, which is what a backlight
-        actually looks like from above: brightest at the edges of the legend */}
-    <div
-      style={{
-        position: "absolute",
-        inset: 0,
-        background: `radial-gradient(120% 140% at 50% 115%, ${withAlpha(LIGHT, 0.5)}, ${withAlpha(LIGHT, 0)} 72%)`,
-        opacity: lit,
-      }}
-    />
-    {k.label ? (
-      <span
-        style={{
-          position: "relative",
-          fontFamily: MONO,
-          fontSize: k.small ? 15 : 20,
-          letterSpacing: k.small ? 0.2 : 0.6,
-          // The legend is the light source: unlit it is nearly invisible,
-          // exactly like the real thing in a dark room.
-          color: withAlpha(LIGHT, 0.1 + lit * 0.85),
-        }}
-      >
-        {k.label}
-      </span>
-    ) : null}
-  </div>
-);
 
 export const KeyboardScene: FC = () => {
   const frame = useCurrentFrame();
@@ -151,18 +86,22 @@ export const KeyboardScene: FC = () => {
   });
 
   const typed = Math.floor(
-    interpolate(frame, [KB_TYPE_AT, KB_TYPE_AT + KB_TYPE_FRAMES], [0, KB_COMMAND.length], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-      // Linear, never eased: eased typing accelerates into the middle of a word
-      // and reads as an animation. A human types at a steady rate.
-    }),
+    interpolate(
+      frame,
+      [KB_TYPE_AT, KB_TYPE_AT + KB_TYPE_FRAMES],
+      [0, KB_COMMAND.length],
+      {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+        // Linear, never eased: eased typing accelerates into the middle of a
+        // word and reads as an animation. A human types at a steady rate.
+      },
+    ),
   );
   const doneTyping = typed >= KB_COMMAND.length;
 
-  // The ambient pool the keyboard throws onto the aluminium around it. It
-  // follows the darkest key rather than leading it, so the room goes dark a
-  // beat after the board does.
+  // The ambient pool follows the darkest key rather than leading it, so the
+  // room goes dark a beat after the board does.
   const pool = interpolate(
     frame,
     [KB_SWEEP_AT, KB_SWEEP_AT + KB_SWEEP_SPREAD + KB_SWEEP_KEY_FRAMES + 8],
@@ -184,7 +123,14 @@ export const KeyboardScene: FC = () => {
         filter: `blur(${(1 - enter) * 8}px)`,
       }}
     >
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 44 }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 44,
+        }}
+      >
         {/* the command, in the same chrome language as the rest of the video */}
         <div
           style={{
@@ -219,62 +165,7 @@ export const KeyboardScene: FC = () => {
           </span>
         </div>
 
-        {/* the machine */}
-        <div
-          style={{
-            position: "relative",
-            width: BODY_W,
-            height: BODY_H,
-            borderRadius: 40,
-            background: "linear-gradient(180deg, #2a2a28 0%, #201f1e 40%, #1a1a19 100%)",
-            border: `1px solid ${claude.border}`,
-            boxShadow: `0 40px 120px rgba(0,0,0,0.55)`,
-          }}
-        >
-          {/* light spilling onto the body around the keys */}
-          <div
-            style={{
-              position: "absolute",
-              left: BODY_PAD_X - 46,
-              top: BODY_PAD_TOP - 40,
-              width: KB_W + 92,
-              height: KB_H + 80,
-              borderRadius: 40,
-              background: `radial-gradient(70% 80% at 50% 45%, ${withAlpha(LIGHT, 0.16)}, ${withAlpha(LIGHT, 0)} 70%)`,
-              opacity: pool,
-            }}
-          />
-
-          {/* the key well */}
-          <div
-            style={{
-              position: "absolute",
-              left: BODY_PAD_X,
-              top: BODY_PAD_TOP,
-              width: KB_W,
-              height: KB_H,
-            }}
-          >
-            {keys.map((k) => (
-              <Key key={k.id} k={k} lit={keyLight(k, frame)} />
-            ))}
-          </div>
-
-          {/* trackpad, present so the object reads as a MacBook and not as a
-              standalone keyboard. Deliberately inert: it never lights. */}
-          <div
-            style={{
-              position: "absolute",
-              left: (BODY_W - 560) / 2,
-              top: BODY_PAD_TOP + KB_H + 44,
-              width: 560,
-              height: TRACKPAD_H - 60,
-              borderRadius: 16,
-              background: "#161615",
-              border: `1px solid ${withAlpha(LIGHT, 0.05)}`,
-            }}
-          />
-        </div>
+        <MacBook unit={UNIT} lit={(k) => keyLight(k, frame)} pool={pool} />
       </div>
     </AbsoluteFill>
   );

@@ -2,7 +2,7 @@ import type { FC } from "react";
 import { AbsoluteFill } from "remotion";
 
 import { Highlights, InstallPill, Mark, Tagline } from "../components/Brand";
-import { Proof } from "../components/Proof";
+import { KeyboardProof } from "../components/KeyboardProof";
 import { withAlpha } from "../color";
 import { content } from "../content";
 import { accent, claude } from "../theme";
@@ -64,12 +64,9 @@ export const Banner: FC = () => (
       </div>
 
       <div style={{ flex: 1, display: "flex", justifyContent: "flex-end" }}>
-        <Proof
+        <KeyboardProof
           width={1584 - PAD_X * 2 - LEFT_W - GAP}
           height={396 - PAD_Y * 2}
-          rows={8}
-          maxFont={17}
-          titlebarH={38}
         />
       </div>
     </AbsoluteFill>

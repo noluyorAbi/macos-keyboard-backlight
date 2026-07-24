@@ -106,3 +106,32 @@ produces corrupted, nondeterministic output. Everything here derives from
 
 Tailwind is intentionally absent. `create-video --blank` installs it even when
 you pass `--no-tailwind` (the flag is ignored in 4.0.489), so it was stripped.
+
+## This copy deviates from the template
+
+The template's rule is that `src/content.ts` is the only file you edit. This
+project breaks it on purpose, once, and this is the record of why.
+
+This tool's visible output is a single number. A terminal demo of `kbdlight get`
+shows nothing, and the first cut of the video worked around that by typing
+`kbdlight --help` and filming its usage text: it showed the interface and never
+showed the product doing anything. What the tool actually changes is the light
+under the keys, which no screen capture can record.
+
+So the body scene draws it instead:
+
+| File                               | Why it exists                                                                                            |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `src/keyboard-layout.ts`           | A MacBook keyboard as data, in real key units. Carries a row-width assertion.                            |
+| `src/components/Keyboard.tsx`      | The board itself, shared by the video and both stills so there is only ever one keyboard in the project. |
+| `src/components/KeyboardProof.tsx` | The lit board fitted to a box, for the banner and the social card.                                       |
+| `src/scenes/KeyboardScene.tsx`     | The shot: type a real command, drain the backlight on a diagonal wave.                                   |
+
+`components/Proof.tsx`, `scenes/TerminalScene.tsx` and `scenes/ScreensScene.tsx`
+are kept even though this project no longer renders them. They are the
+template's other two demo modes, both documented in its own contract, and
+`content.ts` still validates against them. Deleting them would fork the template
+rather than configure it.
+
+The MacBook is an illustration and the README and landing caption both say so.
+The command it types is real.
