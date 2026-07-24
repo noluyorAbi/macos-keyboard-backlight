@@ -1,0 +1,151 @@
+{
+  "site": {
+    "url": "https://macos-keyboard-backlight.vercel.app",
+    "lang": "en",
+    "themeColor": "#0b0b0b",
+    "ogImage": "assets/social-card.png",
+    "ogImageAlt": "macos-keyboard-backlight, your keyboard backlight finally scriptable",
+    "twitterSite": "",
+    "twitterCreator": "",
+    "utm": {
+      "enabled": true,
+      "source": "landing",
+      "campaign": ""
+    }
+  },
+  "meta": {
+    "title": "macos-keyboard-backlight, script the MacBook keyboard backlight",
+    "description": "macOS gives you a slider and two keys, and no way to script either one. This adds a kbdlight command and a Node API to read and set the keyboard backlight and toggle the ambient light sensor. One dependency, no native build step, MIT."
+  },
+  "project": {
+    "name": "macos-keyboard-backlight",
+    "wordmark": "macos-keyboard-backlight",
+    "repo": "https://github.com/noluyorAbi/macos-keyboard-backlight"
+  },
+  "hero": {
+    "eyebrow": "No build step, one dependency, MIT",
+    "headline": "Your keyboard backlight, finally scriptable.",
+    "sub": "macOS gives you a slider in System Settings and two keys on the keyboard, and that is the whole interface. There is no way to reach the keyboard backlight from a shell script, a scheduled job, or a Node program. This adds the missing one.",
+    "install": {
+      "label": "Install",
+      "command": "npm i -g macos-keyboard-backlight",
+      "then": "then run kbdlight off"
+    },
+    "primaryCta": {
+      "label": "Star on GitHub",
+      "href": "https://github.com/noluyorAbi/macos-keyboard-backlight",
+      "slot": "hero-primary"
+    },
+    "secondaryCta": {
+      "label": "Read the docs",
+      "href": "https://github.com/noluyorAbi/macos-keyboard-backlight#readme",
+      "slot": "hero-secondary"
+    }
+  },
+  "demo": {
+    "heading": "See it run",
+    "icon": "terminal",
+    "video": {
+      "src": "assets/demo.mp4",
+      "poster": "assets/demo.gif",
+      "width": 1920,
+      "height": 1080
+    },
+    "alt": "The kbdlight command printing its full help output in a terminal",
+    "caption": "Real captured output, not a mockup. Recorded at 1920 by 1080."
+  },
+  "why": {
+    "heading": "Why this exists",
+    "icon": "sparkle",
+    "body": [
+      "Almost every part of a Mac can be driven from a script. The keyboard backlight cannot: there is no command, no flag and no supported API. If you want it off between midnight and seven, or dimmed while a recording runs, there is nothing to call.",
+      "This package resolves the private CoreBrightness interface at runtime and exposes it as a command and a library, so the backlight becomes one more thing your scripts can control."
+    ],
+    "highlight": "No node-gyp. No Xcode. Nothing compiled at install time."
+  },
+  "features": {
+    "heading": "What you get",
+    "icon": "zap",
+    "items": [
+      {
+        "icon": "terminal",
+        "title": "A real command",
+        "body": "kbdlight get, set, off, max, auto and list. Values are clamped to the 0.0 to 1.0 range before they reach the system call."
+      },
+      {
+        "icon": "download",
+        "title": "No native build step",
+        "body": "No node-gyp, no Xcode, no compiler on the installing machine. The system calls are resolved at runtime through koffi, which ships prebuilt for both architectures."
+      },
+      {
+        "icon": "git-branch",
+        "title": "A Node API too",
+        "body": "get, set, isAuto, setAuto and keyboardIDs. Every call takes an optional keyboard ID, so you can target one keyboard instead of all of them."
+      },
+      {
+        "icon": "shield",
+        "title": "Honest failure",
+        "body": "It calls a private Apple framework, so it throws a descriptive Error rather than crashing when that interface is not there. Catch it, do not feature-detect it."
+      },
+      {
+        "icon": "clock",
+        "title": "The sensor gotcha, documented",
+        "body": "Auto-brightness keeps re-adjusting the backlight and overrides a level you set. Turn the sensor off first and the value sticks. The help text says so too."
+      },
+      {
+        "icon": "folder",
+        "title": "One dependency",
+        "body": "koffi, and nothing else. Tested on macOS against Node 18, 20, 22 and 24 on every push."
+      }
+    ]
+  },
+  "install": {
+    "heading": "Install and use",
+    "icon": "download",
+    "intro": "Requires macOS, Apple Silicon or Intel, and Node 18 or newer.",
+    "steps": [
+      {
+        "title": "Install",
+        "body": "Installs a kbdlight command. Use npx instead if you only want to run it once.",
+        "command": "npm i -g macos-keyboard-backlight"
+      },
+      {
+        "title": "Turn it off",
+        "body": "Disable the ambient sensor first, otherwise it adjusts the backlight straight back.",
+        "command": "kbdlight auto off && kbdlight off"
+      },
+      {
+        "title": "Use it from Node",
+        "body": "The same operations as the command, returning numbers and booleans.",
+        "command": "node -e \"require('macos-keyboard-backlight').set(0.5)\""
+      }
+    ],
+    "note": "Restore the ambient light sensor at any time with kbdlight auto on."
+  },
+  "footer": {
+    "license": "MIT. Free to use, modify and redistribute, commercially or not.",
+    "links": [
+      {
+        "label": "GitHub",
+        "href": "https://github.com/noluyorAbi/macos-keyboard-backlight",
+        "slot": "footer-repo"
+      },
+      {
+        "label": "npm",
+        "href": "https://www.npmjs.com/package/macos-keyboard-backlight",
+        "slot": "footer-npm"
+      },
+      {
+        "label": "Changelog",
+        "href": "https://github.com/noluyorAbi/macos-keyboard-backlight/blob/main/CHANGELOG.md",
+        "slot": "footer-changelog"
+      },
+      {
+        "label": "Security",
+        "href": "https://github.com/noluyorAbi/macos-keyboard-backlight/security/policy",
+        "slot": "footer-security"
+      }
+    ],
+    "copyright": "Copyright 2026 noluyorAbi"
+  }
+}

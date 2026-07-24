@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!--
+    Everything between launch:head:start and launch:head:end is generated from
+    content.json by sync.mjs. Do not hand edit it; edit content.json and run
+    "node sync.mjs".
+  -->
+  <!-- launch:head:start -->
+  <title>macos-keyboard-backlight, script the MacBook keyboard backlight</title>
+  <meta name="description" content="macOS gives you a slider and two keys, and no way to script either one. This adds a kbdlight command and a Node API to read and set the keyboard backlight and toggle the ambient light sensor. One dependency, no native build step, MIT.">
+  <meta name="theme-color" content="#0b0b0b">
+  <link rel="canonical" href="https://macos-keyboard-backlight.vercel.app">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="macos-keyboard-backlight">
+  <meta property="og:title" content="macos-keyboard-backlight, script the MacBook keyboard backlight">
+  <meta property="og:description" content="macOS gives you a slider and two keys, and no way to script either one. This adds a kbdlight command and a Node API to read and set the keyboard backlight and toggle the ambient light sensor. One dependency, no native build step, MIT.">
+  <meta property="og:url" content="https://macos-keyboard-backlight.vercel.app">
+  <meta property="og:image" content="https://macos-keyboard-backlight.vercel.app/assets/social-card.png">
+  <meta property="og:image:alt" content="macos-keyboard-backlight, your keyboard backlight finally scriptable">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="macos-keyboard-backlight, script the MacBook keyboard backlight">
+  <meta name="twitter:description" content="macOS gives you a slider and two keys, and no way to script either one. This adds a kbdlight command and a Node API to read and set the keyboard backlight and toggle the ambient light sensor. One dependency, no native build step, MIT.">
+  <meta name="twitter:image" content="https://macos-keyboard-backlight.vercel.app/assets/social-card.png">
+  <meta name="twitter:image:alt" content="macos-keyboard-backlight, your keyboard backlight finally scriptable">
+  <!-- launch:head:end -->
+
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <main id="main">
+
+    <!-- Hero -->
+    <section class="section hero" aria-labelledby="hero-heading">
+      <!-- launch:hero:start -->
+      <p class="wordmark">macos-keyboard-backlight</p>
+      <p class="eyebrow">No build step, one dependency, MIT</p>
+      <h1 class="hero-title" id="hero-heading">Your keyboard backlight, finally scriptable.</h1>
+      <p class="hero-sub">macOS gives you a slider in System Settings and two keys on the keyboard, and that is the whole interface. There is no way to reach the keyboard backlight from a shell script, a scheduled job, or a Node program. This adds the missing one.</p>
+
+      <div class="install-strip">
+        <p class="install-label" id="hero-install-label">Install</p>
+        <div class="copy">
+          <pre class="copy-code" id="hero-install"><code>npm i -g macos-keyboard-backlight</code></pre>
+          <button class="copy-btn" type="button" data-copy-target="hero-install" aria-label="Copy the command npm i -g macos-keyboard-backlight to the clipboard">
+            <span class="copy-btn-label" aria-hidden="true">Copy</span>
+          </button>
+        </div>
+        <p class="install-then">then run kbdlight off</p>
+      </div>
+
+      <p class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/noluyorAbi/macos-keyboard-backlight?utm_source=landing&amp;utm_medium=hero-primary" data-utm-slot="hero-primary" rel="noopener">Star on GitHub</a>
+        <a class="btn btn-secondary" href="https://github.com/noluyorAbi/macos-keyboard-backlight?utm_source=landing&amp;utm_medium=hero-secondary#readme" data-utm-slot="hero-secondary" rel="noopener">Read the docs</a>
+      </p>
+      <!-- launch:hero:end -->
+    </section>
+
+    <!-- Demo -->
+    <section class="section section-demo" aria-labelledby="demo-heading">
+      <!-- launch:demo:start -->
+      <h2 class="section-title" id="demo-heading"><svg class="icon section-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="3.3 14.2 8.3 9.2 3.3 4.2"/><line x1="10.4" y1="15.8" x2="16.7" y2="15.8"/></svg><span>See it run</span></h2>
+      <figure class="demo">
+        <video
+          class="demo-video"
+          src="assets/demo.mp4"
+          poster="assets/demo.gif"
+          width="1920"
+          height="1080"
+          controls
+          muted
+          loop
+          playsinline
+          preload="none"
+          aria-label="The kbdlight command printing its full help output in a terminal">
+          <p>Your browser cannot play this video. <a href="assets/demo.mp4">Download the recording</a> instead.</p>
+        </video>
+        <figcaption class="demo-caption">
+          <p class="demo-alt">The kbdlight command printing its full help output in a terminal</p>
+          <p class="caption">Real captured output, not a mockup. Recorded at 1920 by 1080.</p>
+        </figcaption>
+      </figure>
+      <!-- launch:demo:end -->
+    </section>
+
+    <!-- Why this exists -->
+    <section class="section section-why" aria-labelledby="why-heading">
+      <!-- launch:why:start -->
+      <h2 class="section-title" id="why-heading"><svg class="icon section-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10 2.2 l1.9 4.6 l4.6 1.9 l-4.6 1.9 l-1.9 4.6 l-1.9-4.6 l-4.6-1.9 l4.6-1.9 z"/><line x1="15.8" y1="14.2" x2="15.8" y2="17.8"/><line x1="14" y1="16" x2="17.6" y2="16"/></svg><span>Why this exists</span></h2>
+      <p class="prose">Almost every part of a Mac can be driven from a script. The keyboard backlight cannot: there is no command, no flag and no supported API. If you want it off between midnight and seven, or dimmed while a recording runs, there is nothing to call.</p>
+      <p class="prose">This package resolves the private CoreBrightness interface at runtime and exposes it as a command and a library, so the backlight becomes one more thing your scripts can control.</p>
+      <p class="highlight">No node-gyp. No Xcode. Nothing compiled at install time.</p>
+      <!-- launch:why:end -->
+    </section>
+
+    <!-- Features -->
+    <section class="section section-features" aria-labelledby="features-heading">
+      <!-- launch:features:start -->
+      <h2 class="section-title" id="features-heading"><svg class="icon section-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11.2 2.2 L4.5 11 h4.6 l-.3 6.8 L15.5 9 h-4.6 z"/></svg><span>What you get</span></h2>
+      <ul class="grid">
+        <li class="card">
+          <h3 class="card-title"><svg class="icon card-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="3.3 14.2 8.3 9.2 3.3 4.2"/><line x1="10.4" y1="15.8" x2="16.7" y2="15.8"/></svg><span>A real command</span></h3>
+          <p class="card-body">kbdlight get, set, off, max, auto and list. Values are clamped to the 0.0 to 1.0 range before they reach the system call.</p>
+        </li>
+        <li class="card">
+          <h3 class="card-title"><svg class="icon card-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M17.5 12.5 v3.3 a1.7 1.7 0 0 1-1.7 1.7 H4.2 a1.7 1.7 0 0 1-1.7-1.7 v-3.3"/><polyline points="5.8 8.3 10 12.5 14.2 8.3"/><line x1="10" y1="12.5" x2="10" y2="2.5"/></svg><span>No native build step</span></h3>
+          <p class="card-body">No node-gyp, no Xcode, no compiler on the installing machine. The system calls are resolved at runtime through koffi, which ships prebuilt for both architectures.</p>
+        </li>
+        <li class="card">
+          <h3 class="card-title"><svg class="icon card-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="5" y1="2.5" x2="5" y2="12.5"/><circle cx="15" cy="5" r="2.5"/><circle cx="5" cy="15" r="2.5"/><path d="M15 7.5 a7.5 7.5 0 0 1-7.5 7.5"/></svg><span>A Node API too</span></h3>
+          <p class="card-body">get, set, isAuto, setAuto and keyboardIDs. Every call takes an optional keyboard ID, so you can target one keyboard instead of all of them.</p>
+        </li>
+        <li class="card">
+          <h3 class="card-title"><svg class="icon card-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10 2.2 l6 2.2 v5.1 c0 3.9-2.6 6.5-6 8.3 c-3.4-1.8-6-4.4-6-8.3 V4.4 z"/></svg><span>Honest failure</span></h3>
+          <p class="card-body">It calls a private Apple framework, so it throws a descriptive Error rather than crashing when that interface is not there. Catch it, do not feature-detect it.</p>
+        </li>
+        <li class="card">
+          <h3 class="card-title"><svg class="icon card-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8"/><polyline points="10 5 10 10 13.4 11.7"/></svg><span>The sensor gotcha, documented</span></h3>
+          <p class="card-body">Auto-brightness keeps re-adjusting the backlight and overrides a level you set. Turn the sensor off first and the value sticks. The help text says so too.</p>
+        </li>
+        <li class="card">
+          <h3 class="card-title"><svg class="icon card-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.2 3.6 H7.3 a1.6 1.6 0 0 1 1.28 .64 l.86 1.15 a1.6 1.6 0 0 0 1.28 .64 H15.8 a1.6 1.6 0 0 1 1.6 1.6 v7.2 a1.6 1.6 0 0 1-1.6 1.6 H4.2 a1.6 1.6 0 0 1-1.6-1.6 V5.2 a1.6 1.6 0 0 1 1.6-1.6 z"/></svg><span>One dependency</span></h3>
+          <p class="card-body">koffi, and nothing else. Tested on macOS against Node 18, 20, 22 and 24 on every push.</p>
+        </li>
+      </ul>
+      <!-- launch:features:end -->
+    </section>
+
+    <!-- Install and usage -->
+    <section class="section section-install" aria-labelledby="install-heading">
+      <!-- launch:install:start -->
+      <h2 class="section-title" id="install-heading"><svg class="icon section-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M17.5 12.5 v3.3 a1.7 1.7 0 0 1-1.7 1.7 H4.2 a1.7 1.7 0 0 1-1.7-1.7 v-3.3"/><polyline points="5.8 8.3 10 12.5 14.2 8.3"/><line x1="10" y1="12.5" x2="10" y2="2.5"/></svg><span>Install and use</span></h2>
+      <p class="prose">Requires macOS, Apple Silicon or Intel, and Node 18 or newer.</p>
+      <ol class="steps">
+        <li class="step">
+          <h3 class="step-title">Install</h3>
+          <p class="step-body">Installs a kbdlight command. Use npx instead if you only want to run it once.</p>
+          <div class="copy">
+          <pre class="copy-code" id="install-step-1"><code>npm i -g macos-keyboard-backlight</code></pre>
+          <button class="copy-btn" type="button" data-copy-target="install-step-1" aria-label="Copy the command npm i -g macos-keyboard-backlight to the clipboard">
+            <span class="copy-btn-label" aria-hidden="true">Copy</span>
+          </button>
+        </div>
+        </li>
+        <li class="step">
+          <h3 class="step-title">Turn it off</h3>
+          <p class="step-body">Disable the ambient sensor first, otherwise it adjusts the backlight straight back.</p>
+          <div class="copy">
+          <pre class="copy-code" id="install-step-2"><code>kbdlight auto off &amp;&amp; kbdlight off</code></pre>
+          <button class="copy-btn" type="button" data-copy-target="install-step-2" aria-label="Copy the command kbdlight auto off &amp;&amp; kbdlight off to the clipboard">
+            <span class="copy-btn-label" aria-hidden="true">Copy</span>
+          </button>
+        </div>
+        </li>
+        <li class="step">
+          <h3 class="step-title">Use it from Node</h3>
+          <p class="step-body">The same operations as the command, returning numbers and booleans.</p>
+          <div class="copy">
+          <pre class="copy-code" id="install-step-3"><code>node -e &quot;require('macos-keyboard-backlight').set(0.5)&quot;</code></pre>
+          <button class="copy-btn" type="button" data-copy-target="install-step-3" aria-label="Copy the command node -e &quot;require('macos-keyboard-backlight').set(0.5)&quot; to the clipboard">
+            <span class="copy-btn-label" aria-hidden="true">Copy</span>
+          </button>
+        </div>
+        </li>
+      </ol>
+      <p class="note">Restore the ambient light sensor at any time with kbdlight auto on.</p>
+      <!-- launch:install:end -->
+    </section>
+
+  </main>
+
+  <footer class="section site-footer">
+    <!-- launch:footer:start -->
+      <p class="footer-license">MIT. Free to use, modify and redistribute, commercially or not.</p>
+      
+      <nav class="footer-links" aria-label="Elsewhere">
+        <a class="footer-link" href="https://github.com/noluyorAbi/macos-keyboard-backlight?utm_source=landing&amp;utm_medium=footer-repo" data-utm-slot="footer-repo" rel="noopener">GitHub</a>
+        <a class="footer-link" href="https://www.npmjs.com/package/macos-keyboard-backlight?utm_source=landing&amp;utm_medium=footer-npm" data-utm-slot="footer-npm" rel="noopener">npm</a>
+        <a class="footer-link" href="https://github.com/noluyorAbi/macos-keyboard-backlight/blob/main/CHANGELOG.md?utm_source=landing&amp;utm_medium=footer-changelog" data-utm-slot="footer-changelog" rel="noopener">Changelog</a>
+        <a class="footer-link" href="https://github.com/noluyorAbi/macos-keyboard-backlight/security/policy?utm_source=landing&amp;utm_medium=footer-security" data-utm-slot="footer-security" rel="noopener">Security</a>
+      </nav>
+      <p class="footer-copy">Copyright 2026 noluyorAbi</p>
+    <!-- launch:footer:end -->
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
