@@ -1,0 +1,33 @@
+{
+  "name": "launch-video",
+  "version": "1.0.0",
+  "description": "Remotion source for this project's launch assets (assets/demo.mp4, assets/demo.gif, assets/banner.png, assets/social-card.png).",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@remotion/cli": "4.0.489",
+    "@remotion/fonts": "4.0.489",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.489"
+  },
+  "devDependencies": {
+    "@remotion/eslint-config-flat": "4.0.489",
+    "@types/react": "19.2.7",
+    "@types/web": "0.0.166",
+    "eslint": "9.19.0",
+    "prettier": "3.8.1",
+    "typescript": "5.9.3"
+  },
+  "scripts": {
+    "dev": "remotion studio",
+    "typecheck": "tsc",
+    "lint": "eslint src && tsc",
+    "compositions": "remotion compositions src/index.ts",
+    "render:mp4": "remotion render src/index.ts Demo ../assets/demo.mp4 --codec=h264 --crf=21 --log=error",
+    "render:gif": "remotion render src/index.ts Demo ../assets/demo.gif --codec=gif --every-nth-frame=2 --scale=0.5 --log=error",
+    "render:banner": "remotion still src/index.ts Banner ../assets/banner.png --log=error",
+    "render:social": "remotion still src/index.ts Social ../assets/social-card.png --log=error",
+    "build": "npm run render:mp4 && npm run render:gif && npm run render:banner && npm run render:social"
+  }
+}

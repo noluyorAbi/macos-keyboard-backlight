@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="https://raw.githubusercontent.com/noluyorAbi/macos-keyboard-backlight/main/assets/banner.png" width="100%" alt="macos-keyboard-backlight: your keyboard backlight, finally scriptable">
+
 <b>Control the MacBook keyboard backlight from the command line.</b>
 
 <br>
@@ -34,6 +36,16 @@ kbdlight get        # 0.5000
 kbdlight set 0.2
 kbdlight off
 ```
+
+<div align="center">
+
+<a href="https://github.com/noluyorAbi/macos-keyboard-backlight/blob/main/assets/demo.mp4">
+  <img src="https://raw.githubusercontent.com/noluyorAbi/macos-keyboard-backlight/main/assets/demo.gif" width="100%" alt="kbdlight running in a terminal">
+</a>
+
+<sub><a href="https://github.com/noluyorAbi/macos-keyboard-backlight/blob/main/assets/demo.mp4">Full quality recording</a></sub>
+
+</div>
 
 There is **no native build step**. No node-gyp, no Xcode, no compiler on the
 installing machine. It calls the system API directly from JavaScript through
