@@ -1,0 +1,46 @@
+# macos-keyboard-backlight
+
+> A command line tool and Node library that controls the MacBook keyboard
+> backlight. macOS ships a slider in System Settings and two keys on the
+> keyboard, and no scriptable interface at all. This adds one.
+
+Installing it provides a `kbdlight` command:
+
+```sh
+npm install -g macos-keyboard-backlight
+kbdlight auto off && kbdlight set 0.5
+```
+
+Key facts, all verifiable in the repository:
+
+- Platform: macOS only, Apple Silicon and Intel. Requires Node.js 18 or newer.
+- One runtime dependency, koffi. No native build step, so no node-gyp, no Xcode
+  and no compiler on the installing machine.
+- License: MIT.
+- It calls the private Apple framework `CoreBrightness`, resolving the
+  `KeyboardBrightnessClient` class and its selectors at runtime through
+  `objc_msgSend`. Apple can change that interface without notice; the failure
+  mode is a thrown `Error`, not a crash.
+- The behaviour people get wrong: ambient auto-brightness keeps re-adjusting the
+  backlight and overrides any level you set. Disable it first with
+  `kbdlight auto off`, then the value holds.
+
+## Commands
+
+- `kbdlight get` prints brightness, 0.0 to 1.0, per keyboard
+- `kbdlight set <0.0-1.0>` sets brightness, clamped, on all keyboards
+- `kbdlight off` and `kbdlight max` are aliases for `set 0` and `set 1`
+- `kbdlight auto [on|off]` reads or sets ambient auto-brightness
+- `kbdlight list` prints keyboard backlight IDs
+
+## Node API
+
+`get`, `set`, `isAuto`, `setAuto` and `keyboardIDs`. Each accepts an optional
+trailing keyboard ID to target a single keyboard instead of all of them.
+
+## Docs
+
+- Source and full README: https://github.com/noluyorAbi/macos-keyboard-backlight
+- Package: https://www.npmjs.com/package/macos-keyboard-backlight
+- Changelog: https://github.com/noluyorAbi/macos-keyboard-backlight/blob/main/CHANGELOG.md
+- Security policy: https://github.com/noluyorAbi/macos-keyboard-backlight/security/policy

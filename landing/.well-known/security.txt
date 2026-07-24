@@ -1,0 +1,5 @@
+# RFC 9116. Report privately through GitHub, never in a public issue.
+Contact: https://github.com/noluyorAbi/macos-keyboard-backlight/security/advisories/new
+Policy: https://github.com/noluyorAbi/macos-keyboard-backlight/security/policy
+Preferred-Languages: en, de
+Expires: 2027-07-24T00:00:00.000Z

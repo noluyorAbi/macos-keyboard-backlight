@@ -316,12 +316,36 @@ function render(html, content) {
   return out.replace(/<html lang="[^"]*">/, () => `<html lang="${esc(lang)}">`);
 }
 
+// The AI crawlers are named rather than left to the wildcard on purpose. A
+// wildcard cannot express a posture, and the posture here is "yes, index and
+// cite this": the page exists to be found, and everything on it is already
+// public in the repository. Naming them also makes the decision visible, so a
+// future change to "search yes, training no" is one line per crawler rather
+// than a rewrite.
+const AI_CRAWLERS = [
+  "GPTBot",
+  "OAI-SearchBot",
+  "ChatGPT-User",
+  "ClaudeBot",
+  "Claude-User",
+  "Claude-SearchBot",
+  "PerplexityBot",
+  "Google-Extended",
+  "Applebot-Extended",
+  "Bingbot",
+  "CCBot",
+  "meta-externalagent",
+];
+
 function robots(content) {
   const base = String(content.site.url).replace(/\/+$/, "");
+  const named = AI_CRAWLERS.map((ua) => `User-agent: ${ua}\nAllow: /\n`).join("\n");
   return `# Static one page site. Everything here is public.
 User-agent: *
 Allow: /
 
+# Named explicitly so the posture is stated rather than inferred.
+${named}
 Sitemap: ${base}/sitemap.xml
 `;
 }

@@ -35,6 +35,42 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
   <script src="app.js" defer></script>
+
+  <!--
+    Outside the generated markers on purpose, so sync.mjs leaves it alone.
+    Describes the page to anything that reads structured data rather than prose.
+    Keep the claims here identical to the ones in content.json: two sources that
+    disagree are worse than one.
+  -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "macos-keyboard-backlight",
+    "alternateName": "kbdlight",
+    "applicationCategory": "DeveloperApplication",
+    "applicationSubCategory": "Command Line Utility",
+    "operatingSystem": "macOS",
+    "description": "A command line tool and Node library that reads and sets the MacBook keyboard backlight and toggles the ambient light sensor. No native build step.",
+    "url": "https://macos-keyboard-backlight.vercel.app",
+    "downloadUrl": "https://www.npmjs.com/package/macos-keyboard-backlight",
+    "codeRepository": "https://github.com/noluyorAbi/macos-keyboard-backlight",
+    "programmingLanguage": "JavaScript",
+    "softwareVersion": "1.0.0",
+    "license": "https://spdx.org/licenses/MIT.html",
+    "isAccessibleForFree": true,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "noluyorAbi",
+      "url": "https://github.com/noluyorAbi"
+    }
+  }
+  </script>
 </head>
 
 <body>
