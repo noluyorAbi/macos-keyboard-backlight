@@ -147,8 +147,8 @@ function headRegion(c) {
   <meta property="og:url" content="${esc(base)}">
   <meta property="og:image" content="${esc(image)}">
   <meta property="og:image:alt" content="${esc(site.ogImageAlt || title)}">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
 
   <meta name="twitter:card" content="summary_large_image">
 ${twitter.join("\n")}${twitter.length ? "\n" : ""}  <meta name="twitter:title" content="${esc(title)}">
@@ -350,9 +350,18 @@ Sitemap: ${base}/sitemap.xml
 `;
 }
 
+// lastmod comes from content.json, never from the wall clock. Stamping
+// new Date() here would make the generator depend on the day it ran, so
+// `sync.mjs --check` (the documented staleness gate) would report the tree
+// stale every day after the last sync even when nothing changed, and a plain
+// run would produce a spurious sitemap diff every time. Bump site.lastmod when
+// the page content actually changes.
 function sitemap(content) {
   const base = String(content.site.url).replace(/\/+$/, "");
-  const today = new Date().toISOString().slice(0, 10);
+  const today = content.site.lastmod;
+  if (!today || !/^\d{4}-\d{2}-\d{2}$/.test(today)) {
+    throw new Error('content.json: site.lastmod is required, format YYYY-MM-DD');
+  }
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>

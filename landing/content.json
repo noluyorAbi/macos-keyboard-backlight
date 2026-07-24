@@ -1,6 +1,7 @@
 {
   "site": {
     "url": "https://macos-keyboard-backlight.vercel.app",
+    "lastmod": "2026-07-24",
     "lang": "en",
     "themeColor": "#0b0b0b",
     "ogImage": "assets/social-card.png",
@@ -47,7 +48,7 @@
     "icon": "terminal",
     "video": {
       "src": "assets/demo.mp4",
-      "poster": "assets/demo.gif",
+      "poster": "assets/poster.jpg",
       "width": 1920,
       "height": 1080
     },
@@ -80,7 +81,7 @@
       {
         "icon": "git-branch",
         "title": "A Node API too",
-        "body": "get, set, isAuto, setAuto and keyboardIDs. Every call takes an optional keyboard ID, so you can target one keyboard instead of all of them."
+        "body": "get, set, isAuto and setAuto each take an optional keyboard ID, so you can target one keyboard instead of all of them. keyboardIDs() returns the IDs to pass them."
       },
       {
         "icon": "shield",

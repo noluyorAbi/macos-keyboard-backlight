@@ -22,8 +22,8 @@
   <meta property="og:url" content="https://macos-keyboard-backlight.vercel.app">
   <meta property="og:image" content="https://macos-keyboard-backlight.vercel.app/assets/social-card.png">
   <meta property="og:image:alt" content="macos-keyboard-backlight, your keyboard backlight finally scriptable">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="640">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="macos-keyboard-backlight, script the MacBook keyboard backlight">
@@ -39,8 +39,12 @@
   <!--
     Outside the generated markers on purpose, so sync.mjs leaves it alone.
     Describes the page to anything that reads structured data rather than prose.
-    Keep the claims here identical to the ones in content.json: two sources that
-    disagree are worse than one.
+
+    Because nothing regenerates this block, it deliberately carries no value that
+    changes per release. There is no softwareVersion here: a hardcoded one would
+    keep advertising the version that happened to be current the day it was
+    written. Keep the remaining claims identical to content.json; two sources
+    that disagree are worse than one.
   -->
   <script type="application/ld+json">
   {
@@ -56,7 +60,6 @@
     "downloadUrl": "https://www.npmjs.com/package/macos-keyboard-backlight",
     "codeRepository": "https://github.com/noluyorAbi/macos-keyboard-backlight",
     "programmingLanguage": "JavaScript",
-    "softwareVersion": "1.0.0",
     "license": "https://spdx.org/licenses/MIT.html",
     "isAccessibleForFree": true,
     "offers": {
@@ -112,7 +115,7 @@
         <video
           class="demo-video"
           src="assets/demo.mp4"
-          poster="assets/demo.gif"
+          poster="assets/poster.jpg"
           width="1920"
           height="1080"
           controls
@@ -156,7 +159,7 @@
         </li>
         <li class="card">
           <h3 class="card-title"><svg class="icon card-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><line x1="5" y1="2.5" x2="5" y2="12.5"/><circle cx="15" cy="5" r="2.5"/><circle cx="5" cy="15" r="2.5"/><path d="M15 7.5 a7.5 7.5 0 0 1-7.5 7.5"/></svg><span>A Node API too</span></h3>
-          <p class="card-body">get, set, isAuto, setAuto and keyboardIDs. Every call takes an optional keyboard ID, so you can target one keyboard instead of all of them.</p>
+          <p class="card-body">get, set, isAuto and setAuto each take an optional keyboard ID, so you can target one keyboard instead of all of them. keyboardIDs() returns the IDs to pass them.</p>
         </li>
         <li class="card">
           <h3 class="card-title"><svg class="icon card-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10 2.2 l6 2.2 v5.1 c0 3.9-2.6 6.5-6 8.3 c-3.4-1.8-6-4.4-6-8.3 V4.4 z"/></svg><span>Honest failure</span></h3>

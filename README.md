@@ -112,8 +112,9 @@ kbd.setAuto(false);   // -> false        disable the ambient sensor
 kbd.keyboardIDs();    // -> [95159106]   IDs of backlit keyboards
 ```
 
-Every function takes an optional trailing `keyboardID` to target one keyboard
-instead of all of them:
+`get`, `set`, `isAuto` and `setAuto` take an optional trailing `keyboardID` to
+target one keyboard instead of all of them. `keyboardIDs()` takes no arguments;
+it is what enumerates them:
 
 ```js
 const [id] = kbd.keyboardIDs();

@@ -35,8 +35,9 @@ Key facts, all verifiable in the repository:
 
 ## Node API
 
-`get`, `set`, `isAuto`, `setAuto` and `keyboardIDs`. Each accepts an optional
-trailing keyboard ID to target a single keyboard instead of all of them.
+`get`, `set`, `isAuto` and `setAuto` each accept an optional trailing keyboard ID
+to target a single keyboard instead of all of them. `keyboardIDs()` takes no
+arguments and returns the IDs to pass to the others.
 
 ## Docs
 
