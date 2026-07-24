@@ -40,7 +40,11 @@ jobs:
           # later step, including a compromised dependency, use it.
           persist-credentials: false
 
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      # No "cache:" input here, deliberately. This job holds id-token: write, so
+      # it is the one job where a cache entry poisoned by an earlier, less
+      # trusted workflow run could end up inside a published tarball. The extra
+      # thirty seconds of a cold install is worth removing that path entirely.
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0 # zizmor: ignore[cache-poisoning]
         with:
           node-version: "22"
           registry-url: "https://registry.npmjs.org"
