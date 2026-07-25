@@ -165,6 +165,83 @@ Always snapshot `isAuto()` alongside the level. Restoring the brightness but
 leaving the sensor disabled looks fine for a minute, then silently stops adapting
 to the room.
 
+## Your keyboard as a status light
+
+Once brightness is scriptable, the backlight becomes an output device for
+anything your machine knows. Three working programs live in
+[`examples/`](examples/).
+
+### Know when Claude Code is done, without watching the terminal
+
+You send a prompt, switch to a browser, and then keep checking back to see
+whether the agent has finished. Add one line to `~/.claude/settings.json` and
+the keyboard blinks four times when the answer lands.
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      { "hooks": [{ "type": "command", "command": "kbdlight pulse --detach" }] }
+    ]
+  }
+}
+```
+
+Hard on, hard off, four times. Not a fade: in peripheral vision a ramp gets
+integrated into a vague glow and you miss it, which defeats the entire purpose.
+
+```sh
+kbdlight pulse                      # 4 blinks, then exactly the state it found
+kbdlight pulse 2 --peak 0.6         # quieter
+kbdlight pulse --mute-until 09:00   # nothing until morning
+kbdlight pulse --unmute
+```
+
+The hook returns in about 50 ms. Claude Code waits for `Stop` hooks before the
+turn ends, so `--detach` hands the blinking to a background process instead of
+holding your session for a second. A lock file keeps two overlapping runs from
+fighting over the hardware: without it, the second run would snapshot the
+keyboard mid-blink and "restore" it to dark on the way out.
+
+Works the same in any hook that runs a command, for a long build or a finished
+test run. [`examples/claude-code-pulse.js`](examples/claude-code-pulse.js) is the
+hackable version of the same thing if you would rather edit a script than pass
+flags.
+
+### Keep a dark room dark, and get the light back
+
+```sh
+node examples/night-mode.js --until 10:00   # dark now, restore at 10:00
+node examples/night-mode.js --status
+node examples/night-mode.js --cancel
+```
+
+The restore is the point. It snapshots the level and the auto-brightness flag
+per keyboard and schedules the exact reverse as a self-removing launchd agent,
+because a `setTimeout` seven hours out dies with the terminal, the logout, or
+the reboot, and "dark until 10:00" with no way back on is just "dark".
+
+### Flash on the kick drum
+
+```sh
+node examples/music-sync.js --verbose
+```
+
+`ffmpeg` decodes a loopback device (or the microphone) to mono 8 kHz, a one-pole
+low-pass isolates the bass band, and a frame counts as a beat when its energy
+beats the last second's average. Against a synthetic 120 bpm track it reports
+beats 480 to 512 ms apart, averaging exactly 120 bpm.
+
+### What is not possible
+
+A MacBook backlight is a **single zone**: one channel for the whole board, no
+per-key addressing, no colour. Every selector on Apple's private
+`KeyboardBrightnessClient` takes a keyboard ID and nothing finer. So brightness
+over time is the only axis there is, and per-key effects need an external RGB
+keyboard driven over its own vendor protocol.
+
+The examples are in the git repository, not in the npm package.
+
 ## How it works
 
 macOS exposes keyboard backlight control through `KeyboardBrightnessClient` in
