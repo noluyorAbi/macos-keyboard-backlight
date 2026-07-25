@@ -1,3 +1,8 @@
+# ------------------------------------------------------------- local tooling
+# Per-machine Claude Code state (cost ledger and friends). Not project config,
+# and it carries session identifiers that have no business in a public repo.
+.claude/
+
 # ---------------------------------------------------------------- launch tool
 # Local state written by the launch skill. Machine specific, and it can contain
 # paths and identifiers from a local machine that do not belong in a public repo.
