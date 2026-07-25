@@ -46,44 +46,71 @@ function fail(msg) {
 // `kbdlight pulse`: a notification blink that puts the keyboard back exactly as
 // it was. Kept in its own function because it is the one command with flags,
 // an async body, and a deliberate "never break the caller" exit policy.
+// Flags that consume the next argument. The parser has to know them, because
+// otherwise the value of "--on 1000" looks exactly like the positional blink
+// count and the command silently blinks a thousand times.
+const PULSE_VALUE_FLAGS = ['peak', 'on', 'off', 'predark', 'mute-until'];
+
+function parsePulseArgs(args) {
+  const opts = {};
+  const flags = new Set();
+  let count;
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+
+    if (arg.startsWith('--')) {
+      const name = arg.slice(2);
+      if (PULSE_VALUE_FLAGS.includes(name)) {
+        const v = args[i + 1];
+        if (v == null || v.startsWith('--')) fail('--' + name + ' needs a value');
+        opts[name] = v;
+        i++; // consumed as a value, so it can never be read as the count
+      } else {
+        flags.add(name);
+      }
+      continue;
+    }
+
+    if (!/^\d+$/.test(arg)) fail('pulse expects a blink count, got "' + arg + '"');
+    if (count != null) fail('pulse takes one count, got "' + count + '" and "' + arg + '"');
+    count = arg;
+  }
+
+  return { opts, flags, count };
+}
+
 function pulse(args) {
   const p = require('../src/pulse.js');
+  const { opts, flags, count } = parsePulseArgs(args);
 
-  const flag = (name) => args.includes('--' + name);
-  const value = (name, fallback) => {
-    const i = args.indexOf('--' + name);
-    return i !== -1 && args[i + 1] != null ? args[i + 1] : fallback;
-  };
-
-  if (flag('status')) {
+  if (flags.has('status')) {
     const until = p.mutedUntil();
     process.stdout.write(until ? 'muted until ' + until.toLocaleString() + '\n' : 'not muted\n');
     return;
   }
-  if (flag('unmute')) {
+  if (flags.has('unmute')) {
     process.stdout.write(p.unmute() ? 'unmuted\n' : 'was not muted\n');
     return;
   }
-  if (flag('mute-until')) {
-    const at = p.parseUntil(value('mute-until', ''));
+  if (opts['mute-until'] != null) {
+    const at = p.parseUntil(opts['mute-until']);
     p.muteUntil(at);
     process.stdout.write('muted until ' + at.toLocaleString() + '\n');
     return;
   }
 
-  if (flag('detach')) {
-    // Hand the child every flag except --detach, or it would fork forever.
+  if (flags.has('detach')) {
+    // Hand the child every argument except --detach, or it would fork forever.
     return p.detachAndExit(['pulse'].concat(args.filter((a) => a !== '--detach')));
   }
 
-  const count = args.find((a) => /^\d+$/.test(a));
-
   p.blink({
-    count: count != null ? count : undefined,
-    peak: flag('peak') ? value('peak') : undefined,
-    onMs: flag('on') ? value('on') : undefined,
-    offMs: flag('off') ? value('off') : undefined,
-    preDarkMs: flag('predark') ? value('predark') : undefined,
+    count: count,
+    peak: opts.peak,
+    onMs: opts.on,
+    offMs: opts.off,
+    preDarkMs: opts.predark,
   }).catch((e) => {
     // A notifier that breaks the hook it hangs off is worse than a missed
     // blink, so this stays quiet unless a human is watching.

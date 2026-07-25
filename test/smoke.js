@@ -65,23 +65,66 @@ function pulseChecks() {
   const run = (args) =>
     execFileSync(process.execPath, [bin, 'pulse'].concat(args), { encoding: 'utf8' });
 
+  const quick = ['1', '--on', '20', '--off', '20', '--predark', '0'];
   const wasMuted = pulse.mutedUntil(); // never clobber a mute the user set
-  run(['--unmute']);
 
-  kbd.setAuto(false);
-  kbd.set(0.5);
-  run(['1', '--on', '20', '--off', '20', '--predark', '0']);
-  assert.ok(Math.abs(kbd.get() - 0.5) < 0.01, 'pulse restores the brightness it found');
-  assert.strictEqual(kbd.isAuto(), false, 'pulse restores auto-brightness state');
+  try {
+    run(['--unmute']);
 
-  // A muted pulse must not touch the hardware at all.
-  run(['--mute-until', '23:59']);
-  kbd.set(0.25);
-  run(['1', '--on', '20', '--off', '20', '--predark', '0']);
-  assert.ok(Math.abs(kbd.get() - 0.25) < 0.01, 'muted pulse leaves the keyboard alone');
-  assert.match(run(['--status']), /muted until/, 'status reports the mute');
+    kbd.setAuto(false);
+    kbd.set(0.5);
+    run(quick);
+    assert.ok(Math.abs(kbd.get() - 0.5) < 0.01, 'pulse restores the brightness it found');
+    assert.strictEqual(kbd.isAuto(), false, 'pulse restores auto-brightness state');
 
-  run(['--unmute']);
-  assert.match(run(['--status']), /not muted/, 'status reports the mute is gone');
-  if (wasMuted) pulse.muteUntil(wasMuted);
+    // A count is positional, but flag values are numbers too. Without a parser
+    // that consumes them, "--on 20" reads as twenty blinks.
+    assert.match(
+      run(['--on', '20', '--off', '20', '--predark', '0', '--status']),
+      /not muted/,
+      'flag values are not mistaken for the blink count'
+    );
+
+    // A muted pulse must not touch the hardware at all.
+    run(['--mute-until', '23:59']);
+    kbd.set(0.25);
+    run(quick);
+    assert.ok(Math.abs(kbd.get() - 0.25) < 0.01, 'muted pulse leaves the keyboard alone');
+    assert.match(run(['--status']), /muted until/, 'status reports the mute');
+
+    run(['--unmute']);
+    assert.match(run(['--status']), /not muted/, 'status reports the mute is gone');
+
+    lockCheck(run);
+  } finally {
+    // The mute is a real file in the user's home directory, so a failed
+    // assertion must not leave their notifier silenced for the rest of the day.
+    pulse.unmute();
+    if (wasMuted) pulse.muteUntil(wasMuted);
+  }
+}
+
+// The lock is what stops a second run from snapshotting the keyboard mid-blink
+// and "restoring" it to dark, so it gets a test of its own. Driven through the
+// CLI rather than blink() directly, to keep this file synchronous: an assertion
+// inside a floating promise would report as an unhandled rejection instead of a
+// test failure.
+function lockCheck(run) {
+  const fs = require('fs');
+  const os = require('os');
+  const path = require('path');
+
+  const lock = path.join(os.tmpdir(), 'kbdlight-pulse.lock');
+  if (fs.existsSync(lock)) return; // a real pulse is running, leave it alone
+
+  fs.writeFileSync(lock, String(process.pid));
+  try {
+    kbd.set(0.75);
+    // A blink here would take 1 second of lit time. Returning instantly with
+    // the keyboard untouched is the whole assertion.
+    run(['1', '--on', '20', '--off', '20', '--predark', '0']);
+    assert.ok(Math.abs(kbd.get() - 0.75) < 0.01, 'a locked pulse leaves the keyboard alone');
+  } finally {
+    fs.unlinkSync(lock);
+  }
 }
