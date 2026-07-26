@@ -339,16 +339,24 @@ const AI_CRAWLERS = [
 
 function robots(content) {
   const base = String(content.site.url).replace(/\/+$/, "");
-  const named = AI_CRAWLERS.map((ua) => `User-agent: ${ua}\nAllow: /\n`).join("\n");
-  return `# Static one page site. Everything here is public.
+  const named = AI_CRAWLERS.map((ua) => `User-agent: ${ua}\nAllow: /\n${DISALLOW}`).join("\n");
+  return `# One page site. Everything here is public except the private launch board.
 User-agent: *
 Allow: /
-
+${DISALLOW}
 # Named explicitly so the posture is stated rather than inferred.
 ${named}
 Sitemap: ${base}/sitemap.xml
 `;
 }
+
+/**
+ * The launch board behind /admin. Answering 404 without ADMIN_PASSWORD set is
+ * the real control; this only keeps the path out of indexes for the deployment
+ * that does have it set. It is repeated per user-agent because a crawler that
+ * matches a named block ignores the wildcard one entirely.
+ */
+const DISALLOW = "Disallow: /admin\nDisallow: /api/\n";
 
 // lastmod comes from content.json, never from the wall clock. Stamping
 // new Date() here would make the generator depend on the day it ran, so

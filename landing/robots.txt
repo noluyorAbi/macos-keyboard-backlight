@@ -1,42 +1,68 @@
-# Static one page site. Everything here is public.
+# One page site. Everything here is public except the private launch board.
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 # Named explicitly so the posture is stated rather than inferred.
 User-agent: GPTBot
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: OAI-SearchBot
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: ClaudeBot
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: Claude-User
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: Claude-SearchBot
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: Google-Extended
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: Applebot-Extended
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: CCBot
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 User-agent: meta-externalagent
 Allow: /
+Disallow: /admin
+Disallow: /api/
 
 Sitemap: https://macos-keyboard-backlight.vercel.app/sitemap.xml

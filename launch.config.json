@@ -1,0 +1,51 @@
+{
+  "$comment": [
+    "Input for the launch-board skill. Committed on purpose: it holds no secrets and no copy.",
+    "The password lives in the environment, the channel list and every post body live in the board.",
+    "The panel is a port, not a copy: this repo's site is static, so the Next.js route handlers",
+    "became Vercel functions under landing/api/ and the React panel became one self-contained page."
+  ],
+
+  "goal": "stars",
+  "$goalNote": "Ranked by the owner: 1 stars, 2 awareness, 3 installs. Stars is primary, so the copy leads with the engineering (a private CoreBrightness API called from JavaScript, no native build step) rather than with the install line.",
+
+  "product": {
+    "name": "macos-keyboard-backlight",
+    "oneLiner": "Control the MacBook keyboard backlight from the command line or Node.",
+    "url": "https://macos-keyboard-backlight.vercel.app",
+    "repo": "https://github.com/noluyorAbi/macos-keyboard-backlight",
+    "licence": "MIT"
+  },
+
+  "audiences": [
+    "claude-code and agent users",
+    "macos developers",
+    "indie hackers and show hn",
+    "open source and self-hosters"
+  ],
+
+  "launchDate": "2026-07-28",
+
+  "channels": {
+    "include": [],
+    "exclude": [],
+    "$": "Proposed in stage 3 from goal and audiences, then cut down with the owner. The names live here; every rule, title and body lives in the board."
+  },
+
+  "assets": {
+    "formats": ["16:9", "1:1", "og", "banner"],
+    "$formatsNote": "9:16 is dropped: there is no short-form video channel in the plan, and the product is a keyboard seen from above, which crops badly to vertical.",
+    "narratedVideo": false,
+    "$narratedVideoNote": "The two committed GIFs (assets/demo.gif, assets/pulse.gif) already carry the demo, and both are Remotion renders from video/. Revisit if a YouTube or Product Hunt slot is added.",
+    "realPhotoRequired": false
+  },
+
+  "hooks": {
+    "afterScaffold": "node landing/sync.mjs --check && npm test",
+    "beforeSeed": null,
+    "afterSeed": null,
+    "beforeDeploy": null,
+    "beforePost": "curl -sfo /dev/null -w '%{http_code}' https://macos-keyboard-backlight.vercel.app | grep -q 200 && npm test",
+    "$": "beforePost is the one that earns its keep: it asserts the live site answers 200 and the package still passes its smoke test before a link goes into a thread that cannot be edited."
+  }
+}

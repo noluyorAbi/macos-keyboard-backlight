@@ -1,1 +1,6 @@
 .vercel
+node_modules
+
+# The unpublished copy of the launch board, written when no Blob token is set.
+# Never commit it: it holds post bodies that have not gone out yet.
+.data

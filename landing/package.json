@@ -1,0 +1,18 @@
+{
+  "name": "macos-keyboard-backlight-landing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "The landing page, plus the private launch board behind /admin. Deployed as a static site with a handful of Vercel functions; there is still no build step.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "sync": "node sync.mjs",
+    "check": "node sync.mjs --check && node test-sync.mjs"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.0.0"
+  }
+}

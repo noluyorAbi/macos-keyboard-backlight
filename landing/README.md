@@ -1,8 +1,14 @@
 # Landing page template
 
 A one page marketing site for any project. Static HTML, CSS and a little vanilla
-JavaScript. No framework, no bundler, no npm dependency, no build step, and not
-one request to a third party host.
+JavaScript. No framework, no bundler, no build step, and not one request to a
+third party host.
+
+Two things sit beside it and are documented at the bottom of this file: a
+private launch board at `/admin`, which is the only reason this directory has a
+`package.json` and a single dependency, and the Vercel functions that serve it.
+The page itself is unchanged: still static, still no build step, still nothing
+fetched from anyone else.
 
 Deploying it is pointing Vercel at this directory. Nothing else.
 
@@ -269,3 +275,71 @@ PORT=8080 sh preview.sh
 ```
 
 Opening `index.html` straight from disk works too, since the page is static.
+
+## The private launch board at /admin
+
+A single-operator panel for running a launch: one card per channel carrying the
+rules that get a post removed, the copy-paste-ready text, a status, a date, and
+the link to the live post once it exists. Built from the `launch-board` skill,
+which ships a Next.js version; this is a port, because this site has no
+framework and is not going to grow one for an admin page.
+
+**Nothing about the launch lives in this repository.** The structure does; the
+channel list and every post body live in the store, because a repository is
+public and a marketing plan read by the people it targets stops being a plan.
+
+### It does not exist unless you switch it on
+
+With `ADMIN_PASSWORD` unset, `/admin` and every `/api/admin` route answer
+**404**, not a login form. That is the state a fork of this public repository
+deploys in, and it is deliberate. Set the password with the host's CLI, never by
+hand in a committed file:
+
+```sh
+vercel env add ADMIN_PASSWORD production
+```
+
+Verified against a running server, not by reading the code:
+
+| Check | Result |
+|---|---|
+| `/admin` with no password set | 404 |
+| `/api/admin/state` with no password set | 404 |
+| `/api/admin/state` with no session | 401 |
+| `POST /api/admin/session` with a wrong password | 401 |
+| `/api/admin/state` with a forged cookie | 401 |
+| `robots.txt` | disallows `/admin` and `/api/` for every named agent |
+
+### Storage
+
+`BLOB_READ_WRITE_TOKEN` set sends the board to Vercel Blob as a **private**
+object. Without it the board is written to `landing/.data/launch.json`, which is
+gitignored and local only. There is no third path: a write with neither
+configured fails loudly rather than pretending to have saved and losing an
+evening of writing.
+
+The `data` tab is the only backup. One blob at one fixed path has no history, so
+export before importing anything.
+
+### Why the CSP has an exception
+
+The static page runs under `script-src 'self'; connect-src 'none'`, which is
+right for a marketing page and fatal for an application. So `/admin` and `/api`
+are excluded from that header in `vercel.json`, and the panel route sends its
+own policy per request: a fresh nonce for its one inline style and one inline
+script, `connect-src 'self'` for the two fetches it makes, and nothing else
+loosened. The page is served whole, styles and script inlined, so that switching
+the panel off is a 404 rather than a page whose assets are missing.
+
+### Files
+
+```
+api/admin.js            the panel page: 404, login, or board
+api/admin/session.js    log in, log out
+api/admin/state.js      read and write the board
+api/_lib/auth.js        password check, session cookie, throttle
+api/_lib/model.js       the board's shape, rebuilt field by field on every write
+api/_lib/store.js       Vercel Blob, or a local file
+api/_lib/panel-css.js   the panel's styles, scoped under .lp-root
+api/_lib/panel-js.js    the panel itself, plain DOM
+```
