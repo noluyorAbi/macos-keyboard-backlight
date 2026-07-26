@@ -123,6 +123,12 @@ export default async function handler(request, response) {
       "default-src 'self'",
       `script-src 'nonce-${nonce}'`,
       `style-src 'nonce-${nonce}'`,
+      // style-src-attr is separate on purpose. A nonce cannot be attached to a
+      // style attribute, so a nonce-only style-src blocks every style="..." in
+      // the markup and every setAttribute("style", ...) in the panel, which
+      // leaves the operator with a working but unlaid-out page. Scripts stay
+      // nonce-locked; only attribute styling is allowed inline.
+      "style-src-attr 'unsafe-inline'",
       "img-src 'self' data:",
       "connect-src 'self'",
       "form-action 'none'",

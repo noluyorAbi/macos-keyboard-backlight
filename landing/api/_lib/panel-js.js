@@ -488,7 +488,8 @@ export const PANEL_JS = String.raw`
     var body = el("tbody", {}, []);
 
     rows.forEach(function (metric) {
-      function cell(key, className, numeric) {
+      /* One editable cell. The wide flag is what lets the note column take the slack. */
+      function cell(key, className, numeric, wide) {
         var input = el("input", { class: className, value: metric[key] || "" });
         if (numeric) input.setAttribute("inputmode", "numeric");
         input.oninput = function () {
@@ -496,24 +497,16 @@ export const PANEL_JS = String.raw`
             metric[key] = numeric ? Number(input.value) || 0 : input.value;
           });
         };
-        return el("td", numeric === "wide" ? { style: "width:100%" } : {}, [input]);
+        return el("td", wide ? { style: "width:100%" } : {}, [input]);
       }
 
       body.appendChild(
         el("tr", {}, [
-          cell("at", "lp-cell lp-num", false),
-          cell("stars", "lp-cell is-num", true),
-          cell("visitors", "lp-cell is-num", true),
-          cell("signups", "lp-cell is-num", true),
-          (function () {
-            var input = el("input", { class: "lp-cell", value: metric.note || "" });
-            input.oninput = function () {
-              quietEdit(function () {
-                metric.note = input.value;
-              });
-            };
-            return el("td", { style: "width:100%" }, [input]);
-          })(),
+          cell("at", "lp-cell lp-num", false, false),
+          cell("stars", "lp-cell is-num", true, false),
+          cell("visitors", "lp-cell is-num", true, false),
+          cell("signups", "lp-cell is-num", true, false),
+          cell("note", "lp-cell", false, true),
           el("td", {}, [
             button("x", "lp-btn is-bare is-danger", function () {
               edit(function () {

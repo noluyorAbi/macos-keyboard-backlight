@@ -10,7 +10,7 @@
   },
   "scripts": {
     "sync": "node sync.mjs",
-    "check": "node sync.mjs --check && node test-sync.mjs"
+    "check": "node sync.mjs --check && node test-sync.mjs && node test-auth.mjs"
   },
   "dependencies": {
     "@vercel/blob": "^2.0.0"
