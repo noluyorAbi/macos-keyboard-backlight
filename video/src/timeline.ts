@@ -270,5 +270,69 @@ export const DEMO_DURATION = END_CARD_AT + END_CARD_DUR;
 
 export const BODY_DURATION = BODY_DUR;
 
+// ---------------------------------------------------------------------------
+// Scene-local: the notification pulse
+// ---------------------------------------------------------------------------
+
+/**
+ * The second demo: `kbdlight pulse`, the shot for the Claude Code hook.
+ *
+ * These frame counts are the real defaults of the shipped command, converted at
+ * 30fps, not numbers chosen to look good in a video. If the defaults in
+ * `src/pulse.js` change, change these with them, or the asset starts advertising
+ * a rhythm the tool does not have.
+ *
+ *   preDarkMs 400 -> 12 frames
+ *   onMs     1000 -> 30 frames
+ *   offMs     500 -> 15 frames
+ *   count        4
+ */
+export const PULSE_PREDARK = 12;
+export const PULSE_ON = 30;
+export const PULSE_OFF = 15;
+export const PULSE_COUNT = 4;
+
+/** Where the keyboard idles before and after: on, but nowhere near full. */
+export const PULSE_AMBIENT = 0.32;
+
+/** The response lands, and the status line flips. */
+export const PULSE_DONE_AT = 36;
+
+/**
+ * A beat between the status flipping and the light moving. Without it the two
+ * read as one event and the causality is lost, which is the whole shot: the
+ * agent finished, so the keyboard told you.
+ */
+export const PULSE_BLINK_AT = PULSE_DONE_AT + 6;
+
+/** Long enough to see the keyboard settle back to where it started. */
+const PULSE_TAIL = 24;
+
+export const PULSE_DURATION =
+  PULSE_BLINK_AT +
+  PULSE_PREDARK +
+  PULSE_COUNT * (PULSE_ON + PULSE_OFF) +
+  PULSE_TAIL;
+
+/**
+ * How lit the board is at this frame, 0 to 1.
+ *
+ * A square wave, on purpose and truthfully: measured through
+ * `backlightLevelForKeyboard:`, the real LEDs reach full inside 26 ms, which is
+ * less than one frame at 30fps. Drawing a fade here would be a nicer looking
+ * lie. It is also uniform across every key, because the hardware is a single
+ * zone: no wave, no per-key anything, which is exactly what the README says.
+ */
+export const pulseLight = (frame: number): number => {
+  const t = frame - PULSE_BLINK_AT;
+  if (t < 0) return PULSE_AMBIENT;
+  if (t < PULSE_PREDARK) return 0;
+
+  const cycle = PULSE_ON + PULSE_OFF;
+  const into = t - PULSE_PREDARK;
+  if (into >= PULSE_COUNT * cycle) return PULSE_AMBIENT; // restored, as the tool does
+  return into % cycle < PULSE_ON ? 1 : 0;
+};
+
 /** Title bar label for the demo window. */
 export const WINDOW_TITLE = content.windowTitle ?? content.name;

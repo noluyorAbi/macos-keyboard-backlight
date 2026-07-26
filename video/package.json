@@ -26,6 +26,8 @@
     "compositions": "remotion compositions src/index.ts",
     "render:mp4": "remotion render src/index.ts Demo ../assets/demo.mp4 --codec=h264 --crf=21 --log=error",
     "render:gif": "remotion render src/index.ts Demo ../assets/demo.gif --codec=gif --every-nth-frame=2 --scale=0.5 --log=error && npm run optimize:gif",
+    "render:pulse": "remotion render src/index.ts Pulse ../assets/pulse.mp4 --codec=h264 --crf=21 --log=error",
+    "render:pulse:gif": "remotion render src/index.ts Pulse ../assets/pulse.gif --codec=gif --every-nth-frame=2 --scale=0.5 --log=error && ./optimize-gif.sh ../assets/pulse.gif",
     "render:banner": "remotion still src/index.ts Banner ../assets/banner.png --log=error",
     "render:social": "remotion still src/index.ts Social ../assets/social-card.png --log=error",
     "build": "npm run render:mp4 && npm run render:gif && npm run render:banner && npm run render:social && npm run render:poster && npm run sync:landing",

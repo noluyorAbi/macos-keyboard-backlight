@@ -3,9 +3,10 @@ import { Composition, Still } from "remotion";
 
 import { Demo } from "./Demo";
 import { Banner } from "./scenes/Banner";
+import { PulseScene } from "./scenes/PulseScene";
 import { SocialCard } from "./scenes/SocialCard";
 import { FPS, FRAME_H, FRAME_W } from "./theme";
-import { DEMO_DURATION } from "./timeline";
+import { DEMO_DURATION, PULSE_DURATION } from "./timeline";
 
 // side effect: blocks the render until JetBrains Mono is actually loaded
 import "./font";
@@ -27,6 +28,14 @@ export const RemotionRoot: FC = () => {
         id="Demo"
         component={Demo}
         durationInFrames={DEMO_DURATION}
+        fps={FPS}
+        width={FRAME_W}
+        height={FRAME_H}
+      />
+      <Composition
+        id="Pulse"
+        component={PulseScene}
+        durationInFrames={PULSE_DURATION}
         fps={FPS}
         width={FRAME_W}
         height={FRAME_H}

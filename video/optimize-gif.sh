@@ -12,7 +12,8 @@
 # success, so an aborted run cannot leave a half written GIF behind either.
 set -eu
 
-GIF="../assets/demo.gif"
+# Which GIF to shrink. Defaults to the demo so existing callers keep working.
+GIF="${1:-../assets/demo.gif}"
 TMP="$GIF.tmp"
 
 if ! command -v gifsicle >/dev/null 2>&1; then

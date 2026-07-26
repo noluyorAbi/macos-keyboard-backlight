@@ -7,9 +7,19 @@ files the top level README and GitHub use:
 | ------------------------------ | ---------------- | ------------------------------------- |
 | `../assets/demo.mp4`           | 1920x1080, 30fps | h264, linked from the README          |
 | `../assets/demo.gif`           | 960x540, 15fps   | embedded inline in the README         |
+| `../assets/pulse.gif`          | 960x540, 15fps   | the `kbdlight pulse` shot, in the README |
 | `../assets/banner.png`         | 1584x396         | README hero                           |
 | `../assets/social-card.png`    | 1280x640         | GitHub social preview, the `og:image` |
 | `../landing/assets/poster.jpg` | 1920x1080        | the landing page video poster frame   |
+
+`pulse.gif` has its own composition (`Pulse`) and its own script,
+`npm run render:pulse:gif`, because it is a second demo rather than a variant of
+the first: it shows `kbdlight pulse`, the notification blink, at the exact
+default rhythm of the shipped command. Its frame counts are derived in
+`timeline.ts` from the millisecond defaults in `../src/pulse.js`. If those
+defaults change, change these with them, or the asset advertises a rhythm the
+tool does not have. It is deliberately not part of `npm run build`, so the
+launch assets keep rendering as one set.
 
 `npm run build` also copies `demo.mp4` and `social-card.png` into
 `../landing/assets/`, so the deployed page cannot drift from the committed

@@ -187,8 +187,21 @@ the keyboard blinks four times when the answer lands.
 }
 ```
 
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/noluyorAbi/macos-keyboard-backlight/main/assets/pulse.gif" width="100%" alt="A MacBook keyboard seen from above. A status line flips from working to response ready, the backlight goes dark for a moment, then blinks four times and returns to the level it started at.">
+
+<sub>The rhythm is the shipped default, frame for frame. The MacBook is an illustration: the backlight is hardware, so no screen recording can show it.</sub>
+
+</div>
+
 Hard on, hard off, four times. Not a fade: in peripheral vision a ramp gets
 integrated into a vague glow and you miss it, which defeats the entire purpose.
+
+The timing is slow for the same reason, and the hardware is not the constraint.
+Measured through `backlightLevelForKeyboard:`, which reports the driver's real
+output instead of the value you asked for, the LEDs reach full within 26 ms and
+drop just as fast. What needs the second of lit time is the room.
 
 ```sh
 kbdlight pulse                      # 4 blinks, then exactly the state it found
