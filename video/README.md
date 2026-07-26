@@ -1,16 +1,16 @@
 # video
 
-Remotion source for this project's launch assets. Rendering it produces the four
+Remotion source for this project's launch assets. Rendering it produces the
 files the top level README and GitHub use:
 
-| Artifact                       | Size             | Notes                                 |
-| ------------------------------ | ---------------- | ------------------------------------- |
-| `../assets/demo.mp4`           | 1920x1080, 30fps | h264, linked from the README          |
-| `../assets/demo.gif`           | 960x540, 15fps   | embedded inline in the README         |
+| Artifact                       | Size             | Notes                                    |
+| ------------------------------ | ---------------- | ---------------------------------------- |
+| `../assets/demo.mp4`           | 1920x1080, 30fps | h264, linked from the README             |
+| `../assets/demo.gif`           | 960x540, 15fps   | embedded inline in the README            |
 | `../assets/pulse.gif`          | 960x540, 15fps   | the `kbdlight pulse` shot, in the README |
-| `../assets/banner.png`         | 1584x396         | README hero                           |
-| `../assets/social-card.png`    | 1280x640         | GitHub social preview, the `og:image` |
-| `../landing/assets/poster.jpg` | 1920x1080        | the landing page video poster frame   |
+| `../assets/banner.png`         | 1584x396         | README hero                              |
+| `../assets/social-card.png`    | 1280x640         | GitHub social preview, the `og:image`    |
+| `../landing/assets/poster.jpg` | 1920x1080        | the landing page video poster frame      |
 
 `pulse.gif` has its own composition (`Pulse`) and its own script,
 `npm run render:pulse:gif`, because it is a second demo rather than a variant of
@@ -74,6 +74,8 @@ npm run dev        # Remotion Studio, scrub the timeline
 npm run build           # every artifact, then the copy into ../landing/assets/
 npm run render:mp4      # 1920x1080 h264  -> ../assets/demo.mp4
 npm run render:gif      # 960x540 15fps   -> ../assets/demo.gif  (then gifsicle)
+npm run render:pulse:gif # 960x540 15fps  -> ../assets/pulse.gif (then gifsicle)
+npm run render:pulse    # 1920x1080 h264  -> ../assets/pulse.mp4 (not committed)
 npm run render:banner   # 1584x396 png    -> ../assets/banner.png
 npm run render:social   # 1280x640 png    -> ../assets/social-card.png
 npm run render:poster   # frame 200 jpeg  -> ../landing/assets/poster.jpg
