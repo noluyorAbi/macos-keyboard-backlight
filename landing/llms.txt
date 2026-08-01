@@ -16,7 +16,7 @@ Key facts, all verifiable in the repository:
 - Platform: macOS only, Apple Silicon and Intel. Requires Node.js 18 or newer.
 - One runtime dependency, koffi. No native build step, so no node-gyp, no Xcode
   and no compiler on the installing machine.
-- License: MIT.
+- License: MIT. Site: https://kbdlight.adatepe.dev
 - It calls the private Apple framework `CoreBrightness`, resolving the
   `KeyboardBrightnessClient` class and its selectors at runtime through
   `objc_msgSend`. Apple can change that interface without notice; the failure
@@ -24,6 +24,8 @@ Key facts, all verifiable in the repository:
 - The behaviour people get wrong: ambient auto-brightness keeps re-adjusting the
   backlight and overrides any level you set. Disable it first with
   `kbdlight auto off`, then the value holds.
+- Nothing in this project makes a network request, at any point, for any
+  reason. That includes the sunrise and sunset schedule described below.
 
 ## Commands
 
@@ -32,12 +34,72 @@ Key facts, all verifiable in the repository:
 - `kbdlight off` and `kbdlight max` are aliases for `set 0` and `set 1`
 - `kbdlight auto [on|off]` reads or sets ambient auto-brightness
 - `kbdlight list` prints keyboard backlight IDs
+- `kbdlight pulse [count]` blinks the backlight as a notification, then restores
+  the exact brightness and auto-brightness state it found, which makes it safe
+  to fire from an editor hook or a scheduled job
+- `kbdlight sun [on|off]` puts the backlight on a sunrise and sunset schedule
+- `kbdlight --help` prints help that is colour coded on a terminal and plain the
+  moment it is piped. `NO_COLOR`, `FORCE_COLOR` and `--no-color` are honoured.
+
+## Sun mode
+
+`kbdlight sun on` holds the backlight dark through the day and lights it after
+sunset, then takes it back down at sunrise. Options: `--night <0.0-1.0|auto>`,
+`--day <0.0-1.0|auto>`, `--at <lat,lon>`, `--rise-offset <min>`,
+`--set-offset <min>`. `kbdlight sun` prints today's times and what is armed, and
+`kbdlight sun off` unloads the schedule and restores the state it found.
+
+How it works, because these are the parts usually assumed wrongly:
+
+- Sunrise and sunset are computed on the machine with the NOAA solar algorithm.
+  There is no API call and no sunrise service.
+- Coordinates are derived from the machine's IANA timezone, which is already a
+  city name. Not CoreLocation, not an IP address lookup. No location permission
+  is requested and nothing about where the user is leaves the Mac. `--at
+  <lat,lon>` overrides the derived coordinates.
+- Scheduling is a `launchd` agent, `local.kbdlight.sun`, that re-checks every
+  five minutes rather than firing at two computed clock times. Sunrise moves by
+  a couple of minutes a day, so a clock-time job has to rewrite itself daily and
+  can drift; a poll cannot, and launchd runs a missed interval at the next wake.
+- It writes to the keyboard only when the day or night phase changes, so a level
+  set by hand during the evening is not overwritten at the next check.
+- Above the polar circles it reports polar day or polar night rather than
+  inventing a sunrise that did not happen.
+
+`auto` and `sun` are different things and they compose. `auto` is the hardware
+ambient light sensor reacting to the room right now; `sun` is a schedule.
+`--day auto` hands the daylight hours back to the sensor and still holds a fixed
+level all evening.
 
 ## Node API
 
 `get`, `set`, `isAuto` and `setAuto` each accept an optional trailing keyboard ID
 to target a single keyboard instead of all of them. `keyboardIDs()` takes no
-arguments and returns the IDs to pass to the others.
+arguments and returns the IDs to pass to the others. Every function throws a
+descriptive `Error` on a non-macOS host, when CoreBrightness cannot be reached,
+or when no backlit keyboard is present.
+
+## Common questions
+
+**Can the MacBook keyboard backlight be set from a script?** Not with anything
+Apple ships. `kbdlight set 0.5` does it, through the private CoreBrightness
+interface, with no compiler involved.
+
+**Why does a brightness I set change back on its own?** Ambient auto-brightness
+is re-adjusting it from the light sensor. Run `kbdlight auto off` first, then the
+value holds.
+
+**Does it need Xcode, node-gyp or a compiler?** No. The system calls are resolved
+at runtime through koffi, which ships prebuilt for arm64 and x64.
+
+**Can it turn the keyboard backlight on at sunset automatically?** Yes, that is
+`kbdlight sun on`. The times are computed locally and follow the season.
+
+**Does it send location data anywhere?** No. Sun mode reads the timezone already
+set on the machine and computes the times on the machine.
+
+**Does it work with an external keyboard?** Any backlit keyboard the system
+reports appears in `kbdlight list` and can be targeted by its ID.
 
 ## Docs
 

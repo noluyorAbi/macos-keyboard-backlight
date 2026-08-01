@@ -48,3 +48,6 @@ Thumbs.db
 *.swp
 *.swo
 *.log
+
+# domain skill run record
+.domain/

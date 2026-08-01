@@ -86,6 +86,12 @@ export type Content = {
   /** Repository, written the way a human reads it: `github.com/user/repo`. */
   repoUrl: string;
   /**
+   * The project's own address, without a scheme: `example.dev`. Optional, and
+   * only used where a card is read by someone who is not already on GitHub, so
+   * the social card sends them to the site and the banner still names the repo.
+   */
+  siteUrl?: string;
+  /**
    * Accent colour, one hex value. Everything coral in the frame follows it: the
    * mark, the cursor, the prompt caret, the `$`, the background wash.
    * Defaults to the Claude coral `#d97757`, which is the house colour. Override

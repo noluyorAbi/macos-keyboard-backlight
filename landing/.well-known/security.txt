@@ -1,4 +1,5 @@
 # RFC 9116. Report privately through GitHub, never in a public issue.
+Canonical: https://kbdlight.adatepe.dev/.well-known/security.txt
 Contact: https://github.com/noluyorAbi/macos-keyboard-backlight/security/advisories/new
 Policy: https://github.com/noluyorAbi/macos-keyboard-backlight/security/policy
 Preferred-Languages: en, de

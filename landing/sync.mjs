@@ -24,6 +24,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
 
 const DIR = dirname(fileURLToPath(import.meta.url));
 const CHECK = process.argv.includes("--check");
@@ -55,6 +56,7 @@ const ICONS = {
   lock: '<rect x="3.4" y="8.6" width="13.2" height="8.6" rx="1.7"/><path d="M6.5 8.6 V6.2 a3.5 3.5 0 0 1 7 0 v2.4"/>',
   chart:
     '<line x1="2.9" y1="17.1" x2="17.1" y2="17.1"/><line x1="6" y1="17.1" x2="6" y2="10.5"/><line x1="10" y1="17.1" x2="10" y2="5.5"/><line x1="14" y1="17.1" x2="14" y2="8.2"/>',
+  sun: '<circle cx="10" cy="10" r="3.6"/><line x1="10" y1="1.8" x2="10" y2="3.4"/><line x1="10" y1="16.6" x2="10" y2="18.2"/><line x1="1.8" y1="10" x2="3.4" y2="10"/><line x1="16.6" y1="10" x2="18.2" y2="10"/><line x1="4.2" y1="4.2" x2="5.3" y2="5.3"/><line x1="14.7" y1="14.7" x2="15.8" y2="15.8"/><line x1="4.2" y1="15.8" x2="5.3" y2="14.7"/><line x1="14.7" y1="5.3" x2="15.8" y2="4.2"/>',
 };
 
 function icon(name, cls = "icon") {
@@ -135,17 +137,34 @@ function headRegion(c) {
   if (site.twitterCreator)
     twitter.push(`  <meta name="twitter:creator" content="${esc(site.twitterCreator)}">`);
 
+  const imageType = /\.jpe?g$/i.test(image) ? "image/jpeg" : "image/png";
+
   return `  <title>${esc(title)}</title>
   <meta name="description" content="${esc(description)}">
   <meta name="theme-color" content="${esc(site.themeColor || "#0b0b0b")}">
   <link rel="canonical" href="${esc(base)}">
 
+  <!--
+    Stated rather than left to a default. max-image-preview:large is what lets a
+    search result carry the social card instead of a thumbnail, and max-snippet
+    unbounded is what lets an answer engine quote enough of the page to be
+    useful rather than truncating it mid sentence.
+  -->
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+
+  <!-- The plain text summary written for language models. The same file is
+       advertised as a Link header on / by vercel.json. -->
+  <link rel="alternate" type="text/markdown" href="${esc(absolute(base, "llms.txt"))}" title="Plain text summary for language models">
+
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="${esc(req(c.project?.name, "project.name"))}">
+  <meta property="og:locale" content="${esc((site.lang || "en").replace("-", "_") === "en" ? "en_US" : (site.lang || "en").replace("-", "_"))}">
   <meta property="og:title" content="${esc(title)}">
   <meta property="og:description" content="${esc(description)}">
   <meta property="og:url" content="${esc(base)}">
   <meta property="og:image" content="${esc(image)}">
+  <meta property="og:image:secure_url" content="${esc(image)}">
+  <meta property="og:image:type" content="${imageType}">
   <meta property="og:image:alt" content="${esc(site.ogImageAlt || title)}">
   <meta property="og:image:width" content="1280">
   <meta property="og:image:height" content="640">
@@ -242,6 +261,63 @@ ${items}
       </ul>`;
 }
 
+/*
+  The sun section carries a small day/night preview.
+
+  What is generated here is deliberately a labelled EXAMPLE, not a computed
+  "today": this file runs when a human edits content.json, so any real sunrise
+  baked in now would be wrong by minutes tomorrow and by hours in six months.
+  sun-preview.js replaces the example with the visitor's own day when it runs,
+  and relabels it as it does. Without JavaScript the page still shows a coherent
+  day that never claims to be today's.
+
+  The bar geometry lives in CSS custom properties rather than a style attribute,
+  because the Content-Security-Policy in vercel.json allows no inline styles.
+*/
+function sunRegion(c) {
+  const sun = req(c.sun, "sun");
+  const preview = req(sun.preview, "sun.preview");
+  const example = req(preview.example, "sun.preview.example");
+
+  const paragraphs = req(sun.body, "sun.body")
+    .map((p) => `      <p class="prose">${esc(p)}</p>`)
+    .join("\n");
+  const highlight = sun.highlight
+    ? `\n      <p class="highlight">${esc(sun.highlight)}</p>`
+    : "";
+  const note = sun.note ? `\n      <p class="note">${esc(sun.note)}</p>` : "";
+
+  const mark = (key, value, hook) =>
+    `          <div class="sun-mark">
+            <dt class="sun-mark-key">${esc(key)}</dt>
+            <dd class="sun-mark-value" ${hook}>${esc(value)}</dd>
+          </div>`;
+
+  return `      <h2 class="section-title" id="sun-heading">${icon(sun.icon || "sun", "icon section-icon")}<span>${esc(req(sun.heading, "sun.heading"))}</span></h2>
+${paragraphs}
+
+      <figure class="sun-preview" data-sun-preview data-sun-live-label="${esc(req(preview.liveLabel, "sun.preview.liveLabel"))}">
+        <p class="sun-preview-label" data-sun-label>${esc(req(preview.label, "sun.preview.label"))}</p>
+
+        <div class="sun-track" aria-hidden="true">
+          <div class="sun-lit sun-lit-early"></div>
+          <div class="sun-lit sun-lit-late"></div>
+          <div class="sun-now"></div>
+        </div>
+        <p class="sun-legend" aria-hidden="true">midnight<span class="sun-legend-mid">the glow is the backlight, on</span>midnight</p>
+
+        <dl class="sun-marks">
+${mark("sunrise", req(example.sunrise, "sun.preview.example.sunrise"), "data-sun-rise")}
+${mark("sunset", req(example.sunset, "sun.preview.example.sunset"), "data-sun-set")}
+${mark("backlight now", "off, it is daylight", "data-sun-phase")}
+        </dl>
+
+        <figcaption class="caption sun-preview-note">${esc(req(preview.note, "sun.preview.note"))}</figcaption>
+      </figure>
+${highlight}
+      ${copyBlock(req(sun.command, "sun.command"), "sun-command")}${note}`;
+}
+
 function installRegion(c) {
   const install = req(c.install, "install");
   const intro = install.intro
@@ -266,6 +342,34 @@ ${steps}
       </ol>${note}`;
 }
 
+/*
+  The visible FAQ.
+
+  It exists because the FAQPage block in index.html has to be answerable from the
+  page itself: structured data that states an answer the visitor cannot read is
+  the definition of the markup search engines penalise, and an answer engine
+  quoting it would be quoting something nobody can check. <details> keeps the
+  section short while leaving every answer in the DOM, which is what crawlers
+  read.
+*/
+function faqRegion(c) {
+  const faq = req(c.faq, "faq");
+  const intro = faq.intro ? `\n      <p class="prose">${esc(faq.intro)}</p>` : "";
+  const items = req(faq.items, "faq.items")
+    .map(
+      (item) => `        <details class="faq-item">
+          <summary class="faq-q">${esc(req(item.q, "faq.items[].q"))}</summary>
+          <p class="faq-a">${esc(req(item.a, "faq.items[].a"))}</p>
+        </details>`,
+    )
+    .join("\n");
+
+  return `      <h2 class="section-title" id="faq-heading">${icon(faq.icon || "book", "icon section-icon")}<span>${esc(req(faq.heading, "faq.heading"))}</span></h2>${intro}
+      <div class="faq">
+${items}
+      </div>`;
+}
+
 function footerRegion(c) {
   const site = c.site || {};
   const footer = req(c.footer, "footer");
@@ -284,13 +388,40 @@ function footerRegion(c) {
       <p class="footer-copy">${esc(footer.copyright || "")}</p>`;
 }
 
+/* --------------------------------------------------------------- sun data */
+/*
+  The timezone to coordinates table the page uses is the package's own, read
+  straight out of ../src/geo.js and written back out as a script the browser can
+  load. Copying it by hand would work exactly once: the day someone corrects a
+  city in geo.js, the page would quietly keep the old one and start drawing a
+  sunrise that the command disagrees with.
+
+  Generated, not fetched: the Content-Security-Policy sets connect-src to none,
+  so the page cannot request a JSON file even from its own origin.
+*/
+function sunData() {
+  const require = createRequire(import.meta.url);
+  const geo = require("../src/geo.js");
+
+  const compact = (value) => JSON.stringify(value).replace(/","/g, '", "');
+
+  return `/* GENERATED by sync.mjs from ../src/geo.js. Do not edit; run "node sync.mjs". */
+window.__kbdlightSunData = {
+  zones: ${compact(geo.TZ_COORDS)},
+  aliases: ${compact(geo.TZ_ALIASES)}
+};
+`;
+}
+
 const REGIONS = {
   head: headRegion,
   hero: heroRegion,
   demo: demoRegion,
   why: whyRegion,
   features: featuresRegion,
+  sun: sunRegion,
   install: installRegion,
+  faq: faqRegion,
   footer: footerRegion,
 };
 
@@ -386,6 +517,7 @@ function main() {
     ["index.html", render(readFileSync(join(DIR, "index.html"), "utf8"), content)],
     ["robots.txt", robots(content)],
     ["sitemap.xml", sitemap(content)],
+    ["sun-data.js", sunData()],
   ];
 
   let stale = 0;

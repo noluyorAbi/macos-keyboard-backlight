@@ -68,9 +68,16 @@ export const InstallPill: FC<{ size: number; padding?: string }> = ({
   </div>
 );
 
-export const RepoLine: FC<{ size: number }> = ({ size }) => (
+/**
+ * Where to go next. Defaults to the repository; pass `site` on a card whose
+ * reader is not already on GitHub, and it prefers the project's own address.
+ */
+export const RepoLine: FC<{ size: number; site?: boolean }> = ({
+  size,
+  site = false,
+}) => (
   <div style={{ ...mono, fontSize: size, color: ansi.mut }}>
-    {content.repoUrl}
+    {(site && content.siteUrl) || content.repoUrl}
   </div>
 );
 

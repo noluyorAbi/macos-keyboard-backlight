@@ -21,7 +21,7 @@
 <br>
 <br>
 
-<a href="https://macos-keyboard-backlight.vercel.app?utm_source=readme&utm_medium=header">macos-keyboard-backlight.vercel.app</a>
+<a href="https://kbdlight.adatepe.dev?utm_source=readme&utm_medium=header">kbdlight.adatepe.dev</a>
 
 </div>
 
@@ -184,7 +184,7 @@ try {
 
 **Backlight off during the day, lit in the evening.** This used to be a shell
 script comparing `date +%H` against two numbers you had to keep re-tuning as the
-seasons moved. It is now `kbdlight sun on`; see below.
+seasons moved. It is now `kbdlight sun on`; see [Sun mode](#sun-mode).
 
 **Dim the keyboard while a screen recording runs**, then restore it:
 

@@ -48,9 +48,11 @@ export const content: Content = {
 
   repoUrl: "github.com/noluyorAbi/macos-keyboard-backlight",
 
+  siteUrl: "kbdlight.adatepe.dev",
+
   accent: "#d97757",
 
-  highlights: ["no build step", "one dependency", "MIT"],
+  highlights: ["follows the sun", "no build step", "MIT"],
 
   coldOpen: [
     "A slider in System Settings.",

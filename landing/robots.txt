@@ -65,4 +65,4 @@ Allow: /
 Disallow: /admin
 Disallow: /api/
 
-Sitemap: https://macos-keyboard-backlight.vercel.app/sitemap.xml
+Sitemap: https://kbdlight.adatepe.dev/sitemap.xml

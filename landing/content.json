@@ -1,6 +1,6 @@
 {
   "site": {
-    "url": "https://macos-keyboard-backlight.vercel.app",
+    "url": "https://kbdlight.adatepe.dev",
     "lastmod": "2026-07-24",
     "lang": "en",
     "themeColor": "#0b0b0b",
@@ -16,7 +16,7 @@
   },
   "meta": {
     "title": "macos-keyboard-backlight, script the MacBook keyboard backlight",
-    "description": "macOS gives you a slider and two keys, and no way to script either one. This adds a kbdlight command and a Node API to read and set the keyboard backlight and toggle the ambient light sensor. One dependency, no native build step, MIT."
+    "description": "macOS gives you a slider and two keys, and no way to script either one. This adds a kbdlight command and a Node API to read and set the keyboard backlight, blink it as a notification, and put it on a sunrise and sunset schedule. One dependency, no native build step, MIT."
   },
   "project": {
     "name": "macos-keyboard-backlight",
@@ -24,7 +24,7 @@
     "repo": "https://github.com/noluyorAbi/macos-keyboard-backlight"
   },
   "hero": {
-    "eyebrow": "No build step, one dependency, MIT",
+    "eyebrow": "No build step, one dependency, no network call, MIT",
     "headline": "Your keyboard backlight, finally scriptable.",
     "sub": "macOS gives you a slider in System Settings and two keys on the keyboard, and that is the whole interface. There is no way to reach the keyboard backlight from a shell script, a scheduled job, or a Node program. This adds the missing one.",
     "install": {
@@ -71,7 +71,12 @@
       {
         "icon": "terminal",
         "title": "A real command",
-        "body": "kbdlight get, set, off, max, auto and list. Values are clamped to the 0.0 to 1.0 range before they reach the system call."
+        "body": "kbdlight get, set, off, max, auto, list, pulse and sun. Values are clamped to the 0.0 to 1.0 range before they reach the system call, and the help is colour coded on a terminal and plain the moment you pipe it."
+      },
+      {
+        "icon": "zap",
+        "title": "Blink it as a notification",
+        "body": "kbdlight pulse flashes the keyboard and then restores the exact brightness and sensor state it found, so it is safe to hang off an editor hook or a scheduled job. A lock stops two runs from restoring each other's half-finished state."
       },
       {
         "icon": "download",
@@ -89,16 +94,31 @@
         "body": "It calls a private Apple framework, so it throws a descriptive Error rather than crashing when that interface is not there. Catch it, do not feature-detect it."
       },
       {
-        "icon": "clock",
-        "title": "The sensor gotcha, documented",
-        "body": "Auto-brightness keeps re-adjusting the backlight and overrides a level you set. Turn the sensor off first and the value sticks. The help text says so too."
-      },
-      {
         "icon": "folder",
         "title": "One dependency",
         "body": "koffi, and nothing else. Tested on macOS against Node 18, 20, 22 and 24 on every push."
       }
     ]
+  },
+  "sun": {
+    "heading": "It follows the sun",
+    "icon": "sun",
+    "command": "kbdlight sun on",
+    "body": [
+      "One command puts the backlight on the sky's schedule: dark through the day, up to a level you choose after sunset, and back down at sunrise. The times move with the season on their own, so there is no clock hour to re-tune in March and again in June.",
+      "Sunrise and sunset are computed on your own machine with the NOAA solar algorithm, from coordinates your timezone already implies. No location permission, no lookup service, nothing about where you are leaving the Mac."
+    ],
+    "preview": {
+      "label": "An example day",
+      "liveLabel": "Today, where you are",
+      "note": "Computed in your browser from your timezone, by the same algorithm the command uses. Nothing is sent anywhere, and nothing is stored.",
+      "example": {
+        "sunrise": "06:00",
+        "sunset": "19:00"
+      }
+    },
+    "highlight": "The ambient light sensor and the sun schedule are different things, and they compose. Sun mode can hand the daylight hours back to the sensor with --day auto and still hold a fixed level all evening.",
+    "note": "kbdlight sun off unloads the schedule and restores the exact brightness and sensor state it found."
   },
   "install": {
     "heading": "Install and use",
@@ -116,12 +136,48 @@
         "command": "kbdlight auto off && kbdlight off"
       },
       {
+        "title": "Put it on the sun's schedule",
+        "body": "Dark through the day, lit after sunset, for as long as you leave it armed. Undo it with kbdlight sun off.",
+        "command": "kbdlight sun on"
+      },
+      {
         "title": "Use it from Node",
         "body": "The same operations as the command, returning numbers and booleans.",
         "command": "node -e \"require('macos-keyboard-backlight').set(0.5)\""
       }
     ],
     "note": "Restore the ambient light sensor at any time with kbdlight auto on."
+  },
+  "faq": {
+    "heading": "Questions people actually ask",
+    "icon": "book",
+    "intro": "The page's structured data carries these same answers, word for word, so anything quoting this page is quoting something you can read here and check.",
+    "items": [
+      {
+        "q": "Can the MacBook keyboard backlight be set from a script?",
+        "a": "Not with anything Apple ships: macOS exposes a slider in System Settings and two keys on the keyboard, and no scriptable interface. kbdlight set 0.5 does it, through the private CoreBrightness framework, with no compiler involved."
+      },
+      {
+        "q": "Why does the keyboard brightness I set change back on its own?",
+        "a": "Ambient auto-brightness is re-adjusting it from the light sensor, and it overrides any fixed value. Run kbdlight auto off first, then the level you set holds. Re-enable the sensor later with kbdlight auto on."
+      },
+      {
+        "q": "Can the keyboard backlight turn on automatically at sunset?",
+        "a": "Yes. kbdlight sun on keeps the backlight dark through the day and lights it after sunset, then takes it back down at sunrise. The times are computed on the machine with the NOAA solar algorithm and move with the season, so there is no clock hour to re-tune."
+      },
+      {
+        "q": "Does it need Xcode, node-gyp or a compiler to install?",
+        "a": "No. There is no native build step. The system calls are resolved at runtime through koffi, which ships prebuilt for both Apple Silicon and Intel, and koffi is the only runtime dependency."
+      },
+      {
+        "q": "Does it send location data anywhere to work out sunrise and sunset?",
+        "a": "No. Coordinates are derived from the IANA timezone already set on the machine, which is a city name, and the times are computed locally. There is no location permission prompt, no IP lookup and no network request at any point."
+      },
+      {
+        "q": "Does it work with an external keyboard?",
+        "a": "Any backlit keyboard the system reports is listed by kbdlight list, and get, set, isAuto and setAuto each take an optional keyboard ID so a single keyboard can be targeted instead of all of them."
+      }
+    ]
   },
   "footer": {
     "license": "MIT. Free to use, modify and redistribute, commercially or not.",

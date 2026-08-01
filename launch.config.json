@@ -12,7 +12,7 @@
   "product": {
     "name": "macos-keyboard-backlight",
     "oneLiner": "Control the MacBook keyboard backlight from the command line or Node.",
-    "url": "https://macos-keyboard-backlight.vercel.app",
+    "url": "https://kbdlight.adatepe.dev",
     "repo": "https://github.com/noluyorAbi/macos-keyboard-backlight",
     "licence": "MIT"
   },
@@ -45,7 +45,7 @@
     "beforeSeed": null,
     "afterSeed": null,
     "beforeDeploy": null,
-    "beforePost": "curl -sfo /dev/null -w '%{http_code}' https://macos-keyboard-backlight.vercel.app | grep -q 200 && npm test",
+    "beforePost": "curl -sfo /dev/null -w '%{http_code}' https://kbdlight.adatepe.dev | grep -q 200 && npm test",
     "$": "beforePost is the one that earns its keep: it asserts the live site answers 200 and the package still passes its smoke test before a link goes into a thread that cannot be edited."
   }
 }

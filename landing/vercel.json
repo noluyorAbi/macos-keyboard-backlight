@@ -2,6 +2,20 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "macos-keyboard-backlight.vercel.app" }],
+      "destination": "https://kbdlight.adatepe.dev/",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "macos-keyboard-backlight.vercel.app" }],
+      "destination": "https://kbdlight.adatepe.dev/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [{ "source": "/admin", "destination": "/api/admin" }],
   "headers": [
     {

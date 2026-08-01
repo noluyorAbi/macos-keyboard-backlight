@@ -22,17 +22,31 @@
  */
 
 import { execFileSync } from "node:child_process";
-import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import {
+  cpSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 
 const DIR = dirname(fileURLToPath(import.meta.url));
-const OUTPUTS = ["index.html", "robots.txt", "sitemap.xml"];
+const OUTPUTS = ["index.html", "robots.txt", "sitemap.xml", "sun-data.js"];
 
 /** Everything sync.mjs reads or writes. Nothing else needs copying. */
 const SANDBOX_FILES = ["sync.mjs", "content.json", ...OUTPUTS];
+
+/**
+ * sun-data.js is built from the package's own timezone table, so the generator
+ * reaches one directory up for it. The sandbox has to reproduce that shape or
+ * the copy of sync.mjs cannot run at all.
+ */
+const SANDBOX_SIBLINGS = [["..", "src", "geo.js"]];
 
 /**
  * A disposable copy of the generator and its inputs.
@@ -41,9 +55,20 @@ const SANDBOX_FILES = ["sync.mjs", "content.json", ...OUTPUTS];
  * directory operates entirely on that copy.
  */
 function sandbox() {
-  const dir = mkdtempSync(join(tmpdir(), "landing-sync-"));
+  // One level deeper than before: the generator now resolves a sibling of the
+  // landing directory, so the copy needs a parent to resolve against.
+  const root = mkdtempSync(join(tmpdir(), "landing-sync-"));
+  const dir = join(root, "landing");
+  mkdirSync(dir, { recursive: true });
+
   for (const name of SANDBOX_FILES) {
     cpSync(join(DIR, name), join(dir, name));
+  }
+  for (const parts of SANDBOX_SIBLINGS) {
+    const from = join(DIR, ...parts);
+    const to = join(dir, ...parts);
+    mkdirSync(dirname(to), { recursive: true });
+    cpSync(from, to);
   }
   return {
     dir,
@@ -54,7 +79,7 @@ function sandbox() {
         cwd: dir,
         encoding: "utf8",
       }),
-    dispose: () => rmSync(dir, { recursive: true, force: true }),
+    dispose: () => rmSync(root, { recursive: true, force: true }),
   };
 }
 
@@ -144,6 +169,40 @@ check("a malformed site.lastmod is rejected rather than guessed", () => {
     assert.throws(() => box.sync(), /lastmod/i);
   } finally {
     box.dispose();
+  }
+});
+
+// The FAQPage block sits outside the generated markers, so nothing regenerates
+// it when content.json changes. Structured data that states an answer the page
+// does not show is exactly what search engines treat as deceptive, and an answer
+// engine quoting it would be quoting something no reader can verify.
+check("the FAQ in the structured data is the FAQ on the page", () => {
+  const content = JSON.parse(readFileSync(join(DIR, "content.json"), "utf8"));
+  const html = readFileSync(join(DIR, "index.html"), "utf8");
+
+  const block = html.match(
+    /<script type="application\/ld\+json">([\s\S]*?)<\/script>/,
+  );
+  assert.ok(block, "index.html carries a ld+json block");
+
+  const graph = JSON.parse(block[1])["@graph"];
+  const faq = graph.find((node) => node["@type"] === "FAQPage");
+  assert.ok(faq, "the structured data carries a FAQPage");
+
+  const stated = faq.mainEntity.map((q) => [q.name, q.acceptedAnswer.text]);
+  const shown = content.faq.items.map((item) => [item.q, item.a]);
+  assert.deepEqual(
+    stated,
+    shown,
+    "the FAQPage and content.json disagree; the page would claim an answer it does not show",
+  );
+
+  // And the answers really are in the markup, not only in content.json.
+  for (const [question] of shown) {
+    assert.ok(
+      html.includes(question.replace(/&/g, "&amp;")),
+      `the page does not show the question: ${question}`,
+    );
   }
 });
 

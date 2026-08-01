@@ -26,7 +26,7 @@
   "bugs": {
     "url": "https://github.com/noluyorAbi/macos-keyboard-backlight/issues"
   },
-  "homepage": "https://macos-keyboard-backlight.vercel.app",
+  "homepage": "https://kbdlight.adatepe.dev",
   "type": "commonjs",
   "main": "src/index.js",
   "bin": {
@@ -48,6 +48,6 @@
     "koffi": "^2.16.3"
   },
   "scripts": {
-    "test": "node test/sun.js && node test/smoke.js"
+    "test": "node test/sun.js && node test/landing-preview.js && node test/smoke.js"
   }
 }

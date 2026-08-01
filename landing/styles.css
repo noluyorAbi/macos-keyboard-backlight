@@ -603,6 +603,216 @@ a:hover {
   color: var(--dim);
 }
 
+/* -------------------------------------------------------------- sun mode */
+/*
+  A day drawn as a single 24 hour track: night is the bare panel, daylight is
+  the lit band across the middle, and a marker sits at the current time.
+
+  The three positions arrive as custom properties, in percent of the day, set
+  by sun-preview.js through the CSSOM. They are not style attributes on purpose:
+  the Content-Security-Policy in vercel.json permits no inline style, and the
+  defaults below are the example day the generated markup describes, so the
+  track is already coherent before any script runs.
+*/
+.sun-preview {
+  max-width: var(--measure);
+  margin: 2rem 0 0;
+  padding: 1.1rem 1.2rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+
+  --sun-rise: 25%;
+  --sun-set: 79.2%;
+  --sun-now: 50%;
+}
+
+.sun-preview-label {
+  margin: 0 0 0.85rem;
+  color: var(--dim-text);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+}
+
+.sun-track {
+  position: relative;
+  height: 3rem;
+  border-radius: var(--radius-sm);
+  background: var(--panel-high); /* the daytime: keyboard off */
+  overflow: hidden;
+}
+
+/*
+  The glow is the backlight, not the daylight.
+
+  Drawing the daytime as the lit band is the obvious way round and it is the
+  wrong one: this is a picture of what the command does, and what it does is
+  leave the keyboard dark all day and light it after sunset. So the track itself
+  is the day, and the two warm segments at either end are the hours the keyboard
+  is actually on. The gradient fades towards the sunrise and sunset edges,
+  because a hard vertical line there reads as a rendering seam rather than as
+  the moment the sun crossed the horizon.
+*/
+.sun-lit {
+  position: absolute;
+  inset-block: 0;
+  transition:
+    inset-inline-start 0.55s var(--ease),
+    inset-inline-end 0.55s var(--ease);
+}
+
+.sun-lit-early {
+  inset-inline-start: 0;
+  inset-inline-end: calc(100% - var(--sun-rise));
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--coral) 55%, transparent),
+    color-mix(in srgb, var(--coral) 8%, transparent)
+  );
+}
+
+.sun-lit-late {
+  inset-inline-start: var(--sun-set);
+  inset-inline-end: 0;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--coral) 8%, transparent),
+    color-mix(in srgb, var(--coral) 55%, transparent)
+  );
+}
+
+.sun-legend {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0.45rem 0 0;
+  color: var(--dim);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+}
+
+.sun-legend-mid {
+  color: var(--dim-text);
+}
+
+/*
+  Hidden until a script has worked out what "now" is. A marker sitting at a
+  guessed time would be the one dishonest pixel on the page.
+*/
+.sun-now {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: var(--sun-now);
+  width: 2px;
+  margin-inline-start: -1px;
+  background: var(--bright);
+  opacity: 0;
+  transition:
+    inset-inline-start 0.55s var(--ease),
+    opacity 0.3s var(--ease);
+}
+
+.sun-now::after {
+  content: "";
+  position: absolute;
+  inset-block-start: -3px;
+  inset-inline-start: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--bright);
+}
+
+[data-sun-live] .sun-now {
+  opacity: 1;
+}
+
+.sun-marks {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: 0.75rem 1.25rem;
+  margin: 0.9rem 0 0;
+}
+
+.sun-mark {
+  min-width: 0;
+}
+
+.sun-mark-key {
+  color: var(--dim-text);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.sun-mark-value {
+  margin: 0.15rem 0 0;
+  color: var(--bright);
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.sun-preview-note {
+  margin: 0.9rem 0 0;
+}
+
+/* -------------------------------------------------------------------- faq */
+.faq {
+  max-width: var(--measure);
+  margin-block-start: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.faq-item + .faq-item {
+  border-block-start: 1px solid var(--border);
+}
+
+.faq-q {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.9rem 1.1rem;
+  color: var(--bright);
+  cursor: pointer;
+  list-style: none;
+  transition: background 0.15s var(--ease);
+}
+
+/* The default triangle differs per browser and cannot be styled in Safari, so
+   it is replaced with one marker that behaves the same everywhere. */
+.faq-q::-webkit-details-marker {
+  display: none;
+}
+
+.faq-q::before {
+  content: "+";
+  color: var(--coral);
+  font-weight: 700;
+  transition: transform 0.2s var(--ease);
+}
+
+.faq-item[open] .faq-q::before {
+  content: "\2212"; /* minus, so the control says what it will do next */
+}
+
+.faq-q:hover,
+.faq-item[open] .faq-q {
+  background: var(--panel);
+}
+
+.faq-q:focus-visible {
+  outline: 2px solid var(--coral);
+  outline-offset: -2px;
+}
+
+.faq-a {
+  margin: 0;
+  padding: 0 1.1rem 1.1rem 2.3rem;
+  color: var(--text);
+}
+
 /* ------------------------------------------------------------------ toast */
 .toast {
   position: fixed;

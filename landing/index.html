@@ -11,30 +11,48 @@
   -->
   <!-- launch:head:start -->
   <title>macos-keyboard-backlight, script the MacBook keyboard backlight</title>
-  <meta name="description" content="macOS gives you a slider and two keys, and no way to script either one. This adds a kbdlight command and a Node API to read and set the keyboard backlight and toggle the ambient light sensor. One dependency, no native build step, MIT.">
+  <meta name="description" content="macOS gives you a slider and two keys, and no way to script either one. This adds a kbdlight command and a Node API to read and set the keyboard backlight, blink it as a notification, and put it on a sunrise and sunset schedule. One dependency, no native build step, MIT.">
   <meta name="theme-color" content="#0b0b0b">
-  <link rel="canonical" href="https://macos-keyboard-backlight.vercel.app">
+  <link rel="canonical" href="https://kbdlight.adatepe.dev">
+
+  <!--
+    Stated rather than left to a default. max-image-preview:large is what lets a
+    search result carry the social card instead of a thumbnail, and max-snippet
+    unbounded is what lets an answer engine quote enough of the page to be
+    useful rather than truncating it mid sentence.
+  -->
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+
+  <!-- The plain text summary written for language models. The same file is
+       advertised as a Link header on / by vercel.json. -->
+  <link rel="alternate" type="text/markdown" href="https://kbdlight.adatepe.dev/llms.txt" title="Plain text summary for language models">
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="macos-keyboard-backlight">
+  <meta property="og:locale" content="en_US">
   <meta property="og:title" content="macos-keyboard-backlight, script the MacBook keyboard backlight">
-  <meta property="og:description" content="macOS gives you a slider and two keys, and no way to script either one. This adds a kbdlight command and a Node API to read and set the keyboard backlight and toggle the ambient light sensor. One dependency, no native build step, MIT.">
-  <meta property="og:url" content="https://macos-keyboard-backlight.vercel.app">
-  <meta property="og:image" content="https://macos-keyboard-backlight.vercel.app/assets/social-card.png">
+  <meta property="og:description" content="macOS gives you a slider and two keys, and no way to script either one. This adds a kbdlight command and a Node API to read and set the keyboard backlight, blink it as a notification, and put it on a sunrise and sunset schedule. One dependency, no native build step, MIT.">
+  <meta property="og:url" content="https://kbdlight.adatepe.dev">
+  <meta property="og:image" content="https://kbdlight.adatepe.dev/assets/social-card.png">
+  <meta property="og:image:secure_url" content="https://kbdlight.adatepe.dev/assets/social-card.png">
+  <meta property="og:image:type" content="image/png">
   <meta property="og:image:alt" content="macos-keyboard-backlight, your keyboard backlight finally scriptable">
   <meta property="og:image:width" content="1280">
   <meta property="og:image:height" content="640">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="macos-keyboard-backlight, script the MacBook keyboard backlight">
-  <meta name="twitter:description" content="macOS gives you a slider and two keys, and no way to script either one. This adds a kbdlight command and a Node API to read and set the keyboard backlight and toggle the ambient light sensor. One dependency, no native build step, MIT.">
-  <meta name="twitter:image" content="https://macos-keyboard-backlight.vercel.app/assets/social-card.png">
+  <meta name="twitter:description" content="macOS gives you a slider and two keys, and no way to script either one. This adds a kbdlight command and a Node API to read and set the keyboard backlight, blink it as a notification, and put it on a sunrise and sunset schedule. One dependency, no native build step, MIT.">
+  <meta name="twitter:image" content="https://kbdlight.adatepe.dev/assets/social-card.png">
   <meta name="twitter:image:alt" content="macos-keyboard-backlight, your keyboard backlight finally scriptable">
   <!-- launch:head:end -->
 
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
   <script src="app.js" defer></script>
+  <!-- sun-data.js is generated from ../src/geo.js by sync.mjs and must load first. -->
+  <script src="sun-data.js" defer></script>
+  <script src="sun-preview.js" defer></script>
 
   <!--
     Outside the generated markers on purpose, so sync.mjs leaves it alone.
@@ -49,29 +67,99 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "macos-keyboard-backlight",
-    "alternateName": "kbdlight",
-    "applicationCategory": "DeveloperApplication",
-    "applicationSubCategory": "Command Line Utility",
-    "operatingSystem": "macOS",
-    "description": "A command line tool and Node library that reads and sets the MacBook keyboard backlight and toggles the ambient light sensor. No native build step.",
-    "url": "https://macos-keyboard-backlight.vercel.app",
-    "downloadUrl": "https://www.npmjs.com/package/macos-keyboard-backlight",
-    "codeRepository": "https://github.com/noluyorAbi/macos-keyboard-backlight",
-    "programmingLanguage": "JavaScript",
-    "license": "https://spdx.org/licenses/MIT.html",
-    "isAccessibleForFree": true,
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
-    "author": {
-      "@type": "Person",
-      "name": "noluyorAbi",
-      "url": "https://github.com/noluyorAbi"
-    }
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://kbdlight.adatepe.dev/#software",
+        "name": "macos-keyboard-backlight",
+        "alternateName": "kbdlight",
+        "applicationCategory": "DeveloperApplication",
+        "applicationSubCategory": "Command Line Utility",
+        "operatingSystem": "macOS",
+        "description": "A command line tool and Node library that reads and sets the MacBook keyboard backlight, blinks it as a notification, and puts it on a sunrise and sunset schedule computed on the machine. No native build step.",
+        "featureList": [
+          "Read and set the keyboard backlight from a shell script or from Node",
+          "Toggle the ambient light sensor that otherwise overrides a fixed level",
+          "Blink the backlight as a notification and restore the state it found",
+          "Follow sunrise and sunset on a schedule computed locally, with no network call",
+          "Target a single keyboard by ID when more than one is attached",
+          "Colour coded help that goes plain when piped, honouring NO_COLOR"
+        ],
+        "url": "https://kbdlight.adatepe.dev",
+        "downloadUrl": "https://www.npmjs.com/package/macos-keyboard-backlight",
+        "installUrl": "https://www.npmjs.com/package/macos-keyboard-backlight",
+        "codeRepository": "https://github.com/noluyorAbi/macos-keyboard-backlight",
+        "programmingLanguage": "JavaScript",
+        "runtimePlatform": "Node.js 18 or newer",
+        "license": "https://spdx.org/licenses/MIT.html",
+        "isAccessibleForFree": true,
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "noluyorAbi",
+          "url": "https://github.com/noluyorAbi"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://kbdlight.adatepe.dev/#faq",
+        "about": { "@id": "https://kbdlight.adatepe.dev/#software" },
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Can the MacBook keyboard backlight be set from a script?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Not with anything Apple ships: macOS exposes a slider in System Settings and two keys on the keyboard, and no scriptable interface. kbdlight set 0.5 does it, through the private CoreBrightness framework, with no compiler involved."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why does the keyboard brightness I set change back on its own?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Ambient auto-brightness is re-adjusting it from the light sensor, and it overrides any fixed value. Run kbdlight auto off first, then the level you set holds. Re-enable the sensor later with kbdlight auto on."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can the keyboard backlight turn on automatically at sunset?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. kbdlight sun on keeps the backlight dark through the day and lights it after sunset, then takes it back down at sunrise. The times are computed on the machine with the NOAA solar algorithm and move with the season, so there is no clock hour to re-tune."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does it need Xcode, node-gyp or a compiler to install?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. There is no native build step. The system calls are resolved at runtime through koffi, which ships prebuilt for both Apple Silicon and Intel, and koffi is the only runtime dependency."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does it send location data anywhere to work out sunrise and sunset?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Coordinates are derived from the IANA timezone already set on the machine, which is a city name, and the times are computed locally. There is no location permission prompt, no IP lookup and no network request at any point."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does it work with an external keyboard?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Any backlit keyboard the system reports is listed by kbdlight list, and get, set, isAuto and setAuto each take an optional keyboard ID so a single keyboard can be targeted instead of all of them."
+            }
+          }
+        ]
+      }
+    ]
   }
   </script>
 </head>
@@ -85,7 +173,7 @@
     <section class="section hero" aria-labelledby="hero-heading">
       <!-- launch:hero:start -->
       <p class="wordmark">macos-keyboard-backlight</p>
-      <p class="eyebrow">No build step, one dependency, MIT</p>
+      <p class="eyebrow">No build step, one dependency, no network call, MIT</p>
       <h1 class="hero-title" id="hero-heading">Your keyboard backlight, finally scriptable.</h1>
       <p class="hero-sub">macOS gives you a slider in System Settings and two keys on the keyboard, and that is the whole interface. There is no way to reach the keyboard backlight from a shell script, a scheduled job, or a Node program. This adds the missing one.</p>
 
@@ -151,7 +239,11 @@
       <ul class="grid">
         <li class="card">
           <h3 class="card-title"><svg class="icon card-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="3.3 14.2 8.3 9.2 3.3 4.2"/><line x1="10.4" y1="15.8" x2="16.7" y2="15.8"/></svg><span>A real command</span></h3>
-          <p class="card-body">kbdlight get, set, off, max, auto and list. Values are clamped to the 0.0 to 1.0 range before they reach the system call.</p>
+          <p class="card-body">kbdlight get, set, off, max, auto, list, pulse and sun. Values are clamped to the 0.0 to 1.0 range before they reach the system call, and the help is colour coded on a terminal and plain the moment you pipe it.</p>
+        </li>
+        <li class="card">
+          <h3 class="card-title"><svg class="icon card-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11.2 2.2 L4.5 11 h4.6 l-.3 6.8 L15.5 9 h-4.6 z"/></svg><span>Blink it as a notification</span></h3>
+          <p class="card-body">kbdlight pulse flashes the keyboard and then restores the exact brightness and sensor state it found, so it is safe to hang off an editor hook or a scheduled job. A lock stops two runs from restoring each other's half-finished state.</p>
         </li>
         <li class="card">
           <h3 class="card-title"><svg class="icon card-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M17.5 12.5 v3.3 a1.7 1.7 0 0 1-1.7 1.7 H4.2 a1.7 1.7 0 0 1-1.7-1.7 v-3.3"/><polyline points="5.8 8.3 10 12.5 14.2 8.3"/><line x1="10" y1="12.5" x2="10" y2="2.5"/></svg><span>No native build step</span></h3>
@@ -166,15 +258,57 @@
           <p class="card-body">It calls a private Apple framework, so it throws a descriptive Error rather than crashing when that interface is not there. Catch it, do not feature-detect it.</p>
         </li>
         <li class="card">
-          <h3 class="card-title"><svg class="icon card-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="8"/><polyline points="10 5 10 10 13.4 11.7"/></svg><span>The sensor gotcha, documented</span></h3>
-          <p class="card-body">Auto-brightness keeps re-adjusting the backlight and overrides a level you set. Turn the sensor off first and the value sticks. The help text says so too.</p>
-        </li>
-        <li class="card">
           <h3 class="card-title"><svg class="icon card-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4.2 3.6 H7.3 a1.6 1.6 0 0 1 1.28 .64 l.86 1.15 a1.6 1.6 0 0 0 1.28 .64 H15.8 a1.6 1.6 0 0 1 1.6 1.6 v7.2 a1.6 1.6 0 0 1-1.6 1.6 H4.2 a1.6 1.6 0 0 1-1.6-1.6 V5.2 a1.6 1.6 0 0 1 1.6-1.6 z"/></svg><span>One dependency</span></h3>
           <p class="card-body">koffi, and nothing else. Tested on macOS against Node 18, 20, 22 and 24 on every push.</p>
         </li>
       </ul>
       <!-- launch:features:end -->
+    </section>
+
+    <!-- Sun mode -->
+    <section class="section section-sun" aria-labelledby="sun-heading">
+      <!-- launch:sun:start -->
+      <h2 class="section-title" id="sun-heading"><svg class="icon section-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="3.6"/><line x1="10" y1="1.8" x2="10" y2="3.4"/><line x1="10" y1="16.6" x2="10" y2="18.2"/><line x1="1.8" y1="10" x2="3.4" y2="10"/><line x1="16.6" y1="10" x2="18.2" y2="10"/><line x1="4.2" y1="4.2" x2="5.3" y2="5.3"/><line x1="14.7" y1="14.7" x2="15.8" y2="15.8"/><line x1="4.2" y1="15.8" x2="5.3" y2="14.7"/><line x1="14.7" y1="5.3" x2="15.8" y2="4.2"/></svg><span>It follows the sun</span></h2>
+      <p class="prose">One command puts the backlight on the sky's schedule: dark through the day, up to a level you choose after sunset, and back down at sunrise. The times move with the season on their own, so there is no clock hour to re-tune in March and again in June.</p>
+      <p class="prose">Sunrise and sunset are computed on your own machine with the NOAA solar algorithm, from coordinates your timezone already implies. No location permission, no lookup service, nothing about where you are leaving the Mac.</p>
+
+      <figure class="sun-preview" data-sun-preview data-sun-live-label="Today, where you are">
+        <p class="sun-preview-label" data-sun-label>An example day</p>
+
+        <div class="sun-track" aria-hidden="true">
+          <div class="sun-lit sun-lit-early"></div>
+          <div class="sun-lit sun-lit-late"></div>
+          <div class="sun-now"></div>
+        </div>
+        <p class="sun-legend" aria-hidden="true">midnight<span class="sun-legend-mid">the glow is the backlight, on</span>midnight</p>
+
+        <dl class="sun-marks">
+          <div class="sun-mark">
+            <dt class="sun-mark-key">sunrise</dt>
+            <dd class="sun-mark-value" data-sun-rise>06:00</dd>
+          </div>
+          <div class="sun-mark">
+            <dt class="sun-mark-key">sunset</dt>
+            <dd class="sun-mark-value" data-sun-set>19:00</dd>
+          </div>
+          <div class="sun-mark">
+            <dt class="sun-mark-key">backlight now</dt>
+            <dd class="sun-mark-value" data-sun-phase>off, it is daylight</dd>
+          </div>
+        </dl>
+
+        <figcaption class="caption sun-preview-note">Computed in your browser from your timezone, by the same algorithm the command uses. Nothing is sent anywhere, and nothing is stored.</figcaption>
+      </figure>
+
+      <p class="highlight">The ambient light sensor and the sun schedule are different things, and they compose. Sun mode can hand the daylight hours back to the sensor with --day auto and still hold a fixed level all evening.</p>
+      <div class="copy">
+          <pre class="copy-code" id="sun-command"><code>kbdlight sun on</code></pre>
+          <button class="copy-btn" type="button" data-copy-target="sun-command" aria-label="Copy the command kbdlight sun on to the clipboard">
+            <span class="copy-btn-label" aria-hidden="true">Copy</span>
+          </button>
+        </div>
+      <p class="note">kbdlight sun off unloads the schedule and restores the exact brightness and sensor state it found.</p>
+      <!-- launch:sun:end -->
     </section>
 
     <!-- Install and usage -->
@@ -204,11 +338,21 @@
         </div>
         </li>
         <li class="step">
+          <h3 class="step-title">Put it on the sun's schedule</h3>
+          <p class="step-body">Dark through the day, lit after sunset, for as long as you leave it armed. Undo it with kbdlight sun off.</p>
+          <div class="copy">
+          <pre class="copy-code" id="install-step-3"><code>kbdlight sun on</code></pre>
+          <button class="copy-btn" type="button" data-copy-target="install-step-3" aria-label="Copy the command kbdlight sun on to the clipboard">
+            <span class="copy-btn-label" aria-hidden="true">Copy</span>
+          </button>
+        </div>
+        </li>
+        <li class="step">
           <h3 class="step-title">Use it from Node</h3>
           <p class="step-body">The same operations as the command, returning numbers and booleans.</p>
           <div class="copy">
-          <pre class="copy-code" id="install-step-3"><code>node -e &quot;require('macos-keyboard-backlight').set(0.5)&quot;</code></pre>
-          <button class="copy-btn" type="button" data-copy-target="install-step-3" aria-label="Copy the command node -e &quot;require('macos-keyboard-backlight').set(0.5)&quot; to the clipboard">
+          <pre class="copy-code" id="install-step-4"><code>node -e &quot;require('macos-keyboard-backlight').set(0.5)&quot;</code></pre>
+          <button class="copy-btn" type="button" data-copy-target="install-step-4" aria-label="Copy the command node -e &quot;require('macos-keyboard-backlight').set(0.5)&quot; to the clipboard">
             <span class="copy-btn-label" aria-hidden="true">Copy</span>
           </button>
         </div>
@@ -216,6 +360,40 @@
       </ol>
       <p class="note">Restore the ambient light sensor at any time with kbdlight auto on.</p>
       <!-- launch:install:end -->
+    </section>
+
+    <!-- Questions -->
+    <section class="section section-faq" aria-labelledby="faq-heading">
+      <!-- launch:faq:start -->
+      <h2 class="section-title" id="faq-heading"><svg class="icon section-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M2.9 4.2 a1.7 1.7 0 0 1 1.7-1.7 H8 a2 2 0 0 1 2 2 v11 a1.7 1.7 0 0 0-1.7-1.7 H4.6 a1.7 1.7 0 0 1-1.7-1.7 z"/><path d="M17.1 4.2 a1.7 1.7 0 0 0-1.7-1.7 H12 a2 2 0 0 0-2 2 v11 a1.7 1.7 0 0 1 1.7-1.7 h3.7 a1.7 1.7 0 0 0 1.7-1.7 z"/></svg><span>Questions people actually ask</span></h2>
+      <p class="prose">The page's structured data carries these same answers, word for word, so anything quoting this page is quoting something you can read here and check.</p>
+      <div class="faq">
+        <details class="faq-item">
+          <summary class="faq-q">Can the MacBook keyboard backlight be set from a script?</summary>
+          <p class="faq-a">Not with anything Apple ships: macOS exposes a slider in System Settings and two keys on the keyboard, and no scriptable interface. kbdlight set 0.5 does it, through the private CoreBrightness framework, with no compiler involved.</p>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">Why does the keyboard brightness I set change back on its own?</summary>
+          <p class="faq-a">Ambient auto-brightness is re-adjusting it from the light sensor, and it overrides any fixed value. Run kbdlight auto off first, then the level you set holds. Re-enable the sensor later with kbdlight auto on.</p>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">Can the keyboard backlight turn on automatically at sunset?</summary>
+          <p class="faq-a">Yes. kbdlight sun on keeps the backlight dark through the day and lights it after sunset, then takes it back down at sunrise. The times are computed on the machine with the NOAA solar algorithm and move with the season, so there is no clock hour to re-tune.</p>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">Does it need Xcode, node-gyp or a compiler to install?</summary>
+          <p class="faq-a">No. There is no native build step. The system calls are resolved at runtime through koffi, which ships prebuilt for both Apple Silicon and Intel, and koffi is the only runtime dependency.</p>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">Does it send location data anywhere to work out sunrise and sunset?</summary>
+          <p class="faq-a">No. Coordinates are derived from the IANA timezone already set on the machine, which is a city name, and the times are computed locally. There is no location permission prompt, no IP lookup and no network request at any point.</p>
+        </details>
+        <details class="faq-item">
+          <summary class="faq-q">Does it work with an external keyboard?</summary>
+          <p class="faq-a">Any backlit keyboard the system reports is listed by kbdlight list, and get, set, isAuto and setAuto each take an optional keyboard ID so a single keyboard can be targeted instead of all of them.</p>
+        </details>
+      </div>
+      <!-- launch:faq:end -->
     </section>
 
   </main>

@@ -1,7 +1,13 @@
 import type { FC } from "react";
 import { AbsoluteFill } from "remotion";
 
-import { InstallPill, Mark, RepoLine, Tagline } from "../components/Brand";
+import {
+  Highlights,
+  InstallPill,
+  Mark,
+  RepoLine,
+  Tagline,
+} from "../components/Brand";
 import { KeyboardProof } from "../components/KeyboardProof";
 import { withAlpha } from "../color";
 import { content } from "../content";
@@ -44,6 +50,7 @@ export const SocialCard: FC = () => (
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <Mark size={markSize} />
         <Tagline size={26} />
+        <Highlights size={20} />
       </div>
 
       <KeyboardProof width={INNER_W} height={268} />
@@ -56,7 +63,10 @@ export const SocialCard: FC = () => (
         }}
       >
         <InstallPill size={24} padding="13px 24px" />
-        <RepoLine size={20} />
+        {/* The site, not the repo: this card is what gets unfurled in a chat
+            window or a search result, where the reader has not arrived from
+            GitHub and the shortest useful address wins. */}
+        <RepoLine size={20} site />
       </div>
     </AbsoluteFill>
   </AbsoluteFill>
