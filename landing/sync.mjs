@@ -388,6 +388,131 @@ function footerRegion(c) {
       <p class="footer-copy">${esc(footer.copyright || "")}</p>`;
 }
 
+/* ---------------------------------------------------------------- machine */
+/*
+  A MacBook, built out of elements and CSS 3D transforms.
+
+  WHY NOT A REAL 3D MODEL
+    The Content-Security-Policy in vercel.json sets connect-src to none, so the
+    page cannot fetch anything: a glTF loader has nothing to load from. A
+    vendored WebGL library would work, but it means shipping several hundred
+    kilobytes of renderer onto a page whose entire argument is that the tool it
+    describes has one dependency and no build step. Transformed elements cost
+    about six kilobytes, need no context, and degrade to a static picture when
+    scripting is off, which the canvas cannot do.
+
+  WHY IT IS GENERATED HERE
+    So the keyboard exists in the markup. A visitor without JavaScript, and every
+    crawler, sees a lit MacBook rather than an empty div waiting for a script.
+
+  The layout is the same data as video/src/keyboard-layout.ts: six rows, fifteen
+  key units each, with the real Apple proportions. A board of equal width keys
+  reads as a placeholder immediately.
+*/
+const KEY_ROWS = [
+  [
+    [1, "esc", 1], [1, "F1", 1], [1, "F2", 1], [1, "F3", 1], [1, "F4", 1],
+    [1, "F5", 1], [1, "F6", 1], [1, "F7", 1], [1, "F8", 1], [1, "F9", 1],
+    [1, "F10", 1], [1, "F11", 1], [1, "F12", 1], [1, "", 1], [1, "", 1],
+  ],
+  [
+    [1, "~"], [1, "1"], [1, "2"], [1, "3"], [1, "4"], [1, "5"], [1, "6"],
+    [1, "7"], [1, "8"], [1, "9"], [1, "0"], [1, "-"], [1, "="], [2, "delete", 1],
+  ],
+  [
+    [1.5, "tab", 1], [1, "Q"], [1, "W"], [1, "E"], [1, "R"], [1, "T"], [1, "Y"],
+    [1, "U"], [1, "I"], [1, "O"], [1, "P"], [1, "["], [1, "]"], [1.5, "\\"],
+  ],
+  [
+    [1.75, "caps", 1], [1, "A"], [1, "S"], [1, "D"], [1, "F"], [1, "G"],
+    [1, "H"], [1, "J"], [1, "K"], [1, "L"], [1, ";"], [1, "'"], [2.25, "return", 1],
+  ],
+  [
+    [2.25, "shift", 1], [1, "Z"], [1, "X"], [1, "C"], [1, "V"], [1, "B"],
+    [1, "N"], [1, "M"], [1, ","], [1, "."], [1, "/"], [2.75, "shift", 1],
+  ],
+  [
+    [1, "fn", 1], [1, "ctrl", 1], [1.25, "opt", 1], [1.25, "cmd", 1],
+    [5, ""], [1.25, "cmd", 1], [1.25, "opt", 1],
+    [0.75, "◀", 1], [0.75, "▲", 1], [0.75, "▼", 1], [0.75, "▶", 1],
+  ],
+];
+
+const ROW_UNITS = 15;
+for (const [i, row] of KEY_ROWS.entries()) {
+  const sum = row.reduce((n, key) => n + key[0], 0);
+  if (Math.abs(sum - ROW_UNITS) > 0.001) {
+    throw new Error(`keyboard row ${i} is ${sum} units, expected ${ROW_UNITS}`);
+  }
+}
+
+/* Widths become classes because the CSP allows no style attribute, so a
+   flex-grow cannot be written inline. */
+const unitClass = (w) => "u" + String(w).replace(".", "-");
+
+function keyboardMarkup() {
+  return KEY_ROWS.map((row) => {
+    const keys = row
+      .map(([w, label, small]) => {
+        const cls = ["mb-key", unitClass(w)];
+        if (small) cls.push("mb-key-sm");
+        if (w === 5) cls.push("mb-key-space");
+        return `<span class="${cls.join(" ")}"><span class="mb-key-cap">${esc(label || "")}</span></span>`;
+      })
+      .join("");
+    return `            <div class="mb-row">${keys}</div>`;
+  }).join("\n");
+}
+
+function machineRegion(c) {
+  const machine = req(c.machine, "machine");
+  const controls = req(machine.controls, "machine.controls")
+    .map((ctl) => {
+      const attr = ctl.action
+        ? `data-mb-action="${esc(ctl.action)}"`
+        : `data-mb-level="${esc(req(ctl.level, "machine.controls[].level"))}"`;
+      return `        <button class="mb-btn" type="button" ${attr} aria-label="${esc(req(ctl.command, "machine.controls[].command"))}"><span class="mb-btn-cmd">${esc(ctl.command)}</span></button>`;
+    })
+    .join("\n");
+
+  return `      <h2 class="section-title" id="machine-heading">${icon(machine.icon || "zap", "icon section-icon")}<span>${esc(req(machine.heading, "machine.heading"))}</span></h2>
+      <p class="prose">${esc(req(machine.body, "machine.body"))}</p>
+
+      <div class="mb-stage" data-macbook>
+        <div class="mb" data-mb aria-hidden="true">
+          <div class="mb-lid">
+            <div class="mb-screen">
+              <div class="mb-wallpaper"></div>
+              <div class="mb-notch"></div>
+              <p class="mb-prompt"><span class="mb-prompt-caret">$</span> <span data-mb-echo>kbdlight sun on</span></p>
+              <div class="mb-glass"></div>
+            </div>
+          </div>
+
+          <div class="mb-base">
+            <div class="mb-deck">
+              <div class="mb-speaker mb-speaker-l"></div>
+              <div class="mb-speaker mb-speaker-r"></div>
+              <div class="mb-keys">
+${keyboardMarkup()}
+              </div>
+              <div class="mb-trackpad"></div>
+              <div class="mb-spill"></div>
+            </div>
+            <div class="mb-lip"></div>
+          </div>
+
+          <div class="mb-cast"></div>
+        </div>
+
+        <div class="mb-controls" role="group" aria-label="Run a command on the illustration">
+${controls}
+        </div>
+      </div>
+
+      <p class="caption mb-note">${esc(req(machine.note, "machine.note"))}</p>`;
+}
+
 /* --------------------------------------------------------------- sun data */
 /*
   The timezone to coordinates table the page uses is the package's own, read
@@ -416,6 +541,7 @@ window.__kbdlightSunData = {
 const REGIONS = {
   head: headRegion,
   hero: heroRegion,
+  machine: machineRegion,
   demo: demoRegion,
   why: whyRegion,
   features: featuresRegion,

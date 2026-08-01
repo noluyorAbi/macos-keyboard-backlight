@@ -53,6 +53,8 @@
   <!-- sun-data.js is generated from ../src/geo.js by sync.mjs and must load first. -->
   <script src="sun-data.js" defer></script>
   <script src="sun-preview.js" defer></script>
+  <!-- Reuses the solar functions sun-preview.js exposes, so it loads after it. -->
+  <script src="macbook.js" defer></script>
 
   <!--
     Outside the generated markers on purpose, so sync.mjs leaves it alone.
@@ -193,6 +195,57 @@
         <a class="btn btn-secondary" href="https://github.com/noluyorAbi/macos-keyboard-backlight?utm_source=landing&amp;utm_medium=hero-secondary#readme" data-utm-slot="hero-secondary" rel="noopener">Read the docs</a>
       </p>
       <!-- launch:hero:end -->
+    </section>
+
+    <!-- The machine -->
+    <section class="section section-machine" aria-labelledby="machine-heading">
+      <!-- launch:machine:start -->
+      <h2 class="section-title" id="machine-heading"><svg class="icon section-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11.2 2.2 L4.5 11 h4.6 l-.3 6.8 L15.5 9 h-4.6 z"/></svg><span>Your keyboard, right now</span></h2>
+      <p class="prose">This one is lit the way sun mode would have yours lit at this moment, worked out from your timezone in your browser. Drive it with the same commands you would type.</p>
+
+      <div class="mb-stage" data-macbook>
+        <div class="mb" data-mb aria-hidden="true">
+          <div class="mb-lid">
+            <div class="mb-screen">
+              <div class="mb-wallpaper"></div>
+              <div class="mb-notch"></div>
+              <p class="mb-prompt"><span class="mb-prompt-caret">$</span> <span data-mb-echo>kbdlight sun on</span></p>
+              <div class="mb-glass"></div>
+            </div>
+          </div>
+
+          <div class="mb-base">
+            <div class="mb-deck">
+              <div class="mb-speaker mb-speaker-l"></div>
+              <div class="mb-speaker mb-speaker-r"></div>
+              <div class="mb-keys">
+            <div class="mb-row"><span class="mb-key u1 mb-key-sm"><span class="mb-key-cap">esc</span></span><span class="mb-key u1 mb-key-sm"><span class="mb-key-cap">F1</span></span><span class="mb-key u1 mb-key-sm"><span class="mb-key-cap">F2</span></span><span class="mb-key u1 mb-key-sm"><span class="mb-key-cap">F3</span></span><span class="mb-key u1 mb-key-sm"><span class="mb-key-cap">F4</span></span><span class="mb-key u1 mb-key-sm"><span class="mb-key-cap">F5</span></span><span class="mb-key u1 mb-key-sm"><span class="mb-key-cap">F6</span></span><span class="mb-key u1 mb-key-sm"><span class="mb-key-cap">F7</span></span><span class="mb-key u1 mb-key-sm"><span class="mb-key-cap">F8</span></span><span class="mb-key u1 mb-key-sm"><span class="mb-key-cap">F9</span></span><span class="mb-key u1 mb-key-sm"><span class="mb-key-cap">F10</span></span><span class="mb-key u1 mb-key-sm"><span class="mb-key-cap">F11</span></span><span class="mb-key u1 mb-key-sm"><span class="mb-key-cap">F12</span></span><span class="mb-key u1 mb-key-sm"><span class="mb-key-cap"></span></span><span class="mb-key u1 mb-key-sm"><span class="mb-key-cap"></span></span></div>
+            <div class="mb-row"><span class="mb-key u1"><span class="mb-key-cap">~</span></span><span class="mb-key u1"><span class="mb-key-cap">1</span></span><span class="mb-key u1"><span class="mb-key-cap">2</span></span><span class="mb-key u1"><span class="mb-key-cap">3</span></span><span class="mb-key u1"><span class="mb-key-cap">4</span></span><span class="mb-key u1"><span class="mb-key-cap">5</span></span><span class="mb-key u1"><span class="mb-key-cap">6</span></span><span class="mb-key u1"><span class="mb-key-cap">7</span></span><span class="mb-key u1"><span class="mb-key-cap">8</span></span><span class="mb-key u1"><span class="mb-key-cap">9</span></span><span class="mb-key u1"><span class="mb-key-cap">0</span></span><span class="mb-key u1"><span class="mb-key-cap">-</span></span><span class="mb-key u1"><span class="mb-key-cap">=</span></span><span class="mb-key u2 mb-key-sm"><span class="mb-key-cap">delete</span></span></div>
+            <div class="mb-row"><span class="mb-key u1-5 mb-key-sm"><span class="mb-key-cap">tab</span></span><span class="mb-key u1"><span class="mb-key-cap">Q</span></span><span class="mb-key u1"><span class="mb-key-cap">W</span></span><span class="mb-key u1"><span class="mb-key-cap">E</span></span><span class="mb-key u1"><span class="mb-key-cap">R</span></span><span class="mb-key u1"><span class="mb-key-cap">T</span></span><span class="mb-key u1"><span class="mb-key-cap">Y</span></span><span class="mb-key u1"><span class="mb-key-cap">U</span></span><span class="mb-key u1"><span class="mb-key-cap">I</span></span><span class="mb-key u1"><span class="mb-key-cap">O</span></span><span class="mb-key u1"><span class="mb-key-cap">P</span></span><span class="mb-key u1"><span class="mb-key-cap">[</span></span><span class="mb-key u1"><span class="mb-key-cap">]</span></span><span class="mb-key u1-5"><span class="mb-key-cap">\</span></span></div>
+            <div class="mb-row"><span class="mb-key u1-75 mb-key-sm"><span class="mb-key-cap">caps</span></span><span class="mb-key u1"><span class="mb-key-cap">A</span></span><span class="mb-key u1"><span class="mb-key-cap">S</span></span><span class="mb-key u1"><span class="mb-key-cap">D</span></span><span class="mb-key u1"><span class="mb-key-cap">F</span></span><span class="mb-key u1"><span class="mb-key-cap">G</span></span><span class="mb-key u1"><span class="mb-key-cap">H</span></span><span class="mb-key u1"><span class="mb-key-cap">J</span></span><span class="mb-key u1"><span class="mb-key-cap">K</span></span><span class="mb-key u1"><span class="mb-key-cap">L</span></span><span class="mb-key u1"><span class="mb-key-cap">;</span></span><span class="mb-key u1"><span class="mb-key-cap">'</span></span><span class="mb-key u2-25 mb-key-sm"><span class="mb-key-cap">return</span></span></div>
+            <div class="mb-row"><span class="mb-key u2-25 mb-key-sm"><span class="mb-key-cap">shift</span></span><span class="mb-key u1"><span class="mb-key-cap">Z</span></span><span class="mb-key u1"><span class="mb-key-cap">X</span></span><span class="mb-key u1"><span class="mb-key-cap">C</span></span><span class="mb-key u1"><span class="mb-key-cap">V</span></span><span class="mb-key u1"><span class="mb-key-cap">B</span></span><span class="mb-key u1"><span class="mb-key-cap">N</span></span><span class="mb-key u1"><span class="mb-key-cap">M</span></span><span class="mb-key u1"><span class="mb-key-cap">,</span></span><span class="mb-key u1"><span class="mb-key-cap">.</span></span><span class="mb-key u1"><span class="mb-key-cap">/</span></span><span class="mb-key u2-75 mb-key-sm"><span class="mb-key-cap">shift</span></span></div>
+            <div class="mb-row"><span class="mb-key u1 mb-key-sm"><span class="mb-key-cap">fn</span></span><span class="mb-key u1 mb-key-sm"><span class="mb-key-cap">ctrl</span></span><span class="mb-key u1-25 mb-key-sm"><span class="mb-key-cap">opt</span></span><span class="mb-key u1-25 mb-key-sm"><span class="mb-key-cap">cmd</span></span><span class="mb-key u5 mb-key-space"><span class="mb-key-cap"></span></span><span class="mb-key u1-25 mb-key-sm"><span class="mb-key-cap">cmd</span></span><span class="mb-key u1-25 mb-key-sm"><span class="mb-key-cap">opt</span></span><span class="mb-key u0-75 mb-key-sm"><span class="mb-key-cap">◀</span></span><span class="mb-key u0-75 mb-key-sm"><span class="mb-key-cap">▲</span></span><span class="mb-key u0-75 mb-key-sm"><span class="mb-key-cap">▼</span></span><span class="mb-key u0-75 mb-key-sm"><span class="mb-key-cap">▶</span></span></div>
+              </div>
+              <div class="mb-trackpad"></div>
+              <div class="mb-spill"></div>
+            </div>
+            <div class="mb-lip"></div>
+          </div>
+
+          <div class="mb-cast"></div>
+        </div>
+
+        <div class="mb-controls" role="group" aria-label="Run a command on the illustration">
+        <button class="mb-btn" type="button" data-mb-level="0" aria-label="kbdlight off"><span class="mb-btn-cmd">kbdlight off</span></button>
+        <button class="mb-btn" type="button" data-mb-level="0.5" aria-label="kbdlight set 0.5"><span class="mb-btn-cmd">kbdlight set 0.5</span></button>
+        <button class="mb-btn" type="button" data-mb-level="1" aria-label="kbdlight max"><span class="mb-btn-cmd">kbdlight max</span></button>
+        <button class="mb-btn" type="button" data-mb-action="pulse" aria-label="kbdlight pulse"><span class="mb-btn-cmd">kbdlight pulse</span></button>
+        <button class="mb-btn" type="button" data-mb-action="sun" aria-label="kbdlight sun on"><span class="mb-btn-cmd">kbdlight sun on</span></button>
+        </div>
+      </div>
+
+      <p class="caption mb-note">An illustration, not a photograph. The backlight is hardware, so no screen recording can show it; the real thing is in the clip below.</p>
+      <!-- launch:machine:end -->
     </section>
 
     <!-- Demo -->

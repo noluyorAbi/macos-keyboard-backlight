@@ -43,6 +43,19 @@
       "slot": "hero-secondary"
     }
   },
+  "machine": {
+    "heading": "Your keyboard, right now",
+    "icon": "zap",
+    "body": "This one is lit the way sun mode would have yours lit at this moment, worked out from your timezone in your browser. Drive it with the same commands you would type.",
+    "note": "An illustration, not a photograph. The backlight is hardware, so no screen recording can show it; the real thing is in the clip below.",
+    "controls": [
+      { "label": "off", "command": "kbdlight off", "level": "0" },
+      { "label": "half", "command": "kbdlight set 0.5", "level": "0.5" },
+      { "label": "max", "command": "kbdlight max", "level": "1" },
+      { "label": "pulse", "command": "kbdlight pulse", "action": "pulse" },
+      { "label": "sun", "command": "kbdlight sun on", "action": "sun" }
+    ]
+  },
   "demo": {
     "heading": "See it run",
     "icon": "terminal",

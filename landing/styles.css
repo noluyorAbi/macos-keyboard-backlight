@@ -603,6 +603,380 @@ a:hover {
   color: var(--dim);
 }
 
+/* --------------------------------------------------------------- macbook */
+/*
+  A MacBook, out of elements and 3D transforms. No canvas, no library, no model
+  file: the page's Content-Security-Policy forbids fetching one, and a vendored
+  WebGL renderer would weigh more than everything else here put together.
+
+  The assembly hangs off the lid, not the deck. The lid is the reference plane,
+  and the deck is hinged at the lid's bottom edge and rotated forward until it
+  lies down towards the viewer, which is the same joint the real object has and
+  the only arrangement where the two parts cannot drift apart when the whole
+  thing turns.
+
+  --mb-glow, 0 to 1, is the backlight. It is one number driving the keycaps, the
+  light bleeding around them, the spill onto the aluminium and the reflection on
+  the deck, so everything brightens as one thing rather than as five.
+*/
+@property --mb-glow {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0.55;
+}
+
+.mb-stage {
+  --mb-w: clamp(15rem, 56vw, 30rem);
+  --mb-glow: 0.55; /* lit by default: a dark keyboard is the boring half of the story */
+  /*
+    Positive, and that is the whole trick. The deck is rotated back towards the
+    viewer about the hinge, so the only way to see its top face is for the camera
+    to sit above it, which is what tipping the whole assembly away does. Negative
+    here puts the eye under the desk and the keyboard vanishes edge on.
+  */
+  --mb-rx: 41deg;
+  --mb-ry: 0deg;
+
+  margin: 2.25rem 0 0;
+  perspective: 2200px;
+  perspective-origin: 50% 42%;
+}
+
+.mb {
+  position: relative;
+  width: var(--mb-w);
+  margin-inline: auto;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--mb-rx)) rotateY(var(--mb-ry));
+  transition: transform 0.5s var(--ease);
+  /*
+    The deck hangs out of the box: it is absolutely positioned past the bottom
+    edge, so it contributes no height and anything after it would be drawn over
+    the keyboard. This reserves what the deck actually projects to at this
+    angle, which is a little over half the width.
+  */
+  margin-block-end: calc(var(--mb-w) * 0.56);
+}
+
+/* ---- lid ---- */
+.mb-lid {
+  position: relative;
+  aspect-ratio: 16 / 10.2;
+  padding: calc(var(--mb-w) * 0.011);
+  border-radius: calc(var(--mb-w) * 0.017) calc(var(--mb-w) * 0.017) 0 0;
+  /* Anodised aluminium is not a flat grey: it is a narrow vertical gradient
+     with a brighter machined edge catching the light at the top. */
+  background:
+    linear-gradient(180deg, #4a4a46 0%, #2e2e2b 6%, #232320 55%, #1b1b19 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 14%),
+    inset 1px 0 0 rgb(255 255 255 / 6%),
+    inset -1px 0 0 rgb(255 255 255 / 6%);
+  transform-style: preserve-3d;
+}
+
+.mb-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: calc(var(--mb-w) * 0.008);
+  background: #08080a;
+}
+
+/* The desktop behind the terminal line. Warm, and it leans towards the accent
+   as the keyboard brightens, because a lit room lights the screen too. */
+.mb-wallpaper {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      120% 90% at 50% 115%,
+      color-mix(in srgb, var(--coral) calc(var(--mb-glow) * 26%), transparent),
+      transparent 60%
+    ),
+    linear-gradient(160deg, #14141a 0%, #0a0a0c 60%);
+}
+
+.mb-notch {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 50%;
+  width: 16%;
+  height: calc(var(--mb-w) * 0.018);
+  border-radius: 0 0 calc(var(--mb-w) * 0.006) calc(var(--mb-w) * 0.006);
+  background: #08080a;
+  transform: translateX(-50%);
+}
+
+.mb-prompt {
+  position: absolute;
+  inset-block-end: 8%;
+  inset-inline-start: 7%;
+  margin: 0;
+  color: var(--text);
+  font-size: calc(var(--mb-w) * 0.026);
+  letter-spacing: 0.02em;
+}
+
+.mb-prompt-caret {
+  color: var(--coral);
+}
+
+/* One diagonal sheen. Glass is only convincing when something is reflected in
+   it, and a single soft band beats a busy fake reflection. */
+.mb-glass {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    108deg,
+    rgb(255 255 255 / 7%) 0%,
+    rgb(255 255 255 / 2%) 22%,
+    transparent 46%
+  );
+  pointer-events: none;
+}
+
+/* ---- base ---- */
+/*
+  Hinged at the lid's bottom edge and laid down towards the viewer. The rotation
+  is a shade under 90 degrees, so the deck is not quite flat: a real laptop sits
+  with its far edge slightly higher, and the sliver of difference is what stops
+  the two halves reading as one folded sheet of card.
+*/
+.mb-base {
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline-start: 50%;
+  width: 100%;
+  aspect-ratio: 16 / 10.6;
+  transform-origin: 50% 0%;
+  transform: translateX(-50%) rotateX(-83deg);
+  transform-style: preserve-3d;
+}
+
+.mb-deck {
+  position: absolute;
+  inset: 0;
+  padding: 3.2% 5.4%;
+  border-radius: 0 0 calc(var(--mb-w) * 0.022) calc(var(--mb-w) * 0.022);
+  background:
+    linear-gradient(180deg, #26262300 0%, #2a2a2726 40%, #33332f4d 100%),
+    linear-gradient(96deg, #2b2b28 0%, #232320 42%, #26262300 42%, #24242100 100%),
+    #232320;
+  /* The hinge: a dark band where the deck meets the lid, and a hairline of
+     light on the machined edge just in front of it. Without it the two planes
+     merge into one shape at the join. */
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 10%),
+    inset 0 10px 14px -10px rgb(0 0 0 / 85%);
+}
+
+.mb-keys {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9%;
+  width: 100%;
+  padding: 0.9%;
+  border-radius: calc(var(--mb-w) * 0.006);
+  /* The well the keys sit in. A board printed flat on the aluminium is the
+     single clearest tell that a laptop was drawn rather than photographed. */
+  background: #191917;
+  box-shadow:
+    inset 0 2px 3px rgb(0 0 0 / 55%),
+    0 1px 0 rgb(255 255 255 / 5%);
+}
+
+.mb-row {
+  display: flex;
+  gap: 0.55%;
+  height: calc(var(--mb-w) * 0.043);
+}
+
+.mb-key {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-basis: 0;
+  min-width: 0;
+  border-radius: calc(var(--mb-w) * 0.005);
+  /* Keycaps are lighter at the top edge and fall away towards the bottom, and
+     the shadow under each one is what separates the board into keys. */
+  background: linear-gradient(180deg, #3a3a36 0%, #26262300 4%, #1e1e1b 100%);
+  box-shadow:
+    0 1px 1px rgb(0 0 0 / 55%),
+    inset 0 1px 0 rgb(255 255 255 / 7%);
+}
+
+/*
+  The light escaping around the keycap. This is the layer that sells it: a real
+  backlit board leaks more around the edges of the cap than through the legend.
+*/
+.mb-key::after {
+  content: "";
+  position: absolute;
+  inset: calc(var(--mb-w) * -0.0018);
+  border-radius: inherit;
+  background: radial-gradient(
+    120% 120% at 50% 120%,
+    color-mix(in srgb, var(--coral) 70%, #ffd9c4),
+    color-mix(in srgb, var(--coral) 40%, transparent) 55%,
+    transparent 78%
+  );
+  box-shadow: 0 0 calc(var(--mb-w) * 0.012) color-mix(in srgb, var(--coral) 55%, transparent);
+  opacity: calc(var(--mb-glow) * 0.85);
+  transition: opacity 0.45s var(--ease);
+  pointer-events: none;
+}
+
+.mb-key-cap {
+  position: relative; /* above the bleed */
+  z-index: 1;
+  color: color-mix(in srgb, #f6ece4 calc(35% + var(--mb-glow) * 65%), #6e6b64);
+  font-size: calc(var(--mb-w) * 0.018);
+  line-height: 1;
+  transition: color 0.45s var(--ease);
+}
+
+.mb-key-sm .mb-key-cap {
+  font-size: calc(var(--mb-w) * 0.012);
+}
+
+.u0-75 { flex-grow: 0.75; }
+.u1 { flex-grow: 1; }
+.u1-25 { flex-grow: 1.25; }
+.u1-5 { flex-grow: 1.5; }
+.u1-75 { flex-grow: 1.75; }
+.u2 { flex-grow: 2; }
+.u2-25 { flex-grow: 2.25; }
+.u2-75 { flex-grow: 2.75; }
+.u5 { flex-grow: 5; }
+
+.mb-trackpad {
+  width: 34%;
+  margin: 3.4% auto 0;
+  aspect-ratio: 16 / 10.4;
+  border-radius: calc(var(--mb-w) * 0.006);
+  background: linear-gradient(180deg, #333330 0%, #2a2a27 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 12%),
+    inset 0 -1px 0 rgb(0 0 0 / 40%),
+    0 1px 2px rgb(0 0 0 / 45%);
+}
+
+/* Speaker grilles, as a dot field rather than drawn holes. */
+.mb-speaker {
+  position: absolute;
+  inset-block-start: 4.2%;
+  width: 4.4%;
+  height: 42%;
+  background-image: radial-gradient(circle, #14141200 0.6px, transparent 0.7px);
+  background-size: calc(var(--mb-w) * 0.0075) calc(var(--mb-w) * 0.0075);
+  opacity: 0.85;
+}
+
+.mb-speaker-l { inset-inline-start: 1.6%; }
+.mb-speaker-r { inset-inline-end: 1.6%; }
+
+/*
+  Light pooling on the aluminium around the board. Sits above the deck and below
+  nothing: it is additive, so it only ever brightens what is already there.
+*/
+.mb-spill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    68% 46% at 50% 34%,
+    color-mix(in srgb, var(--coral) 30%, transparent),
+    transparent 70%
+  );
+  opacity: var(--mb-glow);
+  mix-blend-mode: screen;
+  transition: opacity 0.45s var(--ease);
+  pointer-events: none;
+}
+
+/* The front lip, standing up from the near edge of the deck. Without a visible
+   thickness the machine reads as a decal lying on the page. */
+.mb-lip {
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline: 0;
+  height: calc(var(--mb-w) * 0.019);
+  border-radius: 0 0 calc(var(--mb-w) * 0.01) calc(var(--mb-w) * 0.01);
+  background: linear-gradient(180deg, #343430 0%, #1c1c1a 100%);
+  transform-origin: 50% 0%;
+  /* Back up to vertical: the deck it hangs off is lying down, and the front edge
+     of a laptop is the one face that still looks straight at you. */
+  transform: rotateX(83deg);
+}
+
+/* Contact shadow. Tight and dark where the machine meets the surface, wide and
+   faint further out, which is the whole difference between sitting on a desk
+   and floating above one. */
+.mb-cast {
+  position: absolute;
+  inset-block-start: 96%;
+  inset-inline-start: 50%;
+  width: 116%;
+  height: calc(var(--mb-w) * 0.36);
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    rgb(0 0 0 / 62%),
+    rgb(0 0 0 / 22%) 45%,
+    transparent 72%
+  );
+  transform: translateX(-50%) rotateX(-83deg) translateZ(calc(var(--mb-w) * -0.02));
+  filter: blur(calc(var(--mb-w) * 0.012));
+  pointer-events: none;
+}
+
+/* ---- controls ---- */
+.mb-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-block-start: 1.5rem;
+}
+
+.mb-btn {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition:
+    background 0.15s var(--ease),
+    border-color 0.15s var(--ease),
+    color 0.15s var(--ease);
+}
+
+.mb-btn:hover {
+  background: var(--panel-high);
+  color: var(--bright);
+}
+
+.mb-btn[data-active="true"] {
+  border-color: var(--coral);
+  color: var(--bright);
+}
+
+.mb-btn-cmd::before {
+  content: "$ ";
+  color: var(--coral);
+}
+
+.mb-note {
+  max-width: var(--measure);
+  margin-block-start: 1rem;
+}
+
 /* -------------------------------------------------------------- sun mode */
 /*
   A day drawn as a single 24 hour track: night is the bare panel, daylight is
