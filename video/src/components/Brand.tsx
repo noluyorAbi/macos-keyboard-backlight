@@ -30,9 +30,15 @@ export const Mark: FC<{ size: number; letterSpacing?: number }> = ({
   </div>
 );
 
+/*
+ * The tagline carries the landing page's headline treatment: bright white with
+ * a soft white bloom, because on this project the glow is the product. The
+ * shadow radii scale with the type so the banner and the end card bloom the
+ * same amount relative to their letters.
+ */
 export const Tagline: FC<{ size: number; color?: string }> = ({
   size,
-  color = claude.dim,
+  color = claude.bright,
 }) => (
   <div
     style={{
@@ -41,6 +47,7 @@ export const Tagline: FC<{ size: number; color?: string }> = ({
       color,
       lineHeight: 1.35,
       whiteSpace: "pre-wrap",
+      textShadow: `0 0 ${Math.round(size * 0.6)}px rgba(255, 255, 255, 0.34), 0 0 ${Math.round(size * 2.2)}px rgba(223, 231, 245, 0.24)`,
     }}
   >
     {content.tagline}

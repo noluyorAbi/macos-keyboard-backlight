@@ -7,8 +7,11 @@
  *
  * Two colour sources, deliberately kept apart:
  *
- * 1. `claude`: the Anthropic / Claude Code design tokens (surfaces, chrome,
- *    the coral accent). These style the *window* the tool runs in.
+ * 1. `claude`: the surface and chrome tokens. This project overrides the
+ *    template's Anthropic palette with the landing page's own Apple greys
+ *    (measured off apple.com: pure black stage, #1d1d1f surfaces, #f5f5f7
+ *    copy), so the clip, the banner and the page read as one piece of work.
+ *    The token names stay `claude.*` because every scene imports them.
  * 2. `ansi`: true xterm-256 colours. These style the *output text*, so
  *    captured output in the video is the same output you get in a real
  *    256-colour terminal.
@@ -31,14 +34,14 @@ export const accent = content.accent ?? DEFAULT_ACCENT;
 export const claude = {
   clay: accent, // the accent itself
   clayDeep: mix(accent, "#000000", 0.16), // pressed / emphasised variant
-  bg: "#0b0b0b", // --gray-900, terminal backdrop
-  frame: "#060606", // page behind the window
-  panel: "#1a1a19", // --gray-830, window chrome
-  panelHi: "#20201f", // --gray-800
-  border: "#383835", // --gray-700
-  dim: "#7b7974", // --gray-450
-  text: "#e4e3dd", // --gray-90
-  bright: "#faf9f5", // headline
+  bg: "#161617", // terminal backdrop, a shade above the black stage
+  frame: "#000000", // page behind the window: Apple's black stage
+  panel: "#1d1d1f", // window chrome, the landing's --surface
+  panelHi: "#262629", // the landing's --surface-high
+  border: "#333336", // hairline, one step up from --hairline for 1px at 1080p
+  dim: "#a1a1a6", // the landing's --dim-text
+  text: "#f5f5f7", // the landing's --text
+  bright: "#ffffff", // headline
 } as const;
 
 /**

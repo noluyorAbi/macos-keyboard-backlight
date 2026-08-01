@@ -73,9 +73,9 @@ export const Window: FC<{
       }}
     >
       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-        <Dot color={traffic ? "#ff5f57" : "#3a3a37"} />
-        <Dot color={traffic ? "#febc2e" : "#3a3a37"} />
-        <Dot color={traffic ? "#28c840" : "#3a3a37"} />
+        <Dot color={traffic ? "#ff5f57" : "#3a3a3c"} />
+        <Dot color={traffic ? "#febc2e" : "#3a3a3c"} />
+        <Dot color={traffic ? "#28c840" : "#3a3a3c"} />
       </div>
 
       <div

@@ -74,7 +74,7 @@ const Key: FC<{ k: PlacedKey; lit: number; unit: number }> = ({
       width: k.w,
       height: k.h,
       borderRadius: Math.max(4, unit * 0.12),
-      background: "#141412",
+      background: "#141417",
       border: `1px solid ${withAlpha(LIGHT, 0.06 + lit * 0.22)}`,
       boxShadow: `0 0 ${unit * 0.14 + lit * unit * 0.35}px ${withAlpha(LIGHT, lit * 0.4)}, inset 0 1px 0 ${withAlpha(LIGHT, lit * 0.3)}`,
       display: "flex",
@@ -155,7 +155,7 @@ export const MacBook: FC<{
         height: bodyH,
         borderRadius: unit * 0.54,
         background:
-          "linear-gradient(180deg, #2a2a28 0%, #201f1e 40%, #1a1a19 100%)",
+          "linear-gradient(180deg, #2a2a2e 0%, #1f1f23 40%, #18181b 100%)",
         border: `1px solid ${claude.border}`,
         boxShadow: "0 40px 120px rgba(0,0,0,0.55)",
       }}
@@ -188,7 +188,7 @@ export const MacBook: FC<{
           width: unit * 7.6,
           height: trackpadH - unit * 0.8,
           borderRadius: unit * 0.22,
-          background: "#161615",
+          background: "#161619",
           border: `1px solid ${withAlpha(LIGHT, 0.05)}`,
         }}
       />
