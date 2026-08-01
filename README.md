@@ -85,8 +85,12 @@ kbdlight auto             print auto-brightness state (1/0) per keyboard
 kbdlight auto off         disable the ambient light sensor
 kbdlight auto on          re-enable it
 kbdlight list             print keyboard backlight IDs
+kbdlight sun on           follow sunrise and sunset (see below)
 kbdlight --help
 ```
+
+The help is colour-coded when it is going to a terminal, and plain when it is
+piped. `NO_COLOR`, `FORCE_COLOR` and `--no-color` all work.
 
 ### Holding a fixed level
 
@@ -99,6 +103,49 @@ kbdlight auto off && kbdlight set 0.5
 ```
 
 Re-enable the sensor later with `kbdlight auto on`.
+
+## Sun mode
+
+`kbdlight sun on` puts the backlight on the sky's schedule: off through the day,
+up to a level you pick after sunset, back down at sunrise.
+
+```sh
+kbdlight sun on                       # dark by day, 0.6 after sunset
+kbdlight sun on --night 0.4 --day auto
+kbdlight sun                          # today's times and what is armed
+kbdlight sun off                      # stop, and put back the state it found
+```
+
+```
+sun mode: on
+  where    52.52, 13.41 (Europe/Berlin)
+  sunrise  05:26   sunset 20:58
+  now      night, level 0.60
+  next     2.8.2026, 05:28:02
+  agent    loaded (checks every 5 min)
+```
+
+Sunrise and sunset are computed locally with the NOAA solar algorithm, so the
+switch tracks the season instead of a clock time that is right in March and an
+hour wrong in June. Coordinates come from the machine's timezone, which is a
+city name and therefore accurate to well under the minute that matters here.
+Pass `--at 48.14,11.58` once if you want your own, and `--rise-offset` /
+`--set-offset` to shift either switch by a number of minutes.
+
+A `launchd` agent (`local.kbdlight.sun`) re-checks every five minutes rather
+than firing at two computed times. Sunrise moves daily, so a clock-time job has
+to rewrite itself every day and can drift, double up, or quietly disappear; a
+poll cannot. It also catches up on the first wake if the Mac slept through the
+moment.
+
+Between two checks the keyboard is yours: the agent only writes on a phase
+change, so turning the backlight down in the evening sticks. `kbdlight sun off`
+unloads the agent and restores the exact brightness and sensor state from before
+sun mode started.
+
+`auto` and `sun` are independent and compose. `auto` is the hardware ambient
+sensor reacting to the room right now; `sun` is a schedule. `--day auto` hands
+the daylight hours back to the sensor and keeps the evening on a fixed level.
 
 ## Node API
 
@@ -135,18 +182,9 @@ try {
 
 ## Recipes
 
-**Backlight off at night, back to automatic in the morning.** Put this behind a
-`launchd` agent or a scheduled job:
-
-```sh
-#!/bin/zsh
-hour=$(date +%H)
-if [ "$hour" -ge 23 ] || [ "$hour" -lt 7 ]; then
-  kbdlight auto off && kbdlight off
-else
-  kbdlight auto on
-fi
-```
+**Backlight off during the day, lit in the evening.** This used to be a shell
+script comparing `date +%H` against two numbers you had to keep re-tuning as the
+seasons moved. It is now `kbdlight sun on`; see below.
 
 **Dim the keyboard while a screen recording runs**, then restore it:
 

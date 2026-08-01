@@ -8,6 +8,8 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-01
+
 ### Added
 
 - `kbdlight pulse [count]`: blink the backlight as a notification and restore
@@ -21,6 +23,25 @@ and this project adheres to
   hardware.
 - A lock file guards against overlapping runs, which would otherwise snapshot
   the keyboard mid-blink and restore it to dark.
+- `kbdlight sun on`: put the backlight on the sky's schedule, dark through the
+  day and lit after sunset. Sunrise and sunset are computed locally with the
+  NOAA solar algorithm from coordinates derived from the machine's timezone, so
+  there is no network call and no location permission; `--at <lat,lon>` sets
+  them by hand. Options: `--night`, `--day` (both accept `auto` to hand a phase
+  back to the ambient sensor), `--rise-offset`, `--set-offset` and `--force`.
+  `kbdlight sun` reports the times and the schedule, `kbdlight sun off` restores
+  the state from before sun mode started. A `launchd` agent re-checks every five
+  minutes instead of firing at two computed times: sunrise moves daily, so a
+  clock-time job has to rewrite itself and can drift or vanish, and a poll also
+  catches up on the first wake after sleep. It writes only on a phase change, so
+  a level set by hand during a phase is left alone.
+- Colour in the help output, and a `Sun mode` section in it. Colour is off when
+  the output is not a terminal, and `NO_COLOR`, `FORCE_COLOR`, `CLICOLOR_FORCE`,
+  `--color` and `--no-color` are all honoured. Column padding is computed from
+  printable width, so the two columns stay aligned either way.
+- Tests for the parts with no hardware in them: the solar math against NOAA's
+  published times, polar day and night, the day/night decision and its offsets,
+  coordinate parsing, the colour rules, and the help's alignment.
 - Examples in `examples/`, not shipped with the package: a Claude Code `Stop`
   hook notifier, a night mode that schedules its own restore through a
   self-removing launchd agent, and a music sync that flashes on the kick drum.
