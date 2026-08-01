@@ -77,6 +77,26 @@ const esc = (value) =>
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 
+/*
+  Prose, with command flags held together.
+
+  A hyphen is a line break opportunity, so a browser is entitled to end a line
+  with "-" and start the next with "-day", and at pull quote size it does. That
+  reads as a typo in the copy rather than as wrapping. Flags are the only token
+  in this page's prose where a break changes what the text says, so they are the
+  only thing wrapped.
+
+  Runs after escaping, which is safe: a flag contains none of the characters
+  esc() replaces. Use it for visible prose only, never for an attribute value.
+*/
+const FLAG_RE = /(^|[\s(])(--?[A-Za-z][\w-]*)/g;
+
+const rich = (value) =>
+  esc(value).replace(
+    FLAG_RE,
+    (_, lead, flag) => `${lead}<span class="nobrk">${flag}</span>`,
+  );
+
 function req(value, path) {
   if (value === undefined || value === null || value === "") {
     throw new Error(`content.json is missing a required field: ${path}`);
@@ -176,6 +196,36 @@ ${twitter.join("\n")}${twitter.length ? "\n" : ""}  <meta name="twitter:title" c
   <meta name="twitter:image:alt" content="${esc(site.ogImageAlt || title)}">`;
 }
 
+/*
+  The local navigation bar.
+
+  Modelled on the one Apple puts under the global nav on a product page: the
+  product's own name on the left, its sections in the middle, the one action
+  worth taking on the right. It is sticky and translucent, so the page keeps
+  moving underneath it.
+
+  Every link here is an in-page anchor, which is why none of them go through
+  utm(): a UTM parameter on a fragment link tags nothing and would only make
+  the address bar ugly. The call to action is an anchor too, because the thing
+  it is calling for is a command the visitor copies off this page.
+*/
+function navRegion(c) {
+  const nav = req(c.nav, "nav");
+  const cta = req(nav.cta, "nav.cta");
+  const links = req(nav.links, "nav.links")
+    .map(
+      (l) =>
+        `          <a class="localnav-link" href="${esc(req(l.href, "nav.links[].href"))}">${esc(req(l.label, "nav.links[].label"))}</a>`,
+    )
+    .join("\n");
+
+  return `      <a class="localnav-title" href="#top">${esc(req(nav.title, "nav.title"))}</a>
+      <nav class="localnav-links" aria-label="Sections of this page">
+${links}
+      </nav>
+      <a class="localnav-cta" href="${esc(req(cta.href, "nav.cta.href"))}">${esc(req(cta.label, "nav.cta.label"))}</a>`;
+}
+
 function heroRegion(c) {
   const site = c.site || {};
   const hero = req(c.hero, "hero");
@@ -189,7 +239,7 @@ function heroRegion(c) {
 
   return `      <p class="wordmark">${esc(req(c.project?.wordmark, "project.wordmark"))}</p>
 ${eyebrow}      <h1 class="hero-title" id="hero-heading">${esc(req(hero.headline, "hero.headline"))}</h1>
-      <p class="hero-sub">${esc(req(hero.sub, "hero.sub"))}</p>
+      <p class="hero-sub">${rich(req(hero.sub, "hero.sub"))}</p>
 
       <div class="install-strip">
         <p class="install-label" id="hero-install-label">${esc(install.label || "Install")}</p>
@@ -206,7 +256,7 @@ function demoRegion(c) {
   const demo = req(c.demo, "demo");
   const video = req(demo.video, "demo.video");
   const caption = demo.caption
-    ? `\n          <p class="caption">${esc(demo.caption)}</p>`
+    ? `\n          <p class="caption">${rich(demo.caption)}</p>`
     : "";
 
   return `      <h2 class="section-title" id="demo-heading">${icon(demo.icon || "terminal", "icon section-icon")}<span>${esc(req(demo.heading, "demo.heading"))}</span></h2>
@@ -226,7 +276,7 @@ function demoRegion(c) {
           <p>Your browser cannot play this video. <a href="${esc(video.src)}">Download the recording</a> instead.</p>
         </video>
         <figcaption class="demo-caption">
-          <p class="demo-alt">${esc(demo.alt)}</p>${caption}
+          <p class="demo-alt">${rich(demo.alt)}</p>${caption}
         </figcaption>
       </figure>`;
 }
@@ -234,10 +284,10 @@ function demoRegion(c) {
 function whyRegion(c) {
   const why = req(c.why, "why");
   const paragraphs = req(why.body, "why.body")
-    .map((p) => `      <p class="prose">${esc(p)}</p>`)
+    .map((p) => `      <p class="prose">${rich(p)}</p>`)
     .join("\n");
   const highlight = why.highlight
-    ? `\n      <p class="highlight">${esc(why.highlight)}</p>`
+    ? `\n      <p class="highlight">${rich(why.highlight)}</p>`
     : "";
 
   return `      <h2 class="section-title" id="why-heading">${icon(why.icon || "sparkle", "icon section-icon")}<span>${esc(req(why.heading, "why.heading"))}</span></h2>
@@ -250,7 +300,7 @@ function featuresRegion(c) {
     .map(
       (item) => `        <li class="card">
           <h3 class="card-title">${icon(item.icon || "zap", "icon card-icon")}<span>${esc(req(item.title, "features.items[].title"))}</span></h3>
-          <p class="card-body">${esc(req(item.body, "features.items[].body"))}</p>
+          <p class="card-body">${rich(req(item.body, "features.items[].body"))}</p>
         </li>`,
     )
     .join("\n");
@@ -280,12 +330,12 @@ function sunRegion(c) {
   const example = req(preview.example, "sun.preview.example");
 
   const paragraphs = req(sun.body, "sun.body")
-    .map((p) => `      <p class="prose">${esc(p)}</p>`)
+    .map((p) => `      <p class="prose">${rich(p)}</p>`)
     .join("\n");
   const highlight = sun.highlight
-    ? `\n      <p class="highlight">${esc(sun.highlight)}</p>`
+    ? `\n      <p class="highlight">${rich(sun.highlight)}</p>`
     : "";
-  const note = sun.note ? `\n      <p class="note">${esc(sun.note)}</p>` : "";
+  const note = sun.note ? `\n      <p class="note">${rich(sun.note)}</p>` : "";
 
   const mark = (key, value, hook) =>
     `          <div class="sun-mark">
@@ -321,16 +371,16 @@ ${highlight}
 function installRegion(c) {
   const install = req(c.install, "install");
   const intro = install.intro
-    ? `\n      <p class="prose">${esc(install.intro)}</p>`
+    ? `\n      <p class="prose">${rich(install.intro)}</p>`
     : "";
   const note = install.note
-    ? `\n      <p class="note">${esc(install.note)}</p>`
+    ? `\n      <p class="note">${rich(install.note)}</p>`
     : "";
   const steps = req(install.steps, "install.steps")
     .map(
       (step, i) => `        <li class="step">
           <h3 class="step-title">${esc(req(step.title, "install.steps[].title"))}</h3>
-          <p class="step-body">${esc(req(step.body, "install.steps[].body"))}</p>
+          <p class="step-body">${rich(req(step.body, "install.steps[].body"))}</p>
           ${copyBlock(req(step.command, "install.steps[].command"), `install-step-${i + 1}`)}
         </li>`,
     )
@@ -354,12 +404,12 @@ ${steps}
 */
 function faqRegion(c) {
   const faq = req(c.faq, "faq");
-  const intro = faq.intro ? `\n      <p class="prose">${esc(faq.intro)}</p>` : "";
+  const intro = faq.intro ? `\n      <p class="prose">${rich(faq.intro)}</p>` : "";
   const items = req(faq.items, "faq.items")
     .map(
       (item) => `        <details class="faq-item">
           <summary class="faq-q">${esc(req(item.q, "faq.items[].q"))}</summary>
-          <p class="faq-a">${esc(req(item.a, "faq.items[].a"))}</p>
+          <p class="faq-a">${rich(req(item.a, "faq.items[].a"))}</p>
         </details>`,
     )
     .join("\n");
@@ -476,7 +526,7 @@ function machineRegion(c) {
     .join("\n");
 
   return `      <h2 class="section-title" id="machine-heading">${icon(machine.icon || "zap", "icon section-icon")}<span>${esc(req(machine.heading, "machine.heading"))}</span></h2>
-      <p class="prose">${esc(req(machine.body, "machine.body"))}</p>
+      <p class="prose">${rich(req(machine.body, "machine.body"))}</p>
 
       <div class="mb-stage" data-macbook>
         <div class="mb" data-mb aria-hidden="true">
@@ -510,7 +560,7 @@ ${controls}
         </div>
       </div>
 
-      <p class="caption mb-note">${esc(req(machine.note, "machine.note"))}</p>`;
+      <p class="caption mb-note">${rich(req(machine.note, "machine.note"))}</p>`;
 }
 
 /* --------------------------------------------------------------- sun data */
@@ -540,6 +590,7 @@ window.__kbdlightSunData = {
 
 const REGIONS = {
   head: headRegion,
+  nav: navRegion,
   hero: heroRegion,
   machine: machineRegion,
   demo: demoRegion,

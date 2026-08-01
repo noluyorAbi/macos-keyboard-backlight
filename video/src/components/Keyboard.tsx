@@ -20,8 +20,12 @@ import { claude } from "../theme";
  * frame stay the same object at two scales rather than two different objects.
  */
 
-/** Warm white, the colour a real backlight actually is. */
-export const LIGHT = "#ffdfb8";
+/**
+ * White. The LED under a MacBook key is a white LED, and the warm amber this
+ * used to be made the board read as a gaming keyboard, which is precisely the
+ * thing the hardware is not. Matches --kbd on the landing page.
+ */
+export const LIGHT = "#ffffff";
 
 export const gapFor = (unit: number): number => Math.round(unit * 0.12);
 export const rowHFor = (unit: number): number => Math.round(unit * 0.92);

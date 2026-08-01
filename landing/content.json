@@ -1,9 +1,9 @@
 {
   "site": {
     "url": "https://kbdlight.adatepe.dev",
-    "lastmod": "2026-07-24",
+    "lastmod": "2026-08-02",
     "lang": "en",
-    "themeColor": "#0b0b0b",
+    "themeColor": "#000000",
     "ogImage": "assets/social-card.png",
     "ogImageAlt": "macos-keyboard-backlight, your keyboard backlight finally scriptable",
     "twitterSite": "",
@@ -22,6 +22,31 @@
     "name": "macos-keyboard-backlight",
     "wordmark": "macos-keyboard-backlight",
     "repo": "https://github.com/noluyorAbi/macos-keyboard-backlight"
+  },
+  "nav": {
+    "title": "kbdlight",
+    "links": [
+      {
+        "label": "Overview",
+        "href": "#machine"
+      },
+      {
+        "label": "Sun mode",
+        "href": "#sun"
+      },
+      {
+        "label": "Install",
+        "href": "#install"
+      },
+      {
+        "label": "FAQ",
+        "href": "#faq"
+      }
+    ],
+    "cta": {
+      "label": "Get it",
+      "href": "#install"
+    }
   },
   "hero": {
     "eyebrow": "No build step, one dependency, no network call, MIT",
@@ -49,11 +74,31 @@
     "body": "This one is lit the way sun mode would have yours lit at this moment, worked out from your timezone in your browser. Drive it with the same commands you would type.",
     "note": "An illustration, not a photograph. The backlight is hardware, so no screen recording can show it; the real thing is in the clip below.",
     "controls": [
-      { "label": "off", "command": "kbdlight off", "level": "0" },
-      { "label": "half", "command": "kbdlight set 0.5", "level": "0.5" },
-      { "label": "max", "command": "kbdlight max", "level": "1" },
-      { "label": "pulse", "command": "kbdlight pulse", "action": "pulse" },
-      { "label": "sun", "command": "kbdlight sun on", "action": "sun" }
+      {
+        "label": "off",
+        "command": "kbdlight off",
+        "level": "0"
+      },
+      {
+        "label": "half",
+        "command": "kbdlight set 0.5",
+        "level": "0.5"
+      },
+      {
+        "label": "max",
+        "command": "kbdlight max",
+        "level": "1"
+      },
+      {
+        "label": "pulse",
+        "command": "kbdlight pulse",
+        "action": "pulse"
+      },
+      {
+        "label": "sun",
+        "command": "kbdlight sun on",
+        "action": "sun"
+      }
     ]
   },
   "demo": {
@@ -65,7 +110,7 @@
       "width": 1920,
       "height": 1080
     },
-    "alt": "A lit MacBook keyboard seen from above. The command kbdlight auto off && kbdlight off runs, and the backlight drains away key by key.",
+    "alt": "A lit MacBook keyboard seen from above. The command kbdlight auto off && kbdlight off runs, and the white backlight drains away key by key.",
     "caption": "The command is real and does exactly this. The MacBook is an illustration: the backlight is hardware, so no screen recording can show it."
   },
   "why": {
@@ -119,7 +164,8 @@
     "command": "kbdlight sun on",
     "body": [
       "One command puts the backlight on the sky's schedule: dark through the day, up to a level you choose after sunset, and back down at sunrise. The times move with the season on their own, so there is no clock hour to re-tune in March and again in June.",
-      "Sunrise and sunset are computed on your own machine with the NOAA solar algorithm, from coordinates your timezone already implies. No location permission, no lookup service, nothing about where you are leaving the Mac."
+      "Sunrise and sunset are computed on your own machine with the NOAA solar algorithm, from coordinates your timezone already implies. No location permission, no lookup service, nothing about where you are leaving the Mac.",
+      "The ambient light sensor is a separate control and the two work together: sun mode can hand the daylight hours back to the sensor with --day auto and still hold a fixed level all evening."
     ],
     "preview": {
       "label": "An example day",
@@ -130,7 +176,7 @@
         "sunset": "19:00"
       }
     },
-    "highlight": "The ambient light sensor and the sun schedule are different things, and they compose. Sun mode can hand the daylight hours back to the sensor with --day auto and still hold a fixed level all evening.",
+    "highlight": "The sensor and the schedule are not alternatives. They compose.",
     "note": "kbdlight sun off unloads the schedule and restores the exact brightness and sensor state it found."
   },
   "install": {

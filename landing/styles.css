@@ -1,9 +1,16 @@
 /* ==========================================================================
    Landing page styles. No framework, no build step, no remote request.
 
-   Palette and easing are the shared launch design tokens. They are identical
-   to the ones the Remotion demo template uses, so the page and the video read
-   as one piece of work. Change them in :root only.
+   The visual language is Apple's own product pages: a black stage, San
+   Francisco set large and tight, one blue reserved for anything you can act
+   on, and surfaces that are a lighter grey rather than a bordered box. The
+   page describes a Mac utility, so it may as well look like it belongs on a
+   Mac.
+
+   Type is the one place this splits from Apple. Prose is set in the system
+   sans, which on the machines this tool runs on is San Francisco itself and
+   costs no request. Anything that is literally terminal content, a command, a
+   prompt, a key legend, stays monospaced, because that is what it is.
    ========================================================================== */
 
 /* --------------------------------------------------------------- typeface */
@@ -42,31 +49,49 @@
 
 /* ----------------------------------------------------------------- tokens */
 :root {
-  /* Shared launch tokens. Do not drift from these. */
-  --coral: #d97757;
-  --coral-deep: #c6613f;
-  --bg: #0b0b0b;
-  --frame: #060606;
-  --panel: #1a1a19;
-  --panel-high: #20201f;
-  --border: #383835;
-  --dim: #7b7974;
-  --text: #e4e3dd;
-  --bright: #faf9f5;
+  /* Measured off apple.com rather than guessed at: #f5f5f7 on #000 for copy,
+     #a1a1a6 for the secondary tone, #86868b for small print, #0071e3 for
+     anything filled and #2997ff for a link on black. */
+  --bg: #000000;
+  --surface: #1d1d1f;
+  --surface-high: #262629;
+  --hairline: #29292b;
+  --text: #f5f5f7;
+  --dim-text: #a1a1a6;
+  --faint: #86868b;
 
-  /* Derived, not part of the shared set. --dim sits at 4.3:1 on --bg, which is
-     below the 4.5:1 body text floor, so it is used for rules, icons and
-     decoration only. --dim-text is the readable secondary tone at 6.2:1. */
-  --dim-text: #96948d;
+  --accent: #2997ff; /* links and marks on a dark background */
+  --accent-solid: #0071e3; /* filled controls, identical in both schemes */
+  --accent-solid-hover: #0077ed;
+  --on-accent: #ffffff;
 
-  --ease: cubic-bezier(0.165, 0.84, 0.44, 1);
-  --radius: 10px;
-  --radius-sm: 6px;
-  --measure: 68ch;
-  --shell: 1080px;
-  --gap: clamp(1rem, 3vw, 2rem);
-  --section-y: clamp(3.5rem, 9vw, 7rem);
+  /*
+    The backlight. White, because the LED under a MacBook key is white: the
+    earlier warm accent made the illustration look like a gaming keyboard,
+    which is the one thing the real hardware is not. --kbd is the emitter and
+    --kbd-halo the very slightly cool falloff around it.
+  */
+  --kbd: #ffffff;
+  --kbd-halo: #dfe7f5;
 
+  /* Apple's transition curve for interface moves, and the softer entrance
+     curve for anything arriving on scroll. */
+  --ease: cubic-bezier(0.28, 0.11, 0.32, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --radius: 18px; /* Apple's tile corner */
+  --radius-sm: 12px;
+  --radius-pill: 980px;
+
+  --measure: 42rem;
+  --shell: 980px; /* Apple's content column */
+  --gap: clamp(1rem, 2.4vw, 1.5rem);
+  --section-y: clamp(3.5rem, 8vw, 6.5rem);
+  --nav-h: 52px;
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+    "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-mono:
     "JetBrains Mono Local", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
     Consolas, "Liberation Mono", monospace;
@@ -74,21 +99,22 @@
   color-scheme: dark light;
 }
 
-/* The dark treatment is the design. Light mode is a faithful inversion for
-   people who have asked their operating system for one. */
+/* Apple ships both. Light is the same page with the stage turned up, not a
+   different design: the greys inverse, the blue darkens to stay legible on
+   white, and the laptop stays the colour a Space Black laptop actually is. */
 @media (prefers-color-scheme: light) {
   :root {
-    --coral: #b8532f;
-    --coral-deep: #97401f;
-    --bg: #faf9f5;
-    --frame: #f2f1eb;
-    --panel: #ffffff;
-    --panel-high: #f6f5f0;
-    --border: #dcdad2;
-    --dim: #8d8b83;
-    --dim-text: #615f59;
-    --text: #2a2926;
-    --bright: #121110;
+    --bg: #ffffff;
+    --surface: #f5f5f7;
+    --surface-high: #ececee;
+    --hairline: #d2d2d7;
+    --text: #1d1d1f;
+    --dim-text: #6e6e73;
+    --faint: #86868b;
+
+    --accent: #0066cc;
+    --accent-solid: #0071e3;
+    --accent-solid-hover: #0077ed;
   }
 }
 
@@ -102,25 +128,20 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  /* An anchor must not land underneath the sticky bar. */
+  scroll-padding-block-start: calc(var(--nav-h) + 1rem);
 }
 
 body {
   margin: 0;
   /* No element may push the page sideways. */
   overflow-x: hidden;
-  background-color: var(--bg);
-  background-image:
-    radial-gradient(
-      120% 70% at 50% -18%,
-      color-mix(in srgb, var(--coral) 13%, transparent) 0%,
-      transparent 62%
-    );
-  background-repeat: no-repeat;
+  background: var(--bg);
   color: var(--text);
-  font-family: var(--font-mono);
-  font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.02rem);
-  line-height: 1.65;
-  font-variant-ligatures: none;
+  font-family: var(--font-sans);
+  font-size: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem); /* 17px at the top */
+  line-height: 1.47;
+  letter-spacing: -0.022em; /* Apple sets body copy slightly tight */
   -webkit-font-smoothing: antialiased;
 }
 
@@ -130,45 +151,152 @@ svg {
   max-width: 100%;
 }
 
+/*
+  A link is blue and unadorned until you point at it, which is the Apple rule.
+  Underlining every link in a page this dense turns the copy into a mesh.
+*/
 a {
-  color: var(--coral);
-  text-decoration-color: color-mix(in srgb, var(--coral) 45%, transparent);
-  text-underline-offset: 0.22em;
-  transition: color 0.18s var(--ease);
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.16s var(--ease);
 }
 
 a:hover {
-  color: var(--bright);
-  text-decoration-color: currentColor;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
 :focus-visible {
-  outline: 2px solid var(--coral);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--coral) 32%, transparent);
-  color: var(--bright);
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 .skip-link {
   position: absolute;
   left: -9999px;
   top: 0;
-  z-index: 10;
+  z-index: 20;
   padding: 0.65rem 1rem;
-  background: var(--panel-high);
-  border: 1px solid var(--border);
+  background: var(--surface);
   border-radius: var(--radius-sm);
-  color: var(--bright);
-  text-decoration: none;
+  color: var(--text);
 }
 
 .skip-link:focus {
   left: 1rem;
   top: 1rem;
+}
+
+/* ---------------------------------------------------------------- localnav */
+/*
+  The bar Apple puts under its global navigation on a product page: the name of
+  the thing on the left, its sections in the middle, the single action worth
+  taking on the right. Translucent and blurred, so the page reads as moving
+  underneath it rather than behind a panel.
+*/
+.localnav {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 10;
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-block-end: 1px solid color-mix(in srgb, var(--hairline) 70%, transparent);
+}
+
+/* No blur available means no translucency either: text over a half
+   transparent background with nothing softening it is unreadable. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .localnav {
+    background: var(--bg);
+  }
+}
+
+.localnav-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: var(--shell);
+  min-height: var(--nav-h);
+  margin-inline: auto;
+  padding-inline: clamp(1.1rem, 5vw, 2.5rem);
+}
+
+.localnav-title {
+  flex: 0 0 auto;
+  margin-inline-end: auto;
+  color: var(--text);
+  font-size: 1.3125rem; /* 21px, Apple's local nav title */
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.localnav-title:hover {
+  text-decoration: none;
+}
+
+.localnav-links {
+  display: flex;
+  gap: clamp(0.9rem, 2.4vw, 1.6rem);
+  font-size: 0.75rem; /* 12px, as Apple sets it */
+  letter-spacing: -0.01em;
+}
+
+.localnav-link {
+  position: relative;
+  padding-block: 0.35rem;
+  color: var(--dim-text);
+}
+
+.localnav-link:hover {
+  color: var(--text);
+  text-decoration: none;
+}
+
+/* The section you are actually looking at, underlined. app.js sets the
+   attribute from an IntersectionObserver. */
+.localnav-link[aria-current="true"] {
+  color: var(--text);
+}
+
+.localnav-link[aria-current="true"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: -0.35rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--text);
+}
+
+.localnav-cta {
+  flex: 0 0 auto;
+  padding: 0.28rem 0.75rem;
+  border-radius: var(--radius-pill);
+  background: var(--accent-solid);
+  color: var(--on-accent);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  transition: background-color 0.16s var(--ease);
+}
+
+.localnav-cta:hover {
+  background: var(--accent-solid-hover);
+  color: var(--on-accent);
+  text-decoration: none;
+}
+
+@media (max-width: 40rem) {
+  .localnav-links {
+    display: none;
+  }
 }
 
 /* -------------------------------------------------------------- structure */
@@ -184,15 +312,24 @@ a:hover {
   padding-block-start: 0;
 }
 
+/*
+  Apple centres a section heading and lets the copy under it sit in a narrower
+  column. The icon goes above the words rather than beside them: at this size
+  an inline glyph fights the type instead of introducing it.
+*/
 .section-title {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.6rem;
-  margin: 0 0 1.4rem;
-  font-size: clamp(1.05rem, 0.95rem + 0.6vw, 1.35rem);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: var(--bright);
+  gap: 0.85rem;
+  margin: 0 0 2rem;
+  font-size: clamp(1.75rem, 1.1rem + 2.6vw, 3rem);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--text);
 }
 
 .icon {
@@ -202,107 +339,111 @@ a:hover {
 }
 
 .section-icon {
-  color: var(--coral);
+  width: 30px;
+  height: 30px;
+  color: var(--accent);
 }
 
 .prose {
   max-width: var(--measure);
-  margin: 0 0 1rem;
-  color: var(--text);
+  margin: 0 auto 1.1rem;
+  color: var(--dim-text);
+  font-size: 1.0625rem;
+}
+
+/* A command flag, held on one line. sync.mjs wraps them; see rich() there. */
+.nobrk {
+  white-space: nowrap;
 }
 
 .note,
 .caption {
   max-width: var(--measure);
-  color: var(--dim-text);
-  font-size: 0.85rem;
+  margin-inline: auto;
+  color: var(--faint);
+  font-size: 0.8125rem; /* 13px, Apple's footnote size */
+  line-height: 1.4;
 }
 
 /* ------------------------------------------------------------------- hero */
 .hero {
-  padding-block-start: clamp(3rem, 10vw, 6.5rem);
-  text-align: left;
+  padding-block-start: clamp(3.5rem, 9vw, 6rem);
+  text-align: center;
 }
 
+/* The repository name, small and quiet. The local nav already carries the
+   short name, so this one states the full one once and gets out of the way. */
 .wordmark {
-  margin: 0 0 1.6rem;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: lowercase;
-  color: var(--bright);
+  margin: 0 0 1.1rem;
+  color: var(--faint);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0;
 }
 
-.wordmark::before {
-  content: "";
-  display: inline-block;
-  width: 9px;
-  height: 9px;
-  margin-inline-end: 0.6rem;
-  border-radius: 2px;
-  background: var(--coral);
-  vertical-align: baseline;
-}
-
+/* Apple's eyebrow: the accent colour, above the headline, no box around it. */
 .eyebrow {
-  display: inline-block;
-  margin: 0 0 1rem;
-  padding: 0.28rem 0.7rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--panel);
-  color: var(--dim-text);
-  font-size: 0.76rem;
-  letter-spacing: 0.02em;
+  margin: 0 0 0.5rem;
+  color: var(--accent);
+  font-size: clamp(1rem, 0.94rem + 0.3vw, 1.3125rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
 }
 
 .hero-title {
-  max-width: 20ch;
-  margin: 0 0 1.1rem;
-  font-size: clamp(1.9rem, 1.15rem + 3.6vw, 3.4rem);
-  font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: -0.035em;
-  color: var(--bright);
+  max-width: 19ch;
+  margin: 0 auto 1.2rem;
+  font-size: clamp(2.25rem, 1.5rem + 3vw, 4rem);
+  font-weight: 600;
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+  color: var(--text);
   text-wrap: balance;
 }
 
 .hero-sub {
-  max-width: 58ch;
-  margin: 0 0 2rem;
-  font-size: clamp(0.98rem, 0.93rem + 0.3vw, 1.1rem);
+  max-width: 34rem;
+  margin: 0 auto 2.25rem;
   color: var(--dim-text);
+  font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.3125rem); /* up to 21px */
+  line-height: 1.38;
+  letter-spacing: -0.017em;
 }
 
 .install-strip {
-  margin: 0 0 1.8rem;
+  margin: 0 0 1.75rem;
 }
 
 .install-label {
-  margin: 0 0 0.5rem;
-  font-size: 0.76rem;
-  letter-spacing: 0.12em;
+  margin: 0 0 0.6rem;
+  color: var(--faint);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--dim-text);
 }
 
 .install-then {
-  margin: 0.65rem 0 0;
-  font-size: 0.85rem;
-  color: var(--dim-text);
+  margin: 0.7rem 0 0;
+  color: var(--faint);
+  font-size: 0.8125rem;
 }
 
 /* --------------------------------------------------------- copyable code */
+/*
+  A command is terminal content, so it stays monospaced and keeps its prompt.
+  The container is an Apple surface rather than a bordered box: one fewer line
+  on the page, and the shape still reads as a field you can act on.
+*/
 .copy {
   display: flex;
   align-items: stretch;
-  gap: 0;
   min-width: 0;
-  max-width: 46rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--frame);
+  max-width: 34rem;
+  margin-inline: auto;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
   overflow: hidden;
+  text-align: start;
 }
 
 .copy-code {
@@ -310,50 +451,52 @@ a:hover {
   flex: 1 1 auto;
   min-width: 0;
   margin: 0;
-  padding: 0.85rem 1rem;
+  padding: 0.8rem 1rem;
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  font-size: 0.92em;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
   line-height: 1.5;
-  color: var(--bright);
+  letter-spacing: 0;
   white-space: pre;
   tab-size: 2;
 }
 
 .copy-code::before {
   content: "$ ";
-  color: var(--coral);
+  color: var(--faint);
 }
 
 .copy-btn {
   flex: 0 0 auto;
-  padding-inline: 0.95rem;
+  padding-inline: 1rem;
   border: 0;
-  border-inline-start: 1px solid var(--border);
-  background: var(--panel);
-  color: var(--dim-text);
+  background: transparent;
+  color: var(--accent);
   font: inherit;
-  font-size: 0.8rem;
+  font-size: 0.8125rem;
   cursor: pointer;
   transition:
-    background-color 0.18s var(--ease),
-    color 0.18s var(--ease);
+    background-color 0.16s var(--ease),
+    color 0.16s var(--ease);
 }
 
 .copy-btn:hover {
-  background: var(--panel-high);
-  color: var(--bright);
+  background: var(--surface-high);
 }
 
 .copy-btn[data-copied="true"] {
-  color: var(--coral);
+  color: var(--text);
 }
 
 /* ---------------------------------------------------------------- buttons */
 .cta-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.5rem 1.75rem;
+  align-items: center;
+  justify-content: center;
   margin: 0;
 }
 
@@ -361,43 +504,55 @@ a:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 46px;
-  padding: 0 1.35rem;
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
-  font-size: 0.92rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-size: 1.0625rem;
+  letter-spacing: -0.022em;
   text-decoration: none;
   transition:
-    transform 0.2s var(--ease),
-    background-color 0.2s var(--ease),
-    border-color 0.2s var(--ease),
-    color 0.2s var(--ease);
+    background-color 0.16s var(--ease),
+    color 0.16s var(--ease);
 }
 
+/* Apple's filled control: a blue pill, 980px radius, white label, no border
+   and no shadow. */
 .btn-primary {
-  background: var(--coral);
-  color: #0b0b0b;
+  min-height: 44px;
+  padding: 0.5rem 1.35rem;
+  border-radius: var(--radius-pill);
+  background: var(--accent-solid);
+  color: var(--on-accent);
 }
 
 .btn-primary:hover {
-  background: var(--coral-deep);
-  color: #0b0b0b;
-  transform: translateY(-1px);
+  background: var(--accent-solid-hover);
+  color: var(--on-accent);
+  text-decoration: none;
 }
 
+/*
+  And Apple's secondary: not a button at all, a blue link with a chevron. It
+  keeps a single filled control per view, which is the reason the filled one
+  reads as the thing to do.
+*/
 .btn-secondary {
-  border-color: var(--border);
-  background: var(--panel);
-  color: var(--text);
+  min-height: 44px;
+  color: var(--accent);
+}
+
+.btn-secondary::after {
+  content: "\203A"; /* single right angle quote, the chevron Apple uses */
+  margin-inline-start: 0.3em;
+  font-size: 1.1em;
+  line-height: 1;
+  transition: transform 0.16s var(--ease);
 }
 
 .btn-secondary:hover {
-  border-color: var(--dim);
-  background: var(--panel-high);
-  color: var(--bright);
-  transform: translateY(-1px);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.btn-secondary:hover::after {
+  transform: translateX(2px);
 }
 
 /* ------------------------------------------------------------------- demo */
@@ -410,61 +565,67 @@ a:hover {
   width: 100%;
   height: auto;
   aspect-ratio: 16 / 9;
-  border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: var(--frame);
+  background: var(--surface);
   object-fit: cover;
 }
 
 .demo-caption {
-  margin-top: 0.85rem;
-  color: var(--dim-text);
-  font-size: 0.85rem;
+  margin-top: 1rem;
+  text-align: center;
 }
 
 .demo-alt {
-  margin: 0;
+  max-width: var(--measure);
+  margin: 0 auto;
+  color: var(--dim-text);
+  font-size: 0.875rem;
 }
 
 .demo-caption .caption {
-  margin: 0.35rem 0 0;
+  margin: 0.4rem auto 0;
 }
 
 /* -------------------------------------------------------------------- why */
+/*
+  The one sentence worth stopping on. Apple sets a pulled-out line larger than
+  the copy around it rather than boxing it, so it reads as emphasis instead of
+  as an aside.
+*/
 .highlight {
   max-width: var(--measure);
-  margin: 1.5rem 0 0;
-  padding: 0.9rem 1.1rem;
-  border-inline-start: 2px solid var(--coral);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  background: var(--panel);
-  color: var(--bright);
+  margin: 2rem auto 0;
+  color: var(--text);
+  font-size: clamp(1.1875rem, 1.05rem + 0.7vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  text-align: center;
+  text-wrap: balance;
 }
 
 /* --------------------------------------------------------------- features */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15.5rem), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
   gap: var(--gap);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+/* Apple's tile: a lighter surface, a generous corner, no border at all. */
 .card {
-  padding: 1.15rem 1.25rem 1.3rem;
-  border: 1px solid var(--border);
+  padding: 1.75rem 1.6rem;
   border-radius: var(--radius);
-  background: var(--panel);
+  background: var(--surface);
   transition:
-    border-color 0.22s var(--ease),
-    background-color 0.22s var(--ease),
-    transform 0.22s var(--ease);
+    background-color 0.25s var(--ease),
+    transform 0.25s var(--ease);
 }
 
 .card:hover {
-  border-color: color-mix(in srgb, var(--coral) 45%, var(--border));
-  background: var(--panel-high);
+  background: var(--surface-high);
   transform: translateY(-2px);
 }
 
@@ -472,20 +633,22 @@ a:hover {
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  margin: 0 0 0.5rem;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--bright);
+  margin: 0 0 0.6rem;
+  font-size: 1.3125rem; /* 21px */
+  font-weight: 600;
+  line-height: 1.19;
+  letter-spacing: -0.015em;
+  color: var(--text);
 }
 
 .card-icon {
-  color: var(--coral);
+  color: var(--accent);
 }
 
 .card-body {
   margin: 0;
   color: var(--dim-text);
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
 }
 
 /* ---------------------------------------------------------------- install */
@@ -495,15 +658,16 @@ a:hover {
      unbreakable command inside it, which pushes the whole page sideways on a
      narrow screen. */
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--gap);
-  margin: 1.5rem 0 0;
+  gap: 2rem;
+  max-width: var(--measure);
+  margin: 2rem auto 0;
   padding: 0;
   list-style: none;
   counter-reset: step;
 }
 
 .step {
-  padding-inline-start: 2.4rem;
+  padding-inline-start: 2.6rem;
   position: relative;
   counter-increment: step;
 }
@@ -511,32 +675,36 @@ a:hover {
 .step::before {
   content: counter(step);
   position: absolute;
-  inset-block-start: 0.1rem;
+  inset-block-start: 0.15rem;
   inset-inline-start: 0;
   display: grid;
   place-items: center;
-  width: 1.7rem;
-  height: 1.7rem;
-  border: 1px solid var(--border);
+  width: 1.75rem;
+  height: 1.75rem;
   border-radius: 50%;
-  background: var(--panel);
-  color: var(--coral);
-  font-size: 0.78rem;
-  font-weight: 700;
+  background: var(--accent-solid);
+  color: var(--on-accent);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 
 .step-title {
   margin: 0 0 0.35rem;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--bright);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--text);
 }
 
 .step-body {
-  max-width: var(--measure);
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.85rem;
   color: var(--dim-text);
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
+}
+
+.step .copy {
+  margin-inline: 0;
 }
 
 /* Any table dropped into the page scrolls inside its own box. */
@@ -544,63 +712,72 @@ a:hover {
   max-width: 100%;
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
 }
 
 .table-scroll table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.88rem;
+  font-size: 0.875rem;
 }
 
 .table-scroll th,
 .table-scroll td {
-  padding: 0.6rem 0.85rem;
-  border-block-end: 1px solid var(--border);
+  padding: 0.65rem 0.9rem;
+  border-block-end: 1px solid var(--hairline);
   text-align: start;
   white-space: nowrap;
 }
 
 /* ----------------------------------------------------------------- footer */
+/* Apple's footer is the smallest type on the page, on a slightly raised
+   surface, with a hairline above it. */
 .site-footer {
-  padding-block: clamp(2.5rem, 6vw, 4rem);
-  border-block-start: 1px solid var(--border);
+  max-width: none;
   margin-block-start: var(--section-y);
-  color: var(--dim-text);
-  font-size: 0.86rem;
+  padding-block: clamp(2.5rem, 6vw, 3.5rem);
+  border-block-start: 1px solid var(--hairline);
+  background: var(--surface);
+  color: var(--faint);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.site-footer > * {
+  max-width: var(--shell);
+  margin-inline: auto;
 }
 
 .footer-license {
-  margin: 0 0 0.45rem;
-  max-width: var(--measure);
-  color: var(--text);
+  /* auto, not 0: these sit in a full width footer and have to line up with the
+     content column above them. A margin shorthand here silently resets the
+     margin-inline: auto that centres them. */
+  margin: 0 auto 0.4rem;
+  color: var(--dim-text);
 }
 
 .footer-commercial {
-  margin: 0 0 1.1rem;
+  margin: 0 auto 1rem;
 }
 
 .footer-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem 1.4rem;
-  margin-bottom: 1.1rem;
+  gap: 0.4rem 1.5rem;
+  margin: 1rem auto;
 }
 
 .footer-link {
   color: var(--dim-text);
-  text-decoration: none;
 }
 
 .footer-link:hover {
-  color: var(--bright);
-  text-decoration: underline;
+  color: var(--text);
 }
 
 .footer-copy {
-  margin: 0;
-  color: var(--dim);
+  margin: 0 auto;
 }
 
 /* --------------------------------------------------------------- macbook */
@@ -615,9 +792,15 @@ a:hover {
   the only arrangement where the two parts cannot drift apart when the whole
   thing turns.
 
+  Colour comes from Apple's own product renders: Space Black is a neutral, very
+  dark grey, nearly the value of the page behind it, and what separates it from
+  that background is not lightness but the bright machined edge running along
+  every cut. The earlier warm grey read as bronze.
+
   --mb-glow, 0 to 1, is the backlight. It is one number driving the keycaps, the
-  light bleeding around them, the spill onto the aluminium and the reflection on
-  the deck, so everything brightens as one thing rather than as five.
+  light bleeding around them, the spill onto the aluminium, the pool on the desk
+  and the reflection on the screen, so everything brightens as one thing rather
+  than as five.
 */
 @property --mb-glow {
   syntax: "<number>";
@@ -626,7 +809,7 @@ a:hover {
 }
 
 .mb-stage {
-  --mb-w: clamp(15rem, 56vw, 30rem);
+  --mb-w: clamp(15rem, 60vw, 32rem);
   --mb-glow: 0.55; /* lit by default: a dark keyboard is the boring half of the story */
   /*
     Positive, and that is the whole trick. The deck is rotated back towards the
@@ -634,11 +817,14 @@ a:hover {
     to sit above it, which is what tipping the whole assembly away does. Negative
     here puts the eye under the desk and the keyboard vanishes edge on.
   */
-  --mb-rx: 41deg;
+  --mb-rx: 38deg;
   --mb-ry: 0deg;
 
-  margin: 2.25rem 0 0;
-  perspective: 2200px;
+  margin: 2.5rem 0 0;
+  /* A long lens. Apple photographs hardware from far away with a tight field,
+     which is why the far edge of a deck barely converges in their renders; a
+     short perspective here made the machine look like a wide angle snapshot. */
+  perspective: 3000px;
   perspective-origin: 50% 42%;
 }
 
@@ -655,7 +841,7 @@ a:hover {
     the keyboard. This reserves what the deck actually projects to at this
     angle, which is a little over half the width.
   */
-  margin-block-end: calc(var(--mb-w) * 0.56);
+  margin-block-end: calc(var(--mb-w) * 0.6);
 }
 
 /* ---- lid ---- */
@@ -667,11 +853,11 @@ a:hover {
   /* Anodised aluminium is not a flat grey: it is a narrow vertical gradient
      with a brighter machined edge catching the light at the top. */
   background:
-    linear-gradient(180deg, #4a4a46 0%, #2e2e2b 6%, #232320 55%, #1b1b19 100%);
+    linear-gradient(180deg, #5c5c62 0%, #303035 5%, #1e1e21 55%, #141417 100%);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 14%),
-    inset 1px 0 0 rgb(255 255 255 / 6%),
-    inset -1px 0 0 rgb(255 255 255 / 6%);
+    inset 0 1px 0 rgb(255 255 255 / 20%),
+    inset 1px 0 0 rgb(255 255 255 / 8%),
+    inset -1px 0 0 rgb(255 255 255 / 8%);
   transform-style: preserve-3d;
 }
 
@@ -681,21 +867,28 @@ a:hover {
   height: 100%;
   overflow: hidden;
   border-radius: calc(var(--mb-w) * 0.008);
-  background: #08080a;
+  background: #000000;
 }
 
-/* The desktop behind the terminal line. Warm, and it leans towards the accent
-   as the keyboard brightens, because a lit room lights the screen too. */
+/*
+  The desktop behind the terminal line. Cool grey ribbons on black, which is
+  the macOS wallpaper Apple ships these machines photographed with, and it
+  brightens with the keyboard because a lit room lights the screen too. The
+  light it gains is white now, not warm.
+*/
 .mb-wallpaper {
   position: absolute;
   inset: 0;
   background:
     radial-gradient(
-      120% 90% at 50% 115%,
-      color-mix(in srgb, var(--coral) calc(var(--mb-glow) * 26%), transparent),
-      transparent 60%
+      95% 70% at 50% 122%,
+      color-mix(in srgb, var(--kbd-halo) calc(var(--mb-glow) * 20%), transparent),
+      transparent 62%
     ),
-    linear-gradient(160deg, #14141a 0%, #0a0a0c 60%);
+    radial-gradient(52% 40% at 26% 24%, rgb(168 182 210 / 26%), transparent 64%),
+    radial-gradient(60% 44% at 74% 56%, rgb(132 146 176 / 20%), transparent 66%),
+    radial-gradient(34% 26% at 54% 78%, rgb(190 202 226 / 12%), transparent 68%),
+    linear-gradient(158deg, #1d1f25 0%, #08090c 66%);
 }
 
 .mb-notch {
@@ -705,7 +898,7 @@ a:hover {
   width: 16%;
   height: calc(var(--mb-w) * 0.018);
   border-radius: 0 0 calc(var(--mb-w) * 0.006) calc(var(--mb-w) * 0.006);
-  background: #08080a;
+  background: #000000;
   transform: translateX(-50%);
 }
 
@@ -715,12 +908,13 @@ a:hover {
   inset-inline-start: 7%;
   margin: 0;
   color: var(--text);
+  font-family: var(--font-mono);
   font-size: calc(var(--mb-w) * 0.026);
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
 }
 
 .mb-prompt-caret {
-  color: var(--coral);
+  color: var(--accent);
 }
 
 /* One diagonal sheen. Glass is only convincing when something is reflected in
@@ -730,7 +924,7 @@ a:hover {
   inset: 0;
   background: linear-gradient(
     108deg,
-    rgb(255 255 255 / 7%) 0%,
+    rgb(255 255 255 / 6%) 0%,
     rgb(255 255 255 / 2%) 22%,
     transparent 46%
   );
@@ -744,12 +938,19 @@ a:hover {
   with its far edge slightly higher, and the sliver of difference is what stops
   the two halves reading as one folded sheet of card.
 */
+/*
+  Everything below is measured off a MacBook Pro 14, normalised to the width of
+  the machine: 312mm across, 221mm deep, a key area 108mm deep starting 20mm
+  down, and a 130 by 81mm trackpad that very nearly reaches the front edge.
+  The first version guessed at these and it showed, as a small keyboard adrift
+  in a wide empty plate of aluminium.
+*/
 .mb-base {
   position: absolute;
   inset-block-start: 100%;
   inset-inline-start: 50%;
   width: 100%;
-  aspect-ratio: 16 / 10.6;
+  aspect-ratio: 312 / 221;
   transform-origin: 50% 0%;
   transform: translateX(-50%) rotateX(-83deg);
   transform-style: preserve-3d;
@@ -758,39 +959,54 @@ a:hover {
 .mb-deck {
   position: absolute;
   inset: 0;
-  padding: 3.2% 5.4%;
+  /* 20mm down, 25mm in on each side, which is where the speaker grilles go. */
+  padding: 6.4% 8% 0;
   border-radius: 0 0 calc(var(--mb-w) * 0.022) calc(var(--mb-w) * 0.022);
   background:
-    linear-gradient(180deg, #26262300 0%, #2a2a2726 40%, #33332f4d 100%),
-    linear-gradient(96deg, #2b2b28 0%, #232320 42%, #26262300 42%, #24242100 100%),
-    #232320;
+    linear-gradient(180deg, #2a2a2e00 0%, #2b2b3026 40%, #3a3a4140 100%),
+    linear-gradient(96deg, #2b2b30 0%, #212125 42%, #21212500 42%, #1e1e2200 100%),
+    #212125;
   /* The hinge: a dark band where the deck meets the lid, and a hairline of
      light on the machined edge just in front of it. Without it the two planes
      merge into one shape at the join. */
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 10%),
-    inset 0 10px 14px -10px rgb(0 0 0 / 85%);
+    inset 0 1px 0 rgb(255 255 255 / 13%),
+    inset 0 10px 14px -10px rgb(0 0 0 / 88%);
 }
 
 .mb-keys {
   display: flex;
   flex-direction: column;
-  gap: 0.9%;
+  /* A length, not a percentage. A percentage row-gap resolves against the
+     block size of a box whose height is auto, which is to say against nothing,
+     so the rows were touching. */
+  gap: calc(var(--mb-w) * 0.0034);
   width: 100%;
-  padding: 0.9%;
+  padding: calc(var(--mb-w) * 0.005);
   border-radius: calc(var(--mb-w) * 0.006);
   /* The well the keys sit in. A board printed flat on the aluminium is the
      single clearest tell that a laptop was drawn rather than photographed. */
-  background: #191917;
+  background: #0d0d0f;
   box-shadow:
-    inset 0 2px 3px rgb(0 0 0 / 55%),
-    0 1px 0 rgb(255 255 255 / 5%);
+    inset 0 2px 3px rgb(0 0 0 / 65%),
+    0 1px 0 rgb(255 255 255 / 6%);
 }
 
+/*
+  A 1u key is the key area (84% of the width) over fifteen units, and a MacBook
+  keycap is very nearly square, so the row height follows from that rather than
+  being picked. The function row is the exception: it is roughly three fifths
+  height on the real machine, and that single short row at the top is one of
+  the most recognisable things about the board.
+*/
 .mb-row {
   display: flex;
   gap: 0.55%;
-  height: calc(var(--mb-w) * 0.043);
+  height: calc(var(--mb-w) * 0.056);
+}
+
+.mb-row:first-child {
+  height: calc(var(--mb-w) * 0.034);
 }
 
 .mb-key {
@@ -803,29 +1019,36 @@ a:hover {
   border-radius: calc(var(--mb-w) * 0.005);
   /* Keycaps are lighter at the top edge and fall away towards the bottom, and
      the shadow under each one is what separates the board into keys. */
-  background: linear-gradient(180deg, #3a3a36 0%, #26262300 4%, #1e1e1b 100%);
+  background: linear-gradient(180deg, #3a3a41 0%, #24242800 4%, #17171a 100%);
   box-shadow:
-    0 1px 1px rgb(0 0 0 / 55%),
-    inset 0 1px 0 rgb(255 255 255 / 7%);
+    0 1px 1px rgb(0 0 0 / 60%),
+    inset 0 1px 0 rgb(255 255 255 / 8%);
 }
 
 /*
   The light escaping around the keycap. This is the layer that sells it: a real
-  backlit board leaks more around the edges of the cap than through the legend.
+  backlit board leaks more around the edges of the cap than through the legend,
+  and the light doing the leaking is white.
 */
 .mb-key::after {
   content: "";
   position: absolute;
-  inset: calc(var(--mb-w) * -0.0018);
+  inset: calc(var(--mb-w) * -0.0016);
   border-radius: inherit;
-  background: radial-gradient(
-    120% 120% at 50% 120%,
-    color-mix(in srgb, var(--coral) 70%, #ffd9c4),
-    color-mix(in srgb, var(--coral) 40%, transparent) 55%,
-    transparent 78%
-  );
-  box-shadow: 0 0 calc(var(--mb-w) * 0.012) color-mix(in srgb, var(--coral) 55%, transparent);
-  opacity: calc(var(--mb-glow) * 0.85);
+  /*
+    Deliberately no background. Filling the cap with light was the first
+    attempt and it turned every key into a white tile: on the real board the
+    cap face stays dark and what you see is the rim, a hard bright line where
+    the light escapes under the edge, and a soft bloom past it. So the whole
+    effect is shadows, and the keycap underneath shows through untouched.
+  */
+  box-shadow:
+    0 0 calc(var(--mb-w) * 0.0035) calc(var(--mb-w) * 0.0009)
+      color-mix(in srgb, var(--kbd) 80%, transparent),
+    0 0 calc(var(--mb-w) * 0.016) color-mix(in srgb, var(--kbd-halo) 38%, transparent),
+    inset 0 calc(var(--mb-w) * -0.0014) calc(var(--mb-w) * 0.004)
+      color-mix(in srgb, var(--kbd) 34%, transparent);
+  opacity: calc(var(--mb-glow) * 0.95);
   transition: opacity 0.45s var(--ease);
   pointer-events: none;
 }
@@ -833,10 +1056,18 @@ a:hover {
 .mb-key-cap {
   position: relative; /* above the bleed */
   z-index: 1;
-  color: color-mix(in srgb, #f6ece4 calc(35% + var(--mb-glow) * 65%), #6e6b64);
+  color: color-mix(in srgb, #ffffff calc(22% + var(--mb-glow) * 78%), #55555c);
+  /* The legend is a window cut in the cap, not paint on it, so it glows in its
+     own right rather than merely being lit. */
+  text-shadow: 0 0 calc(var(--mb-w) * 0.004)
+    color-mix(in srgb, var(--kbd) calc(var(--mb-glow) * 65%), transparent);
+  font-family: var(--font-mono);
   font-size: calc(var(--mb-w) * 0.018);
   line-height: 1;
-  transition: color 0.45s var(--ease);
+  letter-spacing: 0;
+  transition:
+    color 0.45s var(--ease),
+    text-shadow 0.45s var(--ease);
 }
 
 .mb-key-sm .mb-key-cap {
@@ -853,31 +1084,36 @@ a:hover {
 .u2-75 { flex-grow: 2.75; }
 .u5 { flex-grow: 5; }
 
+/* 130 by 81mm, 13mm below the keys. Sized off --mb-w rather than in percent,
+   because a percentage here would resolve against the padded content box and
+   quietly come out an eighth too narrow. */
 .mb-trackpad {
-  width: 34%;
-  margin: 3.4% auto 0;
-  aspect-ratio: 16 / 10.4;
+  width: calc(var(--mb-w) * 0.417);
+  margin: calc(var(--mb-w) * 0.042) auto 0;
+  aspect-ratio: 130 / 81;
   border-radius: calc(var(--mb-w) * 0.006);
-  background: linear-gradient(180deg, #333330 0%, #2a2a27 100%);
+  background: linear-gradient(180deg, #26262b 0%, #1e1e22 100%);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 12%),
-    inset 0 -1px 0 rgb(0 0 0 / 40%),
-    0 1px 2px rgb(0 0 0 / 45%);
+    inset 0 1px 0 rgb(255 255 255 / 10%),
+    inset 0 -1px 0 rgb(0 0 0 / 45%),
+    0 1px 2px rgb(0 0 0 / 50%);
 }
 
 /* Speaker grilles, as a dot field rather than drawn holes. */
+/* Outboard of the keys, running the depth of the key area, which is where the
+   grilles sit on the machine this is a picture of. */
 .mb-speaker {
   position: absolute;
-  inset-block-start: 4.2%;
+  inset-block-start: 9%;
   width: 4.4%;
-  height: 42%;
-  background-image: radial-gradient(circle, #14141200 0.6px, transparent 0.7px);
+  height: 48%;
+  background-image: radial-gradient(circle, #111114 0.6px, transparent 0.7px);
   background-size: calc(var(--mb-w) * 0.0075) calc(var(--mb-w) * 0.0075);
   opacity: 0.85;
 }
 
-.mb-speaker-l { inset-inline-start: 1.6%; }
-.mb-speaker-r { inset-inline-end: 1.6%; }
+.mb-speaker-l { inset-inline-start: 1.8%; }
+.mb-speaker-r { inset-inline-end: 1.8%; }
 
 /*
   Light pooling on the aluminium around the board. Sits above the deck and below
@@ -888,9 +1124,9 @@ a:hover {
   inset: 0;
   border-radius: inherit;
   background: radial-gradient(
-    68% 46% at 50% 34%,
-    color-mix(in srgb, var(--coral) 30%, transparent),
-    transparent 70%
+    82% 58% at 50% 33%,
+    color-mix(in srgb, var(--kbd-halo) 34%, transparent),
+    transparent 72%
   );
   opacity: var(--mb-glow);
   mix-blend-mode: screen;
@@ -906,7 +1142,7 @@ a:hover {
   inset-inline: 0;
   height: calc(var(--mb-w) * 0.019);
   border-radius: 0 0 calc(var(--mb-w) * 0.01) calc(var(--mb-w) * 0.01);
-  background: linear-gradient(180deg, #343430 0%, #1c1c1a 100%);
+  background: linear-gradient(180deg, #43434a 0%, #1a1a1d 100%);
   transform-origin: 50% 0%;
   /* Back up to vertical: the deck it hangs off is lying down, and the front edge
      of a laptop is the one face that still looks straight at you. */
@@ -933,48 +1169,65 @@ a:hover {
   pointer-events: none;
 }
 
+/* And the light the keyboard throws back onto the desk, which is the half of
+   the effect a shadow alone cannot show. It rides the same blur as the shadow
+   it sits in, so the two read as one contact. */
+.mb-cast::after {
+  content: "";
+  position: absolute;
+  inset: 14% 10%;
+  background: radial-gradient(
+    50% 50% at 50% 42%,
+    color-mix(in srgb, var(--kbd-halo) 20%, transparent),
+    transparent 68%
+  );
+  opacity: var(--mb-glow);
+  mix-blend-mode: screen;
+  transition: opacity 0.45s var(--ease);
+}
+
 /* ---- controls ---- */
 .mb-controls {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: center;
-  margin-block-start: 1.5rem;
+  margin-block-start: 1.75rem;
 }
 
 .mb-btn {
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 0.4rem 0.85rem;
-  background: var(--panel);
-  color: var(--text);
-  font: inherit;
-  font-size: 0.8rem;
+  padding: 0.4rem 0.9rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--dim-text);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0;
   cursor: pointer;
   transition:
-    background 0.15s var(--ease),
-    border-color 0.15s var(--ease),
-    color 0.15s var(--ease);
+    background-color 0.16s var(--ease),
+    color 0.16s var(--ease);
 }
 
 .mb-btn:hover {
-  background: var(--panel-high);
-  color: var(--bright);
+  background: var(--surface-high);
+  color: var(--text);
 }
 
 .mb-btn[data-active="true"] {
-  border-color: var(--coral);
-  color: var(--bright);
+  background: var(--accent-solid);
+  color: var(--on-accent);
 }
 
 .mb-btn-cmd::before {
   content: "$ ";
-  color: var(--coral);
+  opacity: 0.6;
 }
 
 .mb-note {
-  max-width: var(--measure);
-  margin-block-start: 1rem;
+  margin-block-start: 1.25rem;
+  text-align: center;
 }
 
 /* -------------------------------------------------------------- sun mode */
@@ -990,11 +1243,10 @@ a:hover {
 */
 .sun-preview {
   max-width: var(--measure);
-  margin: 2rem 0 0;
-  padding: 1.1rem 1.2rem 1rem;
-  border: 1px solid var(--border);
+  margin: 2.25rem auto 0;
+  padding: 1.4rem 1.5rem 1.25rem;
   border-radius: var(--radius);
-  background: var(--panel);
+  background: var(--surface);
 
   --sun-rise: 25%;
   --sun-set: 79.2%;
@@ -1002,17 +1254,16 @@ a:hover {
 }
 
 .sun-preview-label {
-  margin: 0 0 0.85rem;
+  margin: 0 0 0.9rem;
   color: var(--dim-text);
-  font-size: 0.82rem;
-  letter-spacing: 0.02em;
+  font-size: 0.8125rem;
 }
 
 .sun-track {
   position: relative;
-  height: 3rem;
+  height: 3.25rem;
   border-radius: var(--radius-sm);
-  background: var(--panel-high); /* the daytime: keyboard off */
+  background: var(--surface-high); /* the daytime: keyboard off */
   overflow: hidden;
 }
 
@@ -1022,10 +1273,11 @@ a:hover {
   Drawing the daytime as the lit band is the obvious way round and it is the
   wrong one: this is a picture of what the command does, and what it does is
   leave the keyboard dark all day and light it after sunset. So the track itself
-  is the day, and the two warm segments at either end are the hours the keyboard
-  is actually on. The gradient fades towards the sunrise and sunset edges,
-  because a hard vertical line there reads as a rendering seam rather than as
-  the moment the sun crossed the horizon.
+  is the day, and the two lit segments at either end are the hours the keyboard
+  is actually on. They are white for the same reason the illustration above them
+  is: that is the colour of the light being described. The gradient fades
+  towards the sunrise and sunset edges, because a hard vertical line there reads
+  as a rendering seam rather than as the moment the sun crossed the horizon.
 */
 .sun-lit {
   position: absolute;
@@ -1040,8 +1292,8 @@ a:hover {
   inset-inline-end: calc(100% - var(--sun-rise));
   background: linear-gradient(
     90deg,
-    color-mix(in srgb, var(--coral) 55%, transparent),
-    color-mix(in srgb, var(--coral) 8%, transparent)
+    color-mix(in srgb, var(--kbd) 52%, transparent),
+    color-mix(in srgb, var(--kbd-halo) 6%, transparent)
   );
 }
 
@@ -1050,8 +1302,8 @@ a:hover {
   inset-inline-end: 0;
   background: linear-gradient(
     90deg,
-    color-mix(in srgb, var(--coral) 8%, transparent),
-    color-mix(in srgb, var(--coral) 55%, transparent)
+    color-mix(in srgb, var(--kbd-halo) 6%, transparent),
+    color-mix(in srgb, var(--kbd) 52%, transparent)
   );
 }
 
@@ -1059,10 +1311,10 @@ a:hover {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  margin: 0.45rem 0 0;
-  color: var(--dim);
-  font-size: 0.7rem;
-  letter-spacing: 0.04em;
+  margin: 0.5rem 0 0;
+  color: var(--faint);
+  font-size: 0.6875rem;
+  letter-spacing: 0;
 }
 
 .sun-legend-mid {
@@ -1079,7 +1331,7 @@ a:hover {
   inset-inline-start: var(--sun-now);
   width: 2px;
   margin-inline-start: -1px;
-  background: var(--bright);
+  background: var(--accent);
   opacity: 0;
   transition:
     inset-inline-start 0.55s var(--ease),
@@ -1094,7 +1346,7 @@ a:hover {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--bright);
+  background: var(--accent);
 }
 
 [data-sun-live] .sun-now {
@@ -1105,7 +1357,7 @@ a:hover {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
   gap: 0.75rem 1.25rem;
-  margin: 0.9rem 0 0;
+  margin: 1.1rem 0 0;
 }
 
 .sun-mark {
@@ -1113,45 +1365,54 @@ a:hover {
 }
 
 .sun-mark-key {
-  color: var(--dim-text);
-  font-size: 0.74rem;
+  color: var(--faint);
+  font-size: 0.6875rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
 }
 
 .sun-mark-value {
-  margin: 0.15rem 0 0;
-  color: var(--bright);
-  font-size: 0.95rem;
+  margin: 0.2rem 0 0;
+  color: var(--text);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
   font-variant-numeric: tabular-nums;
 }
 
 .sun-preview-note {
-  margin: 0.9rem 0 0;
+  margin: 1rem 0 0;
+  text-align: start;
+}
+
+.section-sun .copy {
+  margin-block-start: 2rem;
 }
 
 /* -------------------------------------------------------------------- faq */
+/* Apple's accordion: hairlines only, no box, the control on the right. */
 .faq {
   max-width: var(--measure);
-  margin-block-start: 1.5rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
+  margin: 2rem auto 0;
+  border-block-start: 1px solid var(--hairline);
 }
 
-.faq-item + .faq-item {
-  border-block-start: 1px solid var(--border);
+.faq-item {
+  border-block-end: 1px solid var(--hairline);
 }
 
 .faq-q {
   display: flex;
-  align-items: baseline;
-  gap: 0.6rem;
-  padding: 0.9rem 1.1rem;
-  color: var(--bright);
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem 0.25rem;
+  color: var(--text);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
   cursor: pointer;
   list-style: none;
-  transition: background 0.15s var(--ease);
 }
 
 /* The default triangle differs per browser and cannot be styled in Safari, so
@@ -1160,31 +1421,42 @@ a:hover {
   display: none;
 }
 
-.faq-q::before {
+.faq-q::after {
   content: "+";
-  color: var(--coral);
-  font-weight: 700;
-  transition: transform 0.2s var(--ease);
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--accent);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1;
+  transition:
+    background-color 0.16s var(--ease),
+    transform 0.2s var(--ease);
 }
 
-.faq-item[open] .faq-q::before {
+.faq-item[open] .faq-q::after {
   content: "\2212"; /* minus, so the control says what it will do next */
 }
 
-.faq-q:hover,
-.faq-item[open] .faq-q {
-  background: var(--panel);
+.faq-q:hover::after {
+  background: var(--surface-high);
 }
 
 .faq-q:focus-visible {
-  outline: 2px solid var(--coral);
+  outline: 2px solid var(--accent);
   outline-offset: -2px;
 }
 
 .faq-a {
   margin: 0;
-  padding: 0 1.1rem 1.1rem 2.3rem;
-  color: var(--text);
+  padding: 0 2.5rem 1.35rem 0.25rem;
+  color: var(--dim-text);
+  font-size: 0.9375rem;
 }
 
 /* ------------------------------------------------------------------ toast */
@@ -1193,18 +1465,17 @@ a:hover {
   inset-block-end: 1.25rem;
   inset-inline-start: 50%;
   z-index: 20;
-  padding: 0.55rem 1rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--panel-high);
-  color: var(--bright);
-  font-size: 0.82rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-pill);
+  background: var(--surface-high);
+  color: var(--text);
+  font-size: 0.8125rem;
   opacity: 0;
   transform: translate(-50%, 8px);
   pointer-events: none;
   transition:
     opacity 0.22s var(--ease),
-    transform 0.22s var(--ease);
+    transform 0.22s var(--ease-out);
 }
 
 .toast[data-visible="true"] {
@@ -1212,14 +1483,37 @@ a:hover {
   transform: translate(-50%, 0);
 }
 
+/* ----------------------------------------------------------------- reveal */
+/*
+  Apple's one piece of scroll choreography: content rises the last few pixels
+  into place as it comes into view. app.js adds the class, so with no script
+  everything is simply already in place, which is the correct fallback.
+
+  --reveal-delay staggers a group. It is set through the CSSOM rather than as a
+  style attribute, because the Content-Security-Policy allows no inline style.
+*/
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.7s var(--ease-out) var(--reveal-delay, 0ms),
+    transform 0.7s var(--ease-out) var(--reveal-delay, 0ms);
+}
+
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
 /* ------------------------------------------------------------ small print */
 @media (max-width: 32rem) {
-  .btn {
+  .btn-primary {
     width: 100%;
   }
 
-  .copy-code {
-    font-size: 0.86em;
+  .cta-row {
+    flex-direction: column;
+    gap: 1rem;
   }
 }
 
@@ -1238,8 +1532,13 @@ a:hover {
     scroll-behavior: auto !important;
   }
 
-  .btn:hover,
   .card:hover {
+    transform: none;
+  }
+
+  /* Never leave content invisible waiting for a transition that will not run. */
+  .reveal {
+    opacity: 1;
     transform: none;
   }
 }
@@ -1247,7 +1546,8 @@ a:hover {
 @media (forced-colors: active) {
   .card,
   .copy,
-  .btn {
+  .btn-primary,
+  .localnav-cta {
     border: 1px solid CanvasText;
   }
 }
@@ -1258,6 +1558,7 @@ a:hover {
     color: #000000;
   }
 
+  .localnav,
   .toast,
   .copy-btn,
   .skip-link {

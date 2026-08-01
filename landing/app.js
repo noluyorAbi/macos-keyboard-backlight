@@ -161,9 +161,125 @@
     observer.observe(video);
   }
 
+  /* --------------------------------------------------------------- reveal */
+  /*
+    Content rises the last few pixels into place as it scrolls into view.
+
+    The class is added here rather than sitting in the markup, and that is the
+    point: `.reveal` starts at zero opacity, so a page that shipped it
+    statically would be blank for anyone without JavaScript. Adding it at
+    runtime means the no-script fallback is simply the finished layout.
+
+    Groups stagger. The delay goes through the CSSOM, not a style attribute,
+    because the page's Content-Security-Policy allows no inline style.
+  */
+  var REVEAL_GROUPS = [
+    ".hero > *",
+    ".section-title",
+    ".mb-stage",
+    ".demo",
+    ".prose",
+    ".highlight",
+    ".card",
+    ".step",
+    ".sun-preview",
+    ".faq",
+    ".section-sun .copy",
+  ];
+
+  var STAGGER_MS = 60;
+  var MAX_STAGGER = 5; /* past a handful the last item feels late, not staged */
+
+  function wireReveal() {
+    if (REDUCED || typeof IntersectionObserver === "undefined") return;
+
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-in");
+          observer.unobserve(entry.target); /* once, not on every pass */
+        });
+      },
+      { threshold: 0.08, rootMargin: "0px 0px -8% 0px" },
+    );
+
+    REVEAL_GROUPS.forEach(function (selector) {
+      var items = document.querySelectorAll(selector);
+      for (var i = 0; i < items.length; i += 1) {
+        var el = items[i];
+        el.classList.add("reveal");
+        if (i > 0) {
+          el.style.setProperty(
+            "--reveal-delay",
+            Math.min(i, MAX_STAGGER) * STAGGER_MS + "ms",
+          );
+        }
+        observer.observe(el);
+      }
+    });
+  }
+
+  /* -------------------------------------------------------------- localnav */
+  /*
+    Underline the section being read, the way a product page local nav does.
+    Anything the observer reports as intersecting counts; the last one to enter
+    from the top wins, which is what makes scrolling up select the section you
+    are scrolling into rather than the one you are leaving.
+  */
+  function wireLocalnav() {
+    var links = document.querySelectorAll(".localnav-link[href^='#']");
+    if (!links.length || typeof IntersectionObserver === "undefined") return;
+
+    var byId = {};
+    var targets = [];
+    for (var i = 0; i < links.length; i += 1) {
+      var id = links[i].getAttribute("href").slice(1);
+      var section = document.getElementById(id);
+      if (!section) continue;
+      byId[id] = links[i];
+      targets.push(section);
+    }
+    if (!targets.length) return;
+
+    var visible = {};
+
+    function paint() {
+      var current = null;
+      for (var i = 0; i < targets.length; i += 1) {
+        if (visible[targets[i].id]) {
+          current = targets[i].id;
+          break;
+        }
+      }
+      for (var id in byId) {
+        if (id === current) byId[id].setAttribute("aria-current", "true");
+        else byId[id].removeAttribute("aria-current");
+      }
+    }
+
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          visible[entry.target.id] = entry.isIntersecting;
+        });
+        paint();
+      },
+      /* Ignore the strip under the bar itself, and treat the top half of the
+         viewport as "what is being read". */
+      { rootMargin: "-52px 0px -55% 0px" },
+    );
+
+    targets.forEach(function (section) {
+      observer.observe(section);
+    });
+  }
+
   tagOutboundLinks();
   wireCopyButtons();
   wireDemo();
+  wireReveal();
+  wireLocalnav();
 
   /* Exposed so a project can add a link later and tag it the same way. */
   window.launch = { withUtm: withUtm, toast: toast };
