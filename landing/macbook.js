@@ -134,21 +134,101 @@
 
   /* ------------------------------------------------------------- controls */
 
+  function run(button) {
+    var action = button.getAttribute("data-mb-action");
+    var level = button.getAttribute("data-mb-level");
+
+    if (action === "pulse") return pulse(button);
+    if (action === "sun") return applySun(button);
+
+    clearTimers();
+    setGlow(parseFloat(level));
+    say(button.getAttribute("aria-label") || "");
+    mark(button);
+  }
+
   for (var i = 0; i < buttons.length; i++) {
     buttons[i].addEventListener("click", function (event) {
-      var button = event.currentTarget;
-      var action = button.getAttribute("data-mb-action");
-      var level = button.getAttribute("data-mb-level");
-
-      if (action === "pulse") return pulse(button);
-      if (action === "sun") return applySun(button);
-
-      clearTimers();
-      setGlow(parseFloat(level));
-      say(button.getAttribute("aria-label") || "");
-      mark(button);
+      stopCycling();
+      run(event.currentTarget);
     });
   }
+
+  /* ----------------------------------------------------------- the demo */
+
+  /*
+    Nobody clicks. The five commands are the entire argument this section
+    makes, and a visitor who never presses anything sees one still frame of a
+    keyboard and scrolls past, so the illustration runs them itself: each
+    command in turn, marked on its own button, and the difference between off,
+    half, full and a pulse is visible without asking anything of anyone.
+
+    It hands over for good the moment somebody does press a button. Something
+    that keeps moving on its own after you have taken hold of it is the whole
+    reason carousels are hated.
+  */
+  var HOLD_MS = 2600;
+  var cycleTimer = null;
+  var cycleAt = 0;
+  /* Reduced motion means what it says: the machine stays where it is, lit for
+     the visitor's own hour, and the buttons still work. */
+  var cycling = !REDUCED && buttons.length > 0;
+  var onScreen = false;
+
+  /* A pulse is not a step you can hold for a fixed beat: it is four blinks at
+     the real command's timings, so its slot is as long as it takes plus a
+     breath at the end. */
+  function stepMs(button) {
+    if (button.getAttribute("data-mb-action") !== "pulse") return HOLD_MS;
+    var blinks = REDUCED ? 1 : PULSE.count;
+    return PULSE.preDarkMs + blinks * (PULSE.onMs + PULSE.offMs) + 700;
+  }
+
+  function stopCycling() {
+    cycling = false;
+    if (cycleTimer !== null) window.clearTimeout(cycleTimer);
+    cycleTimer = null;
+  }
+
+  function pauseCycling() {
+    if (cycleTimer !== null) window.clearTimeout(cycleTimer);
+    cycleTimer = null;
+  }
+
+  function step() {
+    var button = buttons[cycleAt % buttons.length];
+    cycleAt += 1;
+    run(button);
+    cycleTimer = window.setTimeout(step, stepMs(button));
+  }
+
+  /* Only while it is being looked at. A timer left running through a scrolled
+     past section comes back mid pulse, and a machine caught halfway through a
+     blink reads as broken rather than as busy. */
+  function resumeCycling() {
+    if (!cycling || cycleTimer !== null) return;
+    if (!onScreen || document.hidden) return;
+    cycleTimer = window.setTimeout(step, 900);
+  }
+
+  if (cycling && typeof window.IntersectionObserver === "function") {
+    new window.IntersectionObserver(
+      function (entries) {
+        onScreen = entries[entries.length - 1].isIntersecting;
+        if (onScreen) resumeCycling();
+        else pauseCycling();
+      },
+      { threshold: 0.4 },
+    ).observe(stage);
+  } else if (cycling) {
+    onScreen = true;
+    resumeCycling();
+  }
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) pauseCycling();
+    else resumeCycling();
+  });
 
   /* ---------------------------------------------------------------- tilt */
 
@@ -161,7 +241,7 @@
   var MAX_PITCH = 3;
   /* Must match --mb-rx in styles.css: this is where a pointer leaving the
      stage puts the machine back to. */
-  var BASE_PITCH = 17;
+  var BASE_PITCH = -20;
 
   function tilt(event) {
     var box = stage.getBoundingClientRect();
