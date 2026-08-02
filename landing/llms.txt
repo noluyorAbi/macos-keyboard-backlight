@@ -101,9 +101,29 @@ set on the machine and computes the times on the machine.
 **Does it work with an external keyboard?** Any backlit keyboard the system
 reports appears in `kbdlight list` and can be targeted by its ID.
 
+## Source, and forking it
+
+The repository is MIT and there is no contributor agreement. About 1,400 lines
+of plain JavaScript across `src/` and `bin/`, one runtime dependency, no build
+step, and three test suites that run with plain `node` in under a second:
+
+```sh
+gh repo fork noluyorAbi/macos-keyboard-backlight --clone
+cd macos-keyboard-backlight && npm install && npm test
+```
+
+`src/index.js` holds the entire CoreBrightness call and exports `get`, `set`,
+`isAuto`, `setAuto` and `keyboardIDs`, which is the same surface the command
+line uses, so a menu bar app, a Raycast command or an Apple Shortcuts action can
+be built on it without touching the private framework directly.
+
+Written by noluyorAbi. Other projects and current work: https://adatepe.dev
+
 ## Docs
 
 - Source and full README: https://github.com/noluyorAbi/macos-keyboard-backlight
 - Package: https://www.npmjs.com/package/macos-keyboard-backlight
 - Changelog: https://github.com/noluyorAbi/macos-keyboard-backlight/blob/main/CHANGELOG.md
 - Security policy: https://github.com/noluyorAbi/macos-keyboard-backlight/security/policy
+- Issues and pull requests: https://github.com/noluyorAbi/macos-keyboard-backlight/issues
+- Author: https://adatepe.dev

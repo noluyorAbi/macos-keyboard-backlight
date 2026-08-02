@@ -420,6 +420,72 @@ ${items}
       </div>`;
 }
 
+/*
+  The source section.
+
+  Every claim in it is a number somebody can check in a minute: the line count,
+  the one dependency, the three test suites, the five exported functions. A
+  landing page that asks for a fork and then describes the codebase in
+  adjectives is asking on credit.
+*/
+function sourceRegion(c) {
+  const site = c.site || {};
+  const source = req(c.source, "source");
+  const paragraphs = req(source.body, "source.body")
+    .map((p) => `      <p class="prose">${rich(p)}</p>`)
+    .join("\n");
+  const items = req(source.items, "source.items")
+    .map(
+      (item) => `        <li class="card">
+          <h3 class="card-title">${icon(item.icon || "code", "icon card-icon")}<span>${esc(req(item.title, "source.items[].title"))}</span></h3>
+          <p class="card-body">${rich(req(item.body, "source.items[].body"))}</p>
+        </li>`,
+    )
+    .join("\n");
+  const note = source.note
+    ? `\n      <p class="note">${rich(source.note)}</p>`
+    : "";
+
+  return `      <h2 class="section-title" id="source-heading">${icon(source.icon || "git-branch", "icon section-icon")}<span>${esc(req(source.heading, "source.heading"))}</span></h2>
+${paragraphs}
+
+      <ul class="grid">
+${items}
+      </ul>
+
+      <div class="source-fork">
+        ${copyBlock(req(source.command, "source.command"), "source-fork-command")}
+      </div>
+
+      <p class="cta-row">
+        ${link(req(source.primaryCta, "source.primaryCta"), "source-fork", site, "btn btn-primary")}
+        ${link(req(source.secondaryCta, "source.secondaryCta"), "source-star", site, "btn btn-secondary")}
+      </p>${note}`;
+}
+
+/*
+  Who made it. One band, no photograph, no biography: a name, why the thing
+  exists, and where the rest of the work is. It sits after the FAQ because it is
+  the last thing worth reading, not the first.
+*/
+function authorRegion(c) {
+  const site = c.site || {};
+  const author = req(c.author, "author");
+  const paragraphs = req(author.body, "author.body")
+    .map((p) => `        <p class="author-body">${rich(p)}</p>`)
+    .join("\n");
+
+  return `      <div class="author">
+        <p class="author-eyebrow">${esc(req(author.eyebrow, "author.eyebrow"))}</p>
+        <h2 class="author-name" id="author-heading">${esc(req(author.name, "author.name"))}</h2>
+${paragraphs}
+        <p class="cta-row author-links">
+          ${link(req(author.primaryCta, "author.primaryCta"), "author-site", site, "btn btn-primary")}
+          ${link(req(author.secondaryCta, "author.secondaryCta"), "author-profile", site, "btn btn-secondary")}
+        </p>
+      </div>`;
+}
+
 function footerRegion(c) {
   const site = c.site || {};
   const footer = req(c.footer, "footer");
@@ -430,7 +496,11 @@ function footerRegion(c) {
     ? `<p class="footer-commercial">${esc(footer.commercial.text)}: <a href="mailto:${esc(footer.commercial.email)}">${esc(footer.commercial.email)}</a></p>`
     : "";
 
-  return `      <p class="footer-license">${esc(req(footer.license, "footer.license"))}</p>
+  const author = footer.author
+    ? `\n      <p class="footer-author">${esc(footer.author)}</p>`
+    : "";
+
+  return `      <p class="footer-license">${esc(req(footer.license, "footer.license"))}</p>${author}
       ${commercial}
       <nav class="footer-links" aria-label="Elsewhere">
         ${links}
@@ -598,7 +668,9 @@ const REGIONS = {
   features: featuresRegion,
   sun: sunRegion,
   install: installRegion,
+  source: sourceRegion,
   faq: faqRegion,
+  author: authorRegion,
   footer: footerRegion,
 };
 

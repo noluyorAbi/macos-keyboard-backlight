@@ -39,6 +39,10 @@
         "href": "#install"
       },
       {
+        "label": "Source",
+        "href": "#source"
+      },
+      {
         "label": "FAQ",
         "href": "#faq"
       }
@@ -207,6 +211,43 @@
     ],
     "note": "Restore the ambient light sensor at any time with kbdlight auto on."
   },
+  "source": {
+    "heading": "Made to be forked.",
+    "icon": "git-branch",
+    "body": [
+      "The whole tool is about 1,400 lines of plain JavaScript across src/ and bin/, one runtime dependency, and no build step. Nothing has to be compiled before you can read it and nothing has to be configured before you can run it.",
+      "MIT, with no contributor agreement to sign. Clone it and the same three suites that guard the published package run on your machine in under a second."
+    ],
+    "items": [
+      {
+        "icon": "code",
+        "title": "Read it in one sitting",
+        "body": "src/index.js is the entire CoreBrightness call: it resolves KeyboardBrightnessClient and its selectors at runtime. The rest is a command line, a solar calculator and a pulse."
+      },
+      {
+        "icon": "git-branch",
+        "title": "Fork without asking",
+        "body": "No permission to request and no queue to join. Fork it, change what you need, and keep the result. If it is useful back here, a pull request is welcome."
+      },
+      {
+        "icon": "sparkle",
+        "title": "Worth building on",
+        "body": "A menu bar app, a Raycast command, an Apple Shortcuts action, a hook in your editor. The library exports the same functions the command uses: get, set, isAuto, setAuto and keyboardIDs."
+      }
+    ],
+    "command": "gh repo fork noluyorAbi/macos-keyboard-backlight --clone",
+    "note": "Then npm install && npm test. Bugs, ideas and pull requests all go to the same place: the issue tracker is open, and so is the discussion of anything you want to build on top of it.",
+    "primaryCta": {
+      "label": "Fork the repo",
+      "href": "https://github.com/noluyorAbi/macos-keyboard-backlight/fork",
+      "slot": "source-fork"
+    },
+    "secondaryCta": {
+      "label": "Star on GitHub",
+      "href": "https://github.com/noluyorAbi/macos-keyboard-backlight",
+      "slot": "source-star"
+    }
+  },
   "faq": {
     "heading": "Questions people actually ask",
     "icon": "book",
@@ -238,6 +279,24 @@
       }
     ]
   },
+  "author": {
+    "eyebrow": "Made by",
+    "name": "noluyorAbi",
+    "body": [
+      "Small tools that take one piece of friction out of a day and then stay out of the way. This one started as wanting the keyboard dark after midnight without opening System Settings.",
+      "Everything else I build, and whatever is current, lives at adatepe.dev."
+    ],
+    "primaryCta": {
+      "label": "adatepe.dev",
+      "href": "https://adatepe.dev",
+      "slot": "author-site"
+    },
+    "secondaryCta": {
+      "label": "GitHub profile",
+      "href": "https://github.com/noluyorAbi",
+      "slot": "author-profile"
+    }
+  },
   "footer": {
     "license": "MIT. Free to use, modify and redistribute, commercially or not.",
     "links": [
@@ -245,6 +304,16 @@
         "label": "GitHub",
         "href": "https://github.com/noluyorAbi/macos-keyboard-backlight",
         "slot": "footer-repo"
+      },
+      {
+        "label": "adatepe.dev",
+        "href": "https://adatepe.dev",
+        "slot": "footer-site"
+      },
+      {
+        "label": "Issues",
+        "href": "https://github.com/noluyorAbi/macos-keyboard-backlight/issues",
+        "slot": "footer-issues"
       },
       {
         "label": "npm",
@@ -262,6 +331,7 @@
         "slot": "footer-security"
       }
     ],
-    "copyright": "Copyright 2026 noluyorAbi"
+    "copyright": "Copyright 2026 noluyorAbi",
+    "author": "Built by noluyorAbi, at adatepe.dev."
   }
 }

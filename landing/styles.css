@@ -751,6 +751,80 @@ a:hover {
   white-space: nowrap;
 }
 
+/* ----------------------------------------------------------------- source */
+/* The fork command, set apart from the cards above it and the buttons below,
+   because it is the one line on the page a visitor is meant to copy and run
+   somewhere other than their own terminal history. */
+.source-fork {
+  max-width: 46rem;
+  margin: var(--gap) auto 1.75rem;
+}
+
+/* The note is a footnote to the two buttons above it, not a caption on them. */
+.section-source .note {
+  margin-block-start: 1.5rem;
+}
+
+/*
+  Wider than the standard copy block, and it wraps rather than scrolls. A
+  repository path is long, and a command whose visible half ends in "--cl" asks
+  the reader to trust that the rest of it is the flag they think it is.
+*/
+.source-fork .copy {
+  max-width: 42rem;
+}
+
+.source-fork .copy-code {
+  overflow-x: visible;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* ----------------------------------------------------------------- author */
+/*
+  One band, and deliberately not a section like the others: no icon, no display
+  size heading, no rule above it. The page has finished making its argument by
+  here, and this is a signature at the bottom of it rather than a further claim.
+*/
+.author {
+  max-width: 40rem;
+  margin-inline: auto;
+  padding: clamp(2rem, 4vw, 2.75rem) clamp(1.5rem, 4vw, 2.5rem);
+  border-radius: var(--radius);
+  background: var(--surface);
+  text-align: center;
+}
+
+.author-eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--faint);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.author-name {
+  margin: 0 0 1rem;
+  color: var(--text);
+  /* A step below a section title. It is a name, not a headline. */
+  font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.125rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.author-body {
+  margin: 0 auto 0.9rem;
+  max-width: 32rem;
+  color: var(--dim-text);
+  text-wrap: pretty;
+}
+
+.author-links {
+  margin-block-start: 1.5rem;
+}
+
 /* ----------------------------------------------------------------- footer */
 /* Apple's footer is the smallest type on the page, on a slightly raised
    surface, with a hairline above it. */
@@ -795,6 +869,11 @@ a:hover {
 
 .footer-link:hover {
   color: var(--text);
+}
+
+.footer-author {
+  margin: 0 auto 0.4rem;
+  color: var(--dim-text);
 }
 
 .footer-copy {
