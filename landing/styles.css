@@ -49,18 +49,23 @@
 
 /* ----------------------------------------------------------------- tokens */
 :root {
-  /* Measured off apple.com rather than guessed at: #f5f5f7 on #000 for copy,
-     #a1a1a6 for the secondary tone, #86868b for small print, #0071e3 for
-     anything filled and #2997ff for a link on black. */
-  --bg: #000000;
-  --surface: #1d1d1f;
-  --surface-high: #262629;
-  --hairline: #29292b;
-  --text: #f5f5f7;
-  --dim-text: #a1a1a6;
+  /* Measured off apple.com rather than guessed at: #1d1d1f on #fff for copy,
+     #6e6e73 for the secondary tone, #86868b for small print, #0071e3 for
+     anything filled and #0066cc for a link on white.
+
+     One scheme, and it is the light one. A Space Black laptop is the darkest
+     thing Apple sells, and it only reads as that against a white page: on
+     black the machine dissolved into the background and the only edges left
+     were the ones the illustration draws itself. */
+  --bg: #ffffff;
+  --surface: #f5f5f7;
+  --surface-high: #ececee;
+  --hairline: #d2d2d7;
+  --text: #1d1d1f;
+  --dim-text: #6e6e73;
   --faint: #86868b;
 
-  --accent: #2997ff; /* links and marks on a dark background */
+  --accent: #0066cc; /* links and marks on a white background */
   --accent-solid: #0071e3; /* filled controls, identical in both schemes */
   --accent-solid-hover: #0077ed;
   --on-accent: #ffffff;
@@ -96,26 +101,7 @@
     "JetBrains Mono Local", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
     Consolas, "Liberation Mono", monospace;
 
-  color-scheme: dark light;
-}
-
-/* Apple ships both. Light is the same page with the stage turned up, not a
-   different design: the greys inverse, the blue darkens to stay legible on
-   white, and the laptop stays the colour a Space Black laptop actually is. */
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #ffffff;
-    --surface: #f5f5f7;
-    --surface-high: #ececee;
-    --hairline: #d2d2d7;
-    --text: #1d1d1f;
-    --dim-text: #6e6e73;
-    --faint: #86868b;
-
-    --accent: #0066cc;
-    --accent-solid: #0071e3;
-    --accent-solid-hover: #0077ed;
-  }
+  color-scheme: light;
 }
 
 /* -------------------------------------------------------------- baseline */
@@ -391,11 +377,10 @@ a:hover {
 }
 
 /*
-  Apple's MacBook Pro page opens on a headline that glows, and this page has a
-  better claim to the effect than Apple does: the glow is the product. It is
-  white rather than their rainbow because the LED under a MacBook key is white.
-  Gradient-clipped text with a drop-shadow bloom; the light scheme drops both,
-  because a white glow on a white page is just blur.
+  Apple's MacBook Pro page opens on a headline that glows, and this one used to
+  as well: gradient-clipped text with a drop-shadow bloom. It went with the dark
+  scheme, because a white glow on a white page is just blur. Flat weight and
+  Apple's own tracking carry it here instead.
 */
 .hero-title {
   max-width: 19ch;
@@ -406,20 +391,6 @@ a:hover {
   letter-spacing: -0.015em;
   color: var(--text);
   text-wrap: balance;
-  background: linear-gradient(180deg, #ffffff 8%, #d7dfef 92%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 14px rgb(255 255 255 / 30%))
-    drop-shadow(0 0 60px rgb(223 231 245 / 24%));
-}
-
-@media (prefers-color-scheme: light) {
-  .hero-title {
-    background: none;
-    -webkit-text-fill-color: currentColor;
-    filter: none;
-  }
 }
 
 .hero-sub {
@@ -1010,19 +981,132 @@ a:hover {
   transform: translateX(-50%);
 }
 
-.mb-prompt {
+/* ---- the terminal on the screen ---- */
+/*
+  A window, not a line of text floating on a wallpaper. The command the buttons
+  run is a command somebody types, and the thing you type it into on this
+  machine is a terminal, so the screen shows one: title bar, three lights, a
+  zsh prompt, and the command arriving a character at a time.
+
+  Every colour here is literal rather than tokenised. The page is white and this
+  is a dark terminal sitting on a dark desktop inside it, so it does not follow
+  the page's palette any more than a real window would.
+*/
+.mb-term {
   position: absolute;
-  inset-block-end: 8%;
-  inset-inline-start: 7%;
-  margin: 0;
-  color: var(--text);
+  /* Not centred and not full screen. A window somebody opened sits where they
+     dropped it, and leaving the desktop visible around it is what says this is
+     a window at all rather than the screen's own contents. */
+  inset-block: 15% 13%;
+  inset-inline: 9% 13%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: calc(var(--mb-w) * 0.012);
+  /* Translucent, because macOS windows are, and because the wallpaper showing
+     through is what keeps this from reading as a black rectangle. */
+  background: rgb(20 20 23 / 90%);
+  box-shadow:
+    0 calc(var(--mb-w) * 0.004) calc(var(--mb-w) * 0.028) rgb(0 0 0 / 55%),
+    inset 0 0 0 1px rgb(255 255 255 / 9%);
+  backdrop-filter: blur(calc(var(--mb-w) * 0.01));
+}
+
+.mb-term-bar {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--mb-w) * 0.008);
+  padding: calc(var(--mb-w) * 0.007) calc(var(--mb-w) * 0.011);
+  background: linear-gradient(180deg, #3c3c42 0%, #2c2c31 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 10%),
+    inset 0 -1px 0 rgb(0 0 0 / 55%);
+}
+
+.mb-term-light {
+  width: calc(var(--mb-w) * 0.0115);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 22%);
+}
+
+.mb-term-close { background: #ff5f57; }
+.mb-term-min { background: #febc2e; }
+.mb-term-zoom { background: #28c840; }
+
+/* Centred on the window, which means offset by the lights it has to clear. */
+.mb-term-title {
+  flex: 1;
+  margin-inline-end: calc(var(--mb-w) * 0.051);
+  color: #c3c3c9;
+  font-family: var(--font-sans);
+  font-size: calc(var(--mb-w) * 0.018);
+  font-weight: 500;
+  text-align: center;
+}
+
+/*
+  Lines stack from the top and the oldest are removed once the window is full,
+  which is the same thing a terminal does with its scrollback: the difference is
+  only that nothing here can scroll back up to them.
+*/
+.mb-term-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: calc(var(--mb-w) * 0.004);
+  overflow: hidden;
+  padding: calc(var(--mb-w) * 0.013);
   font-family: var(--font-mono);
-  font-size: calc(var(--mb-w) * 0.026);
+  font-size: calc(var(--mb-w) * 0.024);
+  line-height: 1.4;
   letter-spacing: 0;
 }
 
-.mb-prompt-caret {
-  color: var(--accent);
+.mb-term-line,
+.mb-term-out {
+  margin: 0;
+  white-space: pre;
+}
+
+.mb-term-path { color: #7fb2f0; }
+
+.mb-term-sign {
+  color: #2997ff;
+  padding-inline: 0.6ch 0.6ch;
+}
+
+.mb-term-cmd { color: #f2f2f4; }
+.mb-term-out { color: #9d9da5; }
+
+/* The block cursor, at the rate macOS blinks one: on for about half a second,
+   off for about half a second. It holds solid while characters are arriving,
+   because a cursor being typed at does not blink. */
+.mb-term-caret {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.02em;
+  margin-inline-start: 0.1em;
+  vertical-align: text-bottom;
+  background: #e8e8ec;
+  animation: mb-caret 1.06s steps(1, end) infinite;
+}
+
+.mb-term-line[data-typing] .mb-term-caret {
+  animation: none;
+}
+
+@keyframes mb-caret {
+  0%,
+  50% { opacity: 1; }
+  50.01%,
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mb-term-caret {
+    animation: none;
+  }
 }
 
 /* One diagonal sheen. Glass is only convincing when something is reflected in

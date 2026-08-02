@@ -524,6 +524,8 @@ function footerRegion(c) {
   WHY IT IS GENERATED HERE
     So the keyboard exists in the markup. A visitor without JavaScript, and every
     crawler, sees a lit MacBook rather than an empty div waiting for a script.
+    The terminal on the screen ships one finished line for the same reason: with
+    no script it is a window with a command already run in it, not an empty box.
 
   The layout is the same data as video/src/keyboard-layout.ts: six rows, fifteen
   key units each, with the real Apple proportions. A board of equal width keys
@@ -604,7 +606,15 @@ function machineRegion(c) {
             <div class="mb-screen">
               <div class="mb-wallpaper"></div>
               <div class="mb-notch"></div>
-              <p class="mb-prompt"><span class="mb-prompt-caret">$</span> <span data-mb-echo>kbdlight sun on</span></p>
+              <div class="mb-term">
+                <div class="mb-term-bar">
+                  <span class="mb-term-light mb-term-close"></span><span class="mb-term-light mb-term-min"></span><span class="mb-term-light mb-term-zoom"></span>
+                  <span class="mb-term-title">~ (zsh)</span>
+                </div>
+                <div class="mb-term-body" data-mb-term>
+                  <p class="mb-term-line"><span class="mb-term-path">~</span><span class="mb-term-sign">%</span><span class="mb-term-cmd">kbdlight sun on</span></p>
+                </div>
+              </div>
               <div class="mb-glass"></div>
             </div>
           </div>

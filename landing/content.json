@@ -3,7 +3,7 @@
     "url": "https://kbdlight.adatepe.dev",
     "lastmod": "2026-08-02",
     "lang": "en",
-    "themeColor": "#000000",
+    "themeColor": "#ffffff",
     "ogImage": "assets/social-card.png",
     "ogImageAlt": "macos-keyboard-backlight, your keyboard backlight finally scriptable",
     "twitterSite": "",
@@ -75,7 +75,7 @@
   "machine": {
     "heading": "Take a closer look.",
     "icon": "zap",
-    "body": "This one is lit the way sun mode would have yours lit at this moment, worked out from your timezone in your browser. It runs through the commands on its own; press one to take over.",
+    "body": "This one is lit the way sun mode would have yours lit at this moment, worked out from your timezone in your browser. It types the commands into its own terminal and runs through them on its own; press one to take over, and it picks the loop back up once you are done.",
     "note": "An illustration, not a photograph. The backlight is hardware, so no screen recording can show it; the real thing is in the clip below.",
     "controls": [
       {

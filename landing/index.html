@@ -12,7 +12,7 @@
   <!-- launch:head:start -->
   <title>macos-keyboard-backlight, script the MacBook keyboard backlight</title>
   <meta name="description" content="macOS gives you a slider and two keys, and no way to script either one. This adds a kbdlight command and a Node API to read and set the keyboard backlight, blink it as a notification, and put it on a sunrise and sunset schedule. One dependency, no native build step, MIT.">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#ffffff">
   <link rel="canonical" href="https://kbdlight.adatepe.dev">
 
   <!--
@@ -227,7 +227,7 @@
     <section class="section section-machine" id="machine" aria-labelledby="machine-heading">
       <!-- launch:machine:start -->
       <h2 class="section-title" id="machine-heading"><svg class="icon section-icon" viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M11.2 2.2 L4.5 11 h4.6 l-.3 6.8 L15.5 9 h-4.6 z"/></svg><span>Take a closer look.</span></h2>
-      <p class="prose">This one is lit the way sun mode would have yours lit at this moment, worked out from your timezone in your browser. It runs through the commands on its own; press one to take over.</p>
+      <p class="prose">This one is lit the way sun mode would have yours lit at this moment, worked out from your timezone in your browser. It types the commands into its own terminal and runs through them on its own; press one to take over, and it picks the loop back up once you are done.</p>
 
       <div class="mb-stage" data-macbook>
         <div class="mb" data-mb aria-hidden="true">
@@ -235,7 +235,15 @@
             <div class="mb-screen">
               <div class="mb-wallpaper"></div>
               <div class="mb-notch"></div>
-              <p class="mb-prompt"><span class="mb-prompt-caret">$</span> <span data-mb-echo>kbdlight sun on</span></p>
+              <div class="mb-term">
+                <div class="mb-term-bar">
+                  <span class="mb-term-light mb-term-close"></span><span class="mb-term-light mb-term-min"></span><span class="mb-term-light mb-term-zoom"></span>
+                  <span class="mb-term-title">~ (zsh)</span>
+                </div>
+                <div class="mb-term-body" data-mb-term>
+                  <p class="mb-term-line"><span class="mb-term-path">~</span><span class="mb-term-sign">%</span><span class="mb-term-cmd">kbdlight sun on</span></p>
+                </div>
+              </div>
               <div class="mb-glass"></div>
             </div>
           </div>
