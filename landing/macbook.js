@@ -161,7 +161,7 @@
   var MAX_PITCH = 3;
   /* Must match --mb-rx in styles.css: this is where a pointer leaving the
      stage puts the machine back to. */
-  var BASE_PITCH = 38;
+  var BASE_PITCH = 17;
 
   function tilt(event) {
     var box = stage.getBoundingClientRect();

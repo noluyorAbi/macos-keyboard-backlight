@@ -431,196 +431,6 @@ a:hover {
   letter-spacing: -0.017em;
 }
 
-/* ------------------------------------------------------------- closed lid */
-/*
-  The hero machine: a MacBook shut, seen dead on, with light escaping through
-  the lid gap. Apple opens the MacBook Pro page on exactly this shot, and this
-  page has more right to it: the light in that gap IS the keyboard backlight.
-  Five slabs and two gradients; --kbd keeps the seam the same white as every
-  other lit surface here, and the slabs reuse the Space Black recipe of the
-  open machine below so the two read as one object in two states.
-*/
-.mb-closed {
-  --mbc-w: min(52rem, 88vw);
-  position: relative;
-  width: var(--mbc-w);
-  margin: clamp(2.75rem, 7vw, 4.25rem) auto clamp(2.5rem, 6vw, 3.5rem);
-}
-
-/* The room the light fills. Anchored to the seam and breathing very slightly,
-   because an LED behind a fan vent never holds perfectly still. */
-.mb-closed-bloom {
-  position: absolute;
-  inset-inline: -8%;
-  inset-block-end: 42%;
-  height: calc(var(--mbc-w) * 0.36);
-  background: radial-gradient(
-    52% 100% at 50% 100%,
-    color-mix(in srgb, var(--kbd) 38%, transparent),
-    color-mix(in srgb, var(--kbd-halo) 14%, transparent) 44%,
-    transparent 76%
-  );
-  animation: mbc-breathe 7s var(--ease) infinite alternate;
-  pointer-events: none;
-}
-
-.mb-closed-lid {
-  position: relative;
-  height: calc(var(--mbc-w) * 0.036);
-  border-radius: calc(var(--mbc-w) * 0.016) calc(var(--mbc-w) * 0.016) 0 0;
-  background: linear-gradient(180deg, #48484f 0%, #1c1c20 40%, #0c0c0f 100%);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 24%);
-}
-
-/*
-  The keyboard, glimpsed through the opening. This layer is what makes the
-  object a laptop rather than a light bar: a field of glow with the dark
-  silhouettes of keycaps standing in it, dimmer towards the hinge ends, in
-  shadow where the lid hangs over it.
-*/
-.mb-closed-gap {
-  position: relative;
-  z-index: 1;
-  height: calc(var(--mbc-w) * 0.022);
-  overflow: hidden;
-  background:
-    linear-gradient(180deg, rgb(0 0 0 / 62%), transparent 75%),
-    repeating-linear-gradient(
-      90deg,
-      rgb(6 6 9 / 74%) 0,
-      rgb(6 6 9 / 74%) calc(var(--mbc-w) * 0.044),
-      transparent calc(var(--mbc-w) * 0.051),
-      transparent calc(var(--mbc-w) * 0.053),
-      rgb(6 6 9 / 74%) calc(var(--mbc-w) * 0.06)
-    ),
-    radial-gradient(
-      54% 170% at 50% 100%,
-      var(--kbd) 0%,
-      color-mix(in srgb, var(--kbd) 55%, transparent) 55%,
-      color-mix(in srgb, var(--kbd-halo) 18%, transparent) 82%,
-      transparent 100%
-    );
-}
-
-/* The hinge ends of the gap fall to black: the lid sits lowest there. */
-.mb-closed-gap::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    #000000,
-    transparent 14%,
-    transparent 86%,
-    #000000
-  );
-}
-
-/* The hot line where the light breaks out under the lid's front edge. */
-.mb-closed-seam {
-  position: relative;
-  z-index: 1; /* the glow spills over both slabs, not under them */
-  height: calc(var(--mbc-w) * 0.009);
-  border-radius: var(--radius-pill);
-  background: radial-gradient(
-    58% 220% at 50% 50%,
-    var(--kbd) 28%,
-    color-mix(in srgb, var(--kbd) 82%, transparent) 58%,
-    color-mix(in srgb, var(--kbd-halo) 30%, transparent) 84%,
-    transparent 100%
-  );
-  box-shadow:
-    0 0 calc(var(--mbc-w) * 0.014)
-      color-mix(in srgb, var(--kbd) 85%, transparent),
-    0 0 calc(var(--mbc-w) * 0.05)
-      color-mix(in srgb, var(--kbd) 45%, transparent),
-    0 0 calc(var(--mbc-w) * 0.13)
-      color-mix(in srgb, var(--kbd-halo) 30%, transparent);
-}
-
-.mb-closed-base {
-  position: relative;
-  height: calc(var(--mbc-w) * 0.042);
-  border-radius: 0 0 calc(var(--mbc-w) * 0.022) calc(var(--mbc-w) * 0.022);
-  background: linear-gradient(180deg, #2c2c31 0%, #17171b 45%, #0c0c0f 100%);
-  /* The top edge catches the seam's light; the rest falls to black. */
-  box-shadow:
-    inset 0 2px calc(var(--mbc-w) * 0.014)
-      color-mix(in srgb, var(--kbd-halo) 30%, transparent),
-    inset 0 -1px 0 rgb(255 255 255 / 5%);
-}
-
-/* The thumb scoop, cut into the base's front edge. The gap is deepest here,
-   so this is where the most light gets out, not the least: a dark notch in
-   the middle of the band reads as a speaker grille, a lit one as the scoop. */
-.mb-closed-base::before {
-  content: "";
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline-start: 50%;
-  width: 12%;
-  height: 58%;
-  border-radius: 0 0 999px 999px;
-  background: radial-gradient(
-    100% 90% at 50% 0%,
-    color-mix(in srgb, var(--kbd) 55%, transparent),
-    color-mix(in srgb, var(--kbd-halo) 14%, transparent) 55%,
-    transparent 100%
-  );
-  transform: translateX(-50%);
-}
-
-/* Contact shadow, and the light the seam throws back onto the desk. */
-.mb-closed-cast {
-  position: absolute;
-  inset-block-start: 100%;
-  inset-inline: 4%;
-  height: calc(var(--mbc-w) * 0.05);
-  background: radial-gradient(
-    50% 100% at 50% 0%,
-    rgb(0 0 0 / 55%),
-    transparent 75%
-  );
-  filter: blur(calc(var(--mbc-w) * 0.008));
-  pointer-events: none;
-}
-
-.mb-closed-cast::after {
-  content: "";
-  position: absolute;
-  inset: 0 18%;
-  background: radial-gradient(
-    50% 90% at 50% 0%,
-    color-mix(in srgb, var(--kbd-halo) 16%, transparent),
-    transparent 70%
-  );
-  mix-blend-mode: screen;
-}
-
-@keyframes mbc-breathe {
-  from {
-    opacity: 0.78;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-/* In the light scheme the room is lit, and a backlight in a lit room is a
-   faint thing: the bloom drops to a suggestion instead of smearing grey
-   across a white page. The seam itself stays bright against the black lid. */
-@media (prefers-color-scheme: light) {
-  .mb-closed-bloom {
-    animation: none;
-    opacity: 0.4;
-  }
-
-  .mb-closed-cast::after {
-    opacity: 0.5;
-  }
-}
-
 .install-strip {
   margin: 0 0 1.75rem;
 }
@@ -1023,19 +833,22 @@ a:hover {
   --mb-w: clamp(15rem, 60vw, 32rem);
   --mb-glow: 0.55; /* lit by default: a dark keyboard is the boring half of the story */
   /*
-    Positive, and that is the whole trick. The deck is rotated back towards the
-    viewer about the hinge, so the only way to see its top face is for the camera
-    to sit above it, which is what tipping the whole assembly away does. Negative
-    here puts the eye under the desk and the keyboard vanishes edge on.
+    Where the camera stands, expressed as how far the lid is tipped away from
+    facing it. A MacBook is open to about 105 degrees, so its lid already leans
+    15 back: 17 here puts the eye about 32 degrees above the desk, which is the
+    angle Apple shoots an open machine from. The screen stays almost its full
+    height and the deck compresses to about half its depth, and that difference
+    between the two halves is the entire reason it reads as a laptop rather
+    than as two rectangles hinged together.
   */
-  --mb-rx: 38deg;
+  --mb-rx: 17deg;
   --mb-ry: 0deg;
 
   margin: 2.5rem 0 0;
-  /* A long lens. Apple photographs hardware from far away with a tight field,
-     which is why the far edge of a deck barely converges in their renders; a
-     short perspective here made the machine look like a wide angle snapshot. */
-  perspective: 3000px;
+  /* A long lens, but not an orthographic one. At 3000px nothing converged, so
+     the near and far edges of the deck came out the same width and the machine
+     read as two flat cards hinged together. This is still a tight field. */
+  perspective: 2600px;
   perspective-origin: 50% 42%;
 }
 
@@ -1050,9 +863,11 @@ a:hover {
     The deck hangs out of the box: it is absolutely positioned past the bottom
     edge, so it contributes no height and anything after it would be drawn over
     the keyboard. This reserves what the deck actually projects to at this
-    angle, which is a little over half the width.
+    angle, which is a little over half the width: the deck's far edge is the
+    hinge and its near edge comes towards the viewer, so perspective makes it
+    taller on screen than the flat trigonometry suggests.
   */
-  margin-block-end: calc(var(--mb-w) * 0.6);
+  margin-block-end: calc(var(--mb-w) * 0.55);
 }
 
 /* ---- lid ---- */
@@ -1144,10 +959,15 @@ a:hover {
 
 /* ---- base ---- */
 /*
-  Hinged at the lid's bottom edge and laid down towards the viewer. The rotation
-  is a shade under 90 degrees, so the deck is not quite flat: a real laptop sits
-  with its far edge slightly higher, and the sliver of difference is what stops
-  the two halves reading as one folded sheet of card.
+  Hinged at the lid's bottom edge and laid down towards the viewer, which is
+  what a positive rotation does here: the near edge swings out of the lid's
+  plane and towards the eye. It was negative before, and negative folds the deck
+  the other way, away and downwards behind the screen. That is the bug that made
+  the whole thing look wrong: a keyboard on a ramp receding under the lid, its
+  near edge drawn narrower than the hinge, which nothing in the world does.
+
+  41 rather than 45 because the lid is already tipped by --mb-rx; the two add up
+  to the 58 degrees that puts the deck flat on the desk.
 */
 /*
   Everything below is measured off a MacBook Pro 14, normalised to the width of
@@ -1163,7 +983,7 @@ a:hover {
   width: 100%;
   aspect-ratio: 312 / 221;
   transform-origin: 50% 0%;
-  transform: translateX(-50%) rotateX(-83deg);
+  transform: translateX(-50%) rotateX(41deg);
   transform-style: preserve-3d;
 }
 
@@ -1356,8 +1176,9 @@ a:hover {
   background: linear-gradient(180deg, #43434a 0%, #1a1a1d 100%);
   transform-origin: 50% 0%;
   /* Back up to vertical: the deck it hangs off is lying down, and the front edge
-     of a laptop is the one face that still looks straight at you. */
-  transform: rotateX(83deg);
+     of a laptop is the one face that still looks straight at you. Mirrors the
+     deck's own rotation, so the two always cancel. */
+  transform: rotateX(-41deg);
 }
 
 /* Contact shadow. Tight and dark where the machine meets the surface, wide and
@@ -1375,7 +1196,7 @@ a:hover {
     rgb(0 0 0 / 22%) 45%,
     transparent 72%
   );
-  transform: translateX(-50%) rotateX(-83deg) translateZ(calc(var(--mb-w) * -0.02));
+  transform: translateX(-50%) rotateX(41deg) translateZ(calc(var(--mb-w) * -0.02));
   filter: blur(calc(var(--mb-w) * 0.012));
   pointer-events: none;
 }

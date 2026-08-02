@@ -237,27 +237,9 @@ function heroRegion(c) {
     ? `\n        <p class="install-then">${esc(install.then)}</p>`
     : "";
 
-  /*
-    The closed machine. Apple opens the MacBook Pro page on the laptop shut,
-    seen head on, with the light escaping through the lid gap, and that shot is
-    this product: the light in the gap IS the keyboard backlight. Pure CSS in
-    styles.css; the markup is five stacked slabs and carries no text, so it is
-    hidden from assistive tech and costs a crawler nothing.
-  */
-  const closed = `      <div class="mb-closed" aria-hidden="true">
-        <div class="mb-closed-bloom"></div>
-        <div class="mb-closed-lid"></div>
-        <div class="mb-closed-gap"></div>
-        <div class="mb-closed-seam"></div>
-        <div class="mb-closed-base"></div>
-        <div class="mb-closed-cast"></div>
-      </div>`;
-
   return `      <p class="wordmark">${esc(req(c.project?.wordmark, "project.wordmark"))}</p>
 ${eyebrow}      <h1 class="hero-title" id="hero-heading">${esc(req(hero.headline, "hero.headline"))}</h1>
       <p class="hero-sub">${rich(req(hero.sub, "hero.sub"))}</p>
-
-${closed}
 
       <div class="install-strip">
         <p class="install-label" id="hero-install-label">${esc(install.label || "Install")}</p>
