@@ -23,7 +23,17 @@ and this project adheres to
   the following morning.
 - It shares sun mode's state file and its single `launchd` agent by design.
   Two schedules writing the same keyboard within one tick is a race; arming
-  either mode now replaces the other rather than running beside it.
+  either mode now replaces the other rather than running beside it. A one-shot's
+  forced levels are not inherited by a later `kbdlight sun on`.
+- The one-shot ends in a state rather than handing the keyboard back: a fixed
+  wake level requires the ambient sensor to be off, so it stays off afterwards.
+  The command says so when it is armed, `kbdlight auto on` reverses it, and
+  `--wake auto` ends the night with the sensor instead of with a level.
+- The wake instant is checked to be in the future before it is stored, so a
+  negative `--rise-offset` can no longer pin it in the past and fire the wake
+  the moment the command is armed.
+- Above the polar circles the failure names the case it actually hit, rather
+  than reporting a polar night when the sun simply never set.
 
 ## [1.1.0] - 2026-08-01
 

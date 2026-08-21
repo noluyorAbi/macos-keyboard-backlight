@@ -178,10 +178,18 @@ still waits for tomorrow morning: "until sunrise" is taken literally rather than
 re-read as "which side of the sun are we on", which would wake it up in the same
 breath.
 
+It ends in a state rather than handing the keyboard back, and that is worth
+saying plainly: holding a level means the ambient sensor is off, so after a
+fixed wake level the sensor is still off. `kbdlight auto on` turns it back on,
+and `kbdlight sleep --wake auto` ends the night with the sensor instead of with
+a fixed level. This is the one place where the one-shot differs from
+`kbdlight sun off` and `kbdlight pulse`, which both restore what they found.
+
 Cancel it early with `kbdlight sun off`. The one-shot deliberately shares sun
 mode's state file and its single `launchd` agent: two schedules writing the same
 keyboard inside the same five-minute tick is a race, and the loser is whichever
-one you happen to notice. Arming either one replaces the other.
+one you happen to notice. Arming either one replaces the other, and a one-shot's
+forced levels are not inherited by the next `kbdlight sun on`.
 
 ## Node API
 

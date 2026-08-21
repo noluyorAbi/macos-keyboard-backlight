@@ -108,17 +108,26 @@ function parseOffset(input, what) {
 
 // --- the decision ---------------------------------------------------------
 
-// The next sunrise strictly after `now`, offset included, or null where the sun
-// is not going to rise at all. Today's sunrise is already behind us for most of
-// the hours anyone arms this in, hence the fall through to tomorrow.
+// The next sunrise strictly after `now`, offset included, or null where none is
+// coming. Today's sunrise is already behind us for most of the hours anyone
+// arms this in, so the search walks forward a day at a time.
+//
+// The `> now` check applies to every candidate, not only today's. A sunrise
+// pulled back far enough by --rise-offset lands in the past, and a wake instant
+// in the past fires the moment it is armed: the command that was asked for dark
+// would go to full brightness and disarm itself in the same breath.
+const SUNRISE_SEARCH_DAYS = 3;
+const DAY_MS = 86400000;
+
 function nextSunrise(now, cfg) {
   const shift = (d) => new Date(d.getTime() + (cfg.riseOffset || 0) * 60000);
 
-  const today = solar.timesFor(now, cfg.lat, cfg.lon);
-  if (!today.polar && shift(today.sunrise) > now) return shift(today.sunrise);
-
-  const tomorrow = solar.timesForNextDay(now, cfg.lat, cfg.lon);
-  if (!tomorrow.polar) return shift(tomorrow.sunrise);
+  for (let i = 0; i <= SUNRISE_SEARCH_DAYS; i++) {
+    const day = solar.timesFor(new Date(now.getTime() + i * DAY_MS), cfg.lat, cfg.lon);
+    if (day.polar) continue;
+    const rise = shift(day.sunrise);
+    if (rise > now) return rise;
+  }
 
   return null;
 }
@@ -279,25 +288,23 @@ function unloadAgent() {
 
 // --- commands -------------------------------------------------------------
 
-// Arm it. Re-running with new options keeps the original snapshot, so `sun off`
-// still undoes to the state from before sun mode ever touched anything.
-function enable(opts = {}) {
-  const prev = read();
-
-  let where;
-  if (opts.at) where = geo.parseCoords(opts.at);
-  else if (prev && prev.lat != null) where = { lat: prev.lat, lon: prev.lon, source: prev.source };
-  else where = geo.locate();
-
-  const saved = prev && prev.saved && prev.saved.length ? prev.saved : snapshot();
-  if (!saved.length) throw new Error('no backlit keyboard found');
-
+// Pure: everything about arming except reading the disk and touching the
+// keyboard. Split out so the rules below can be tested on a CI box with no
+// backlit keyboard, which is where a wrong one would otherwise ship from.
+function buildConfig(prev, opts, where, saved, now) {
   // The flag name is carried along only so a bad value names the flag the user
   // actually typed rather than the property it happens to be stored under.
   const FLAG = { night: '--night', day: '--day', riseOffset: '--rise-offset', setOffset: '--set-offset' };
+
+  // A one-shot's levels are an instruction for that one night, not a preference
+  // to remember. Inheriting them would let "kbdlight sleep" quietly hand its
+  // forced night level of 0 to the next plain "kbdlight sun on", which would
+  // then never light the keyboard again and never say why.
+  const inherit = prev && !prev.once ? prev : null;
+
   const pick = (name, parse) => {
     if (opts[name] != null) return parse(opts[name], FLAG[name]);
-    if (prev && prev[name] != null) return prev[name];
+    if (inherit && inherit[name] != null) return inherit[name];
     return DEFAULTS[name];
   };
 
@@ -323,18 +330,47 @@ function enable(opts = {}) {
   if (opts.once) {
     cfg.once = true;
     cfg.wake = opts.wake != null ? parseLevel(opts.wake, '--wake') : DEFAULTS.wake;
-    const wakeAt = nextSunrise(new Date(), cfg);
+    const wakeAt = nextSunrise(now, cfg);
     if (!wakeAt) {
+      // Naming the wrong polar case would send the user to the opposite remedy,
+      // so the message is taken from what the sky is actually doing today.
+      const polar = solar.timesFor(now, cfg.lat, cfg.lon).polar;
+      const because =
+        polar === 'day'
+          ? 'the sun does not set there at this time of year'
+          : 'the sun does not rise there at this time of year';
       throw new Error(
-        'no sunrise is coming at ' +
+        'no sunrise within ' +
+          SUNRISE_SEARCH_DAYS +
+          ' days at ' +
           cfg.lat.toFixed(2) +
           ', ' +
           cfg.lon.toFixed(2) +
-          ' (polar night); use "kbdlight sun on --night 0 --day 1" instead'
+          ': ' +
+          because +
+          '. Use "kbdlight sun on" for a fixed level instead'
       );
     }
     cfg.wakeAt = wakeAt.toISOString();
   }
+
+  return cfg;
+}
+
+// Arm it. Re-running with new options keeps the original snapshot, so `sun off`
+// still undoes to the state from before sun mode ever touched anything.
+function enable(opts = {}) {
+  const prev = read();
+
+  let where;
+  if (opts.at) where = geo.parseCoords(opts.at);
+  else if (prev && prev.lat != null) where = { lat: prev.lat, lon: prev.lon, source: prev.source };
+  else where = geo.locate();
+
+  const saved = prev && prev.saved && prev.saved.length ? prev.saved : snapshot();
+  if (!saved.length) throw new Error('no backlit keyboard found');
+
+  const cfg = buildConfig(prev, opts, where, saved, new Date());
 
   write(cfg);
   writePlist();
@@ -349,7 +385,20 @@ function enable(opts = {}) {
 // the same tick and leaving whichever lost the race.
 function sleepUntilSunrise(opts = {}) {
   const r = enable(Object.assign({ night: 0 }, opts, { once: true }));
-  return { config: r.config, wakeAt: new Date(r.config.wakeAt), rearmed: r.rearmed };
+
+  // Holding a level means turning the ambient sensor off, and a fixed wake level
+  // means it stays off afterwards: this mode ends in a state, it does not hand
+  // the keyboard back. That is a thing the caller has to be able to say out
+  // loud, because the alternative is a sensor that silently stopped working
+  // overnight.
+  const sensorWasOn = r.config.saved.some((k) => k.auto);
+
+  return {
+    config: r.config,
+    wakeAt: new Date(r.config.wakeAt),
+    rearmed: r.rearmed,
+    sensorStaysOff: sensorWasOn && r.config.wake !== 'auto',
+  };
 }
 
 // Disarm, and put the keyboard back the way sun mode found it. "Dark until
@@ -433,6 +482,7 @@ function status(now = new Date()) {
 
 module.exports = {
   enable,
+  buildConfig,
   sleepUntilSunrise,
   nextSunrise,
   disable,

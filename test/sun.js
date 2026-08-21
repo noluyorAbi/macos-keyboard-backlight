@@ -181,13 +181,67 @@ const hours = (a, b) => (b - a) / 3600000;
   const later = sun.nextSunrise(new Date('2026-08-21T00:01:00Z'), { ...base, riseOffset: 45 });
   assert.strictEqual(later - wakeAt, 45 * 60000, '--rise-offset shifts the wake');
 
-  // Polar night: there is no sunrise to wait for, and inventing one would leave
-  // a keyboard dark for months.
+  // A negative offset can pull a sunrise back into the past, and a wake instant
+  // in the past fires the moment it is armed: the command asked for dark would
+  // go to full brightness and disarm itself in the same breath.
+  const evening = new Date('2026-08-21T20:00:00Z');
+  const pulledBack = sun.nextSunrise(evening, { ...base, riseOffset: -600 });
+  assert.ok(pulledBack > evening, 'a -600 min offset still lands in the future, got ' + pulledBack);
+
+  // Both polar cases: no sunrise inside the search window, and the caller has to
+  // be able to tell them apart rather than being handed a NaN or a date months
+  // out.
   assert.strictEqual(
     sun.nextSunrise(new Date('2026-12-21T12:00:00Z'), { ...base, lat: 78.22, lon: 15.65 }),
     null,
     'no sunrise is coming during the polar night'
   );
+  assert.strictEqual(
+    sun.nextSunrise(new Date('2026-06-21T12:00:00Z'), { ...base, lat: 78.22, lon: 15.65 }),
+    null,
+    'no sunrise under the midnight sun either, because the sun never set'
+  );
+}
+
+// --- arming, without a keyboard in the room --------------------------------
+
+// buildConfig is the whole of "what does this arm to", minus the disk and the
+// hardware, which is what makes these runnable on a CI box with no backlight.
+
+{
+  const where = { lat: BERLIN.lat, lon: BERLIN.lon, source: 'manual' };
+  const saved = [{ id: '1', level: 0.61, auto: true }];
+  const night = new Date('2026-08-21T00:01:00Z');
+  const build = (prev, opts, now = night) => sun.buildConfig(prev, opts, where, saved, now);
+
+  const sleep = build(null, { night: 0, once: true });
+  assert.strictEqual(sleep.once, true, 'the one-shot is marked in the config');
+  assert.strictEqual(sleep.night, 0, 'it holds the keyboard dark');
+  assert.strictEqual(sleep.wake, 1, 'and wakes to full brightness by default');
+  assert.ok(new Date(sleep.wakeAt) > night, 'the wake instant is pinned in the future');
+
+  assert.strictEqual(build(null, { night: 0, once: true, wake: 'auto' }).wake, 'auto', '--wake auto');
+  assert.throws(() => build(null, { once: true, wake: '3' }), /--wake/, '--wake is range checked');
+
+  // The one-shot's forced levels are an instruction for one night, not a
+  // preference. A later "sun on" with no flags must not inherit night 0 from it,
+  // or the keyboard never lights after sunset again and nothing says why.
+  const afterSleep = build(sleep, {});
+  assert.strictEqual(afterSleep.night, sun.DEFAULTS.night, 'sun on after sleep falls back to the default');
+  assert.strictEqual(afterSleep.once, undefined, 'and it is no longer a one-shot');
+  assert.strictEqual(afterSleep.wakeAt, undefined, 'with no wake instant left over');
+
+  // A previous *sun mode* config is still a preference and is still inherited.
+  const sunCfg = build(null, { night: 0.4 });
+  assert.strictEqual(build(sunCfg, {}).night, 0.4, 're-arming sun mode keeps the level it had');
+
+  // Neither polar case can produce a wake instant, and the message has to name
+  // the right one: the remedy for a sun that never rises is not the remedy for
+  // a sun that never sets.
+  const svalbard = { lat: 78.22, lon: 15.65, source: 'manual' };
+  const polarBuild = (now) => sun.buildConfig(null, { night: 0, once: true }, svalbard, saved, now);
+  assert.throws(() => polarBuild(new Date('2026-12-21T12:00:00Z')), /does not rise/, 'polar night');
+  assert.throws(() => polarBuild(new Date('2026-06-21T12:00:00Z')), /does not set/, 'midnight sun');
 }
 
 // --- coordinates ----------------------------------------------------------

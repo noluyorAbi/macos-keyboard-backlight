@@ -56,6 +56,8 @@ const SLEEP = [
   { flag: '--at', arg: '<lat,lon>', desc: 'coordinates (default: the system timezone)' },
   { flag: '--rise-offset', arg: '<min>', desc: 'shift the sunrise switch, + later, - earlier' },
   { blank: true, note: 'Cancel it early with "kbdlight sun off": the two share one schedule.' },
+  { blank: true, note: 'A fixed wake level leaves the ambient sensor off afterwards; --wake auto' },
+  { blank: true, note: 'hands the morning back to it, and "kbdlight auto on" undoes it by hand.' },
 ];
 
 const PULSE = [
@@ -86,7 +88,9 @@ const NOTES = [
   '',
   '"kbdlight sleep" is the one-shot of the same idea: dark from now until the',
   'next sunrise, full brightness then, and the schedule removes itself. One',
-  'night, rather than every night.',
+  'night, rather than every night. It ends in that state rather than handing the',
+  'keyboard back, so the ambient sensor stays off; "--wake auto" ends with the',
+  'sensor instead of with a fixed level.',
   '',
   '"kbdlight pulse" restores the exact brightness and auto-brightness state it',
   'found, so it is safe to fire from an editor hook or a scheduled job. Use',
@@ -416,6 +420,22 @@ function sleepCommand(args, c) {
       c.value(levelText(r.config.wake)) +
       '\n'
   );
+
+  // Holding a level means the ambient sensor is off, and a fixed wake level
+  // means it is still off when this is over. Said here, at arming time, because
+  // the wake itself runs from a launchd agent with nobody watching, and a sensor
+  // that quietly stopped working overnight is the kind of thing you blame on
+  // the Mac rather than on the command you ran.
+  if (r.sensorStaysOff) {
+    process.stdout.write(
+      c.note('  the ambient sensor is off until then, and stays off after the wake: ') +
+        c.code('kbdlight auto on') +
+        c.note(' brings it back, or arm it with ') +
+        c.code('--wake auto') +
+        '\n'
+    );
+  }
+
   return printSunStatus(c);
 }
 
