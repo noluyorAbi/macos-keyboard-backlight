@@ -44,10 +44,18 @@ jobs:
       # it is the one job where a cache entry poisoned by an earlier, less
       # trusted workflow run could end up inside a published tarball. The extra
       # thirty seconds of a cold install is worth removing that path entirely.
+      # No "registry-url:" here, and that is the whole reason trusted publishing
+      # works. Given one, setup-node writes an .npmrc holding
+      # //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN} and points
+      # NPM_CONFIG_USERCONFIG at it. There is no NODE_AUTH_TOKEN in this
+      # workflow on purpose, so that expands to an empty credential, npm counts
+      # itself as already authenticated, never attempts the OIDC exchange, and
+      # the registry answers a bare "404 Not Found - PUT" that reads like a
+      # missing package rather than a missing credential. Cost us three failed
+      # runs on v1.2.0. npm defaults to registry.npmjs.org anyway.
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0 # zizmor: ignore[cache-poisoning]
         with:
           node-version: "22"
-          registry-url: "https://registry.npmjs.org"
 
       # Trusted publishing needs npm 11.5.1 or newer, which is newer than the
       # npm bundled with the Node images. Pinned to a major rather than @latest:
