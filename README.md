@@ -86,6 +86,7 @@ kbdlight auto off         disable the ambient light sensor
 kbdlight auto on          re-enable it
 kbdlight list             print keyboard backlight IDs
 kbdlight sun on           follow sunrise and sunset (see below)
+kbdlight sleep            dark now, max at sunrise, then it disarms
 kbdlight --help
 ```
 
@@ -146,6 +147,41 @@ sun mode started.
 `auto` and `sun` are independent and compose. `auto` is the hardware ambient
 sensor reacting to the room right now; `sun` is a schedule. `--day auto` hands
 the daylight hours back to the sensor and keeps the evening on a fixed level.
+
+## Until sunrise
+
+One night, one command:
+
+```sh
+kbdlight sleep
+```
+
+The backlight goes dark now and comes back at full brightness at the next
+sunrise, and then the schedule removes itself. It is the answer to "I want to
+sleep and this thing is glowing at me", which is a different question from "put
+my keyboard on the sky's schedule from now on".
+
+```
+dark until 21.8.2026, 06:16:37 (sunrise), then 1.00
+until sunrise: on
+  where    48.14, 11.58 (manual)
+  sunrise  06:16   sunset 20:17
+  now      sleep, level off
+  wake     21.8.2026, 06:16:37 to 1.00, then it disarms itself
+  agent    loaded (checks every 5 min)
+```
+
+`--wake <0.0-1.0|auto>` picks the morning level instead of full, `--level` the
+level until then instead of off, and `--at` / `--rise-offset` mean what they
+mean in sun mode. Run it at two in the afternoon and it still goes dark and
+still waits for tomorrow morning: "until sunrise" is taken literally rather than
+re-read as "which side of the sun are we on", which would wake it up in the same
+breath.
+
+Cancel it early with `kbdlight sun off`. The one-shot deliberately shares sun
+mode's state file and its single `launchd` agent: two schedules writing the same
+keyboard inside the same five-minute tick is a race, and the loser is whichever
+one you happen to notice. Arming either one replaces the other.
 
 ## Node API
 

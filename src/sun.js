@@ -48,7 +48,7 @@ const CLI = path.join(__dirname, '..', 'bin', 'kbdlight.js');
 // sunset, coarse enough that the wakeups are free.
 const TICK_SECONDS = 300;
 
-const DEFAULTS = { night: 0.6, day: 0, riseOffset: 0, setOffset: 0 };
+const DEFAULTS = { night: 0.6, day: 0, wake: 1, riseOffset: 0, setOffset: 0 };
 
 // --- state ----------------------------------------------------------------
 
@@ -108,10 +108,51 @@ function parseOffset(input, what) {
 
 // --- the decision ---------------------------------------------------------
 
+// The next sunrise strictly after `now`, offset included, or null where the sun
+// is not going to rise at all. Today's sunrise is already behind us for most of
+// the hours anyone arms this in, hence the fall through to tomorrow.
+function nextSunrise(now, cfg) {
+  const shift = (d) => new Date(d.getTime() + (cfg.riseOffset || 0) * 60000);
+
+  const today = solar.timesFor(now, cfg.lat, cfg.lon);
+  if (!today.polar && shift(today.sunrise) > now) return shift(today.sunrise);
+
+  const tomorrow = solar.timesForNextDay(now, cfg.lat, cfg.lon);
+  if (!tomorrow.polar) return shift(tomorrow.sunrise);
+
+  return null;
+}
+
+// One-shot mode: dark from the moment it is armed until one named instant, then
+// a single write and the schedule takes itself out.
+//
+// It deliberately does NOT ask which side of the sun we are on. "Until sunrise"
+// arms at 02:00 and at 14:00 with the same meaning, and a phase machine would
+// answer "it is day, so wake up" to the second one and undo the request in the
+// same breath.
+function oncePlan(now, cfg) {
+  const wakeAt = new Date(cfg.wakeAt);
+  const woke = now >= wakeAt;
+  const today = solar.timesFor(now, cfg.lat, cfg.lon);
+
+  return {
+    phase: woke ? 'wake' : 'sleep',
+    level: woke ? cfg.wake : cfg.night,
+    sunrise: today.sunrise,
+    sunset: today.sunset,
+    next: woke ? null : wakeAt,
+    polar: today.polar,
+    once: true,
+    wakeAt,
+  };
+}
+
 // Pure: given an instant and a config, say which phase we are in, what level
 // that phase wants, and when it changes next. No hardware, no files, so the
 // interesting part is testable without a keyboard or a particular date.
 function plan(now, cfg) {
+  if (cfg.once) return oncePlan(now, cfg);
+
   const lat = cfg.lat;
   const lon = cfg.lon;
   const riseOffset = cfg.riseOffset || 0;
@@ -275,11 +316,40 @@ function enable(opts = {}) {
     error: null,
   };
 
+  // One-shot mode pins the instant now, at arming time, rather than recomputing
+  // "the next sunrise" on every tick: five minutes after the switch, the next
+  // sunrise is the one a day later, and a job that keeps moving its own finish
+  // line never finishes.
+  if (opts.once) {
+    cfg.once = true;
+    cfg.wake = opts.wake != null ? parseLevel(opts.wake, '--wake') : DEFAULTS.wake;
+    const wakeAt = nextSunrise(new Date(), cfg);
+    if (!wakeAt) {
+      throw new Error(
+        'no sunrise is coming at ' +
+          cfg.lat.toFixed(2) +
+          ', ' +
+          cfg.lon.toFixed(2) +
+          ' (polar night); use "kbdlight sun on --night 0 --day 1" instead'
+      );
+    }
+    cfg.wakeAt = wakeAt.toISOString();
+  }
+
   write(cfg);
   writePlist();
   loadAgent();
 
   return { config: cfg, rearmed: !!prev, applied: apply({ force: true }) };
+}
+
+// "Dark now, back up at sunrise, then forget about it." The whole feature is
+// one call into enable(), because sharing sun mode's state file and its single
+// launchd agent is what keeps two schedules from writing the same keyboard in
+// the same tick and leaving whichever lost the race.
+function sleepUntilSunrise(opts = {}) {
+  const r = enable(Object.assign({ night: 0 }, opts, { once: true }));
+  return { config: r.config, wakeAt: new Date(r.config.wakeAt), rearmed: r.rearmed };
 }
 
 // Disarm, and put the keyboard back the way sun mode found it. "Dark until
@@ -329,6 +399,20 @@ function apply(opts = {}) {
     throw e;
   }
 
+  // The one-shot is done the moment it has written the waking level. It removes
+  // its own agent and state rather than idling until the user remembers it: a
+  // schedule nobody asked for any more is the thing that surprises you at
+  // sunset, when it would otherwise go dark again.
+  //
+  // State first, agent second, and not the other way round: booting out this
+  // job kills the process running these lines, so anything left for "after"
+  // may never happen. A leftover state file would then read as armed forever.
+  if (cfg.once && p.phase === 'wake') {
+    forget();
+    unloadAgent();
+    return { ran: true, done: true, plan: p };
+  }
+
   write(
     Object.assign({}, cfg, {
       phase: p.phase,
@@ -349,6 +433,8 @@ function status(now = new Date()) {
 
 module.exports = {
   enable,
+  sleepUntilSunrise,
+  nextSunrise,
   disable,
   apply,
   status,

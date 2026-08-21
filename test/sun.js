@@ -134,6 +134,62 @@ const hours = (a, b) => (b - a) / 3600000;
   assert.throws(() => sun.parseOffset('9000', '--set-offset'), /--set-offset/, 'a silly offset is refused');
 }
 
+// --- until sunrise, the one-shot ------------------------------------------
+
+{
+  const base = { lat: BERLIN.lat, lon: BERLIN.lon, night: 0, wake: 1, once: true };
+
+  // Berlin sunrise on 21 August 2026 is 03:59 UTC. Armed the night before, the
+  // one-shot has to hold the keyboard dark right through it and then let go.
+  const wakeAt = sun.nextSunrise(new Date('2026-08-21T00:01:00Z'), base);
+  assert.ok(
+    Math.abs(utcMinutes(wakeAt) - (3 * 60 + 59)) <= 3,
+    'the next sunrise after midnight is this morning, got ' + wakeAt.toISOString()
+  );
+
+  const cfg = { ...base, wakeAt: wakeAt.toISOString() };
+  const at = (iso) => sun.plan(new Date(iso), cfg);
+
+  assert.strictEqual(at('2026-08-21T00:01:00Z').phase, 'sleep', 'armed at night, still asleep');
+  assert.strictEqual(at('2026-08-21T00:01:00Z').level, 0, 'asleep means dark');
+  assert.deepStrictEqual(at('2026-08-21T00:01:00Z').next, wakeAt, 'the only switch left is sunrise');
+  assert.strictEqual(at('2026-08-21T03:58:00Z').phase, 'sleep', 'a minute before sunrise, still dark');
+  assert.strictEqual(at('2026-08-21T04:05:00Z').phase, 'wake', 'past sunrise it wakes');
+  assert.strictEqual(at('2026-08-21T04:05:00Z').level, 1, 'waking means full brightness');
+  assert.strictEqual(at('2026-08-21T04:05:00Z').next, null, 'nothing is scheduled after the wake');
+
+  // Sunset must not move it. This is the difference between the one-shot and
+  // sun mode, and the bug it exists to avoid: going dark again the same evening.
+  assert.strictEqual(at('2026-08-21T21:00:00Z').phase, 'wake', 'the evening does not re-arm it');
+
+  // Armed in the afternoon, "until sunrise" means tomorrow's, not the one that
+  // already happened this morning.
+  const afternoon = new Date('2026-08-21T12:00:00Z');
+  const tomorrow = sun.nextSunrise(afternoon, base);
+  assert.ok(tomorrow > afternoon, 'the next sunrise is always in the future');
+  assert.ok(
+    hours(afternoon, tomorrow) > 12 && hours(afternoon, tomorrow) < 20,
+    'armed at midday, it waits for tomorrow morning, got ' + tomorrow.toISOString()
+  );
+  assert.strictEqual(
+    sun.plan(afternoon, { ...base, wakeAt: tomorrow.toISOString() }).phase,
+    'sleep',
+    'armed in daylight it still goes dark, because that is what was asked for'
+  );
+
+  // A sunrise offset has to move the instant the schedule is pinned to.
+  const later = sun.nextSunrise(new Date('2026-08-21T00:01:00Z'), { ...base, riseOffset: 45 });
+  assert.strictEqual(later - wakeAt, 45 * 60000, '--rise-offset shifts the wake');
+
+  // Polar night: there is no sunrise to wait for, and inventing one would leave
+  // a keyboard dark for months.
+  assert.strictEqual(
+    sun.nextSunrise(new Date('2026-12-21T12:00:00Z'), { ...base, lat: 78.22, lon: 15.65 }),
+    null,
+    'no sunrise is coming during the polar night'
+  );
+}
+
 // --- coordinates ----------------------------------------------------------
 
 {
@@ -206,7 +262,14 @@ const hours = (a, b) => (b - a) / 3600000;
 
   const plain = run(['--help'], { NO_COLOR: '1', FORCE_COLOR: '' });
   assert.ok(!plain.includes('\u001b['), 'NO_COLOR help carries no escape codes');
-  for (const expected of ['kbdlight sun on', '--night', '--rise-offset', 'kbdlight pulse']) {
+  for (const expected of [
+    'kbdlight sun on',
+    '--night',
+    '--rise-offset',
+    'kbdlight pulse',
+    'kbdlight sleep',
+    '--wake',
+  ]) {
     assert.ok(plain.includes(expected), 'help documents ' + expected);
   }
 
@@ -230,6 +293,17 @@ const hours = (a, b) => (b - a) / 3600000;
     /unknown sub-command/,
     'a bad sun sub-command fails loudly'
   );
+
+  assert.throws(
+    () => execFileSync(process.execPath, [BIN, 'sleep', 'tight'], { stdio: 'pipe' }),
+    /takes no arguments/,
+    'sleep refuses a positional argument rather than ignoring it'
+  );
+  assert.throws(
+    () => execFileSync(process.execPath, [BIN, 'sleep', '--wake'], { stdio: 'pipe' }),
+    /--wake needs a value/,
+    'a flag with no value is refused before anything is armed'
+  );
 }
 
-console.log('PASS: solar, plan, coordinates, colour, help');
+console.log('PASS: solar, plan, until-sunrise, coordinates, colour, help');

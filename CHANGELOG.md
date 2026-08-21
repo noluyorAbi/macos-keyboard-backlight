@@ -8,6 +8,23 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-08-21
+
+### Added
+
+- `kbdlight sleep`: dark from now until the next sunrise, full brightness then,
+  and the schedule takes itself out afterwards. The one-shot of sun mode, for
+  the night you want to sleep rather than the schedule you want from now on.
+  Options: `--wake` (the level at sunrise, default full), `--level` (the level
+  until then, default off), `--at` and `--rise-offset`.
+- The wake instant is pinned when the command is armed rather than recomputed on
+  every tick, so the switch cannot keep moving its own finish line, and it is
+  taken literally: armed in the afternoon it still goes dark and still waits for
+  the following morning.
+- It shares sun mode's state file and its single `launchd` agent by design.
+  Two schedules writing the same keyboard within one tick is a race; arming
+  either mode now replaces the other rather than running beside it.
+
 ## [1.1.0] - 2026-08-01
 
 ### Added
@@ -61,5 +78,7 @@ and this project adheres to
   auto-brightness state afterwards, skipping cleanly on hosts without a backlit
   keyboard.
 
-[Unreleased]: https://github.com/noluyorAbi/macos-keyboard-backlight/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/noluyorAbi/macos-keyboard-backlight/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/noluyorAbi/macos-keyboard-backlight/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/noluyorAbi/macos-keyboard-backlight/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/noluyorAbi/macos-keyboard-backlight/releases/tag/v1.0.0

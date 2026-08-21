@@ -23,6 +23,7 @@ const USAGE = [
   { cmd: 'list', desc: 'print keyboard backlight IDs' },
   { cmd: 'pulse', arg: '[count]', desc: 'blink as a notification, then restore (default 4)' },
   { cmd: 'sun', arg: '[on|off]', desc: 'follow sunrise and sunset (see below)' },
+  { cmd: 'sleep', desc: 'dark now, back to max at sunrise, then done' },
   {
     raw: (c) => c.prog('kbdlight') + ' ' + c.flag('-h') + ' | ' + c.flag('--help'),
     desc: 'show this help',
@@ -45,6 +46,16 @@ const SUN = [
   { flag: '--rise-offset', arg: '<min>', desc: 'shift the sunrise switch, + later, - earlier' },
   { flag: '--set-offset', arg: '<min>', desc: 'shift the sunset switch the same way' },
   { flag: '--force', desc: 'apply even if the phase has not changed' },
+];
+
+const SLEEP = [
+  { cmd: 'sleep', desc: 'dark now, max at sunrise, then it disarms' },
+  { blank: true },
+  { flag: '--wake', arg: '<0.0-1.0|auto>', desc: 'level at sunrise (default 1, full)' },
+  { flag: '--level', arg: '<0.0-1.0|auto>', desc: 'level until then (default 0, off)' },
+  { flag: '--at', arg: '<lat,lon>', desc: 'coordinates (default: the system timezone)' },
+  { flag: '--rise-offset', arg: '<min>', desc: 'shift the sunrise switch, + later, - earlier' },
+  { blank: true, note: 'Cancel it early with "kbdlight sun off": the two share one schedule.' },
 ];
 
 const PULSE = [
@@ -72,6 +83,10 @@ const NOTES = [
   'schedule computed from sunrise and sunset at your coordinates, so it tracks',
   'the season instead of a clock time. They compose: --day auto hands the',
   'daylight hours back to the sensor and keeps the evening on a fixed level.',
+  '',
+  '"kbdlight sleep" is the one-shot of the same idea: dark from now until the',
+  'next sunrise, full brightness then, and the schedule removes itself. One',
+  'night, rather than every night.',
   '',
   '"kbdlight pulse" restores the exact brightness and auto-brightness state it',
   'found, so it is safe to fire from an editor hook or a scheduled job. Use',
@@ -107,6 +122,8 @@ function help(stream, argv) {
     renderSection('Usage', USAGE, c) +
     '\n\n' +
     renderSection('Sun mode', SUN, c) +
+    '\n\n' +
+    renderSection('Until sunrise', SLEEP, c) +
     '\n\n' +
     renderSection('Pulse options', PULSE, c) +
     '\n\n' +
@@ -273,7 +290,7 @@ function printSunStatus(c) {
   const cfg = s.config;
   const p = s.plan;
 
-  out.push(c.head('sun mode: ') + c.ok('on'));
+  out.push(c.head(cfg.once ? 'until sunrise: ' : 'sun mode: ') + c.ok('on'));
   row(
     'where',
     c.value(cfg.lat.toFixed(2) + ', ' + cfg.lon.toFixed(2)) + ' ' + c.note('(' + cfg.source + ')')
@@ -286,7 +303,15 @@ function printSunStatus(c) {
   }
 
   row('now', c.value(p.phase) + ', level ' + c.value(levelText(p.level)));
-  row('next', p.next ? c.value(p.next.toLocaleString()) : c.note('no switch until the season turns'));
+  if (cfg.once) {
+    row(
+      'wake',
+      c.value(p.wakeAt.toLocaleString()) +
+        c.note(' to ' + levelText(cfg.wake) + ', then it disarms itself')
+    );
+  } else {
+    row('next', p.next ? c.value(p.next.toLocaleString()) : c.note('no switch until the season turns'));
+  }
   row(
     'agent',
     (s.agent ? c.ok('loaded') : c.err('MISSING, nothing will switch')) +
@@ -344,6 +369,54 @@ function sunCommand(args, c) {
     default:
       fail('sun: unknown sub-command "' + sub + '" (try: on, off, apply)');
   }
+}
+
+// --- sleep ----------------------------------------------------------------
+
+// Same shape as the two parsers above, and the same reason for the table: an
+// unconsumed value would be read as a sub-command that does not exist.
+// "--level" rather than "--night", because the whole point of this command is
+// that it does not care whether it is night when you run it.
+const SLEEP_VALUE_FLAGS = {
+  wake: 'wake',
+  level: 'night',
+  at: 'at',
+  'rise-offset': 'riseOffset',
+};
+
+function parseSleepArgs(args) {
+  const opts = {};
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (!arg.startsWith('--')) fail('sleep takes no arguments, got "' + arg + '"');
+
+    const name = arg.slice(2);
+    if (SLEEP_VALUE_FLAGS[name]) {
+      const v = args[i + 1];
+      if (v == null || v.startsWith('--')) fail('--' + name + ' needs a value');
+      opts[SLEEP_VALUE_FLAGS[name]] = v;
+      i++;
+    } else if (name !== 'color' && name !== 'no-color') {
+      fail('sleep: unknown option "' + arg + '"');
+    }
+  }
+
+  return opts;
+}
+
+function sleepCommand(args, c) {
+  const sun = require('../src/sun.js');
+  const r = sun.sleepUntilSunrise(parseSleepArgs(args));
+
+  process.stdout.write(
+    'dark until ' +
+      c.value(r.wakeAt.toLocaleString()) +
+      c.note(' (sunrise), then ') +
+      c.value(levelText(r.config.wake)) +
+      '\n'
+  );
+  return printSunStatus(c);
 }
 
 // --- main -----------------------------------------------------------------
@@ -408,6 +481,9 @@ function main(argv) {
 
       case 'sun':
         return sunCommand(argv.slice(1), colors(process.stdout, argv));
+
+      case 'sleep':
+        return sleepCommand(argv.slice(1), colors(process.stdout, argv));
 
       default:
         fail('unknown command "' + cmd + '"\n\n' + help(process.stderr, argv));
