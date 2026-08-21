@@ -44,18 +44,29 @@ jobs:
       # it is the one job where a cache entry poisoned by an earlier, less
       # trusted workflow run could end up inside a published tarball. The extra
       # thirty seconds of a cold install is worth removing that path entirely.
-      # No "registry-url:" here, and that is the whole reason trusted publishing
-      # works. Given one, setup-node writes an .npmrc holding
-      # //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN} and points
-      # NPM_CONFIG_USERCONFIG at it. There is no NODE_AUTH_TOKEN in this
-      # workflow on purpose, so that expands to an empty credential, npm counts
-      # itself as already authenticated, never attempts the OIDC exchange, and
-      # the registry answers a bare "404 Not Found - PUT" that reads like a
-      # missing package rather than a missing credential. Cost us three failed
-      # runs on v1.2.0. npm defaults to registry.npmjs.org anyway.
+      # "registry-url:" is the usual suspect when a trusted-publishing job fails,
+      # and it is worth writing down that it was tried and cleared, so the next
+      # person does not spend the afternoon on it again.
+      #
+      # It is a suspect because setup-node reacts to it by writing a temporary
+      # .npmrc holding //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN} and
+      # pointing NPM_CONFIG_USERCONFIG at it. This workflow deliberately has no
+      # NODE_AUTH_TOKEN, so that expands to an empty credential.
+      #
+      # On 2026-08-21, with v1.2.0 failing at "404 Not Found - PUT", the line was
+      # removed to test that theory. The result was worse: npm then had no
+      # credential at all, stopped at ENEEDAUTH, and no longer even reached the
+      # provenance signing it had managed before. So the empty credential is not
+      # what suppresses the OIDC exchange, and the line stays.
+      #
+      # What "404 Not Found - PUT" on an already published package means is that
+      # the credential holds no publish right on that name; npm answers 404
+      # rather than 403 so a probe cannot learn whether a package exists. The
+      # thing to check is the trusted publisher on npmjs.com, not this file.
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0 # zizmor: ignore[cache-poisoning]
         with:
           node-version: "22"
+          registry-url: "https://registry.npmjs.org"
 
       # Trusted publishing needs npm 11.5.1 or newer, which is newer than the
       # npm bundled with the Node images. Pinned to a major rather than @latest:
